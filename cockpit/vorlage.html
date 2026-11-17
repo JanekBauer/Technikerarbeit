@@ -159,7 +159,7 @@ svg text{font-family:var(--f-body)}
 .vnode .vtxt{min-width:0;flex:1 1 240px}
 </style>
 
-<style>#pcsync,#zipall,#zipallv,#updbtn,[data-zip],[data-dl],#archup{display:none!important}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
+<style>#pcsync,#zipall,#zipallv,#updbtn,[data-zip]{display:none!important}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
 <div class="app">
   <nav id="nav" aria-label="Bereiche"></nav>
   <main id="main"><div class="empty">Cockpit wird geladen …</div></main>
@@ -219,11 +219,32 @@ svg text{font-family:var(--f-body)}
     };}
   };}
   var db={collection:coll};
+  function clean(x){return String(x).replace(/[\\\/:*?"<>|#%]+/g,"_").trim();}
+  function encPath(p){return p.split("/").map(encodeURIComponent).join("/");}
+  function toB64File(file){return file.arrayBuffer().then(function(buf){var by=new Uint8Array(buf),bin="";for(var i=0;i<by.length;i+=0x8000)bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));return btoa(bin);});}
+  /* Datei als Commit nach docs/archiv/<Ordner>/<Dokument>/<Version>_<Name> legen */
+  function upload(file,o){
+    o=o||{};
+    if(file.size>20*1048576)return Promise.reject(new Error("Datei zu groß (max. 20 MB)"));
+    var rel="archiv/"+clean(o.folder||"Sonstiges")+"/"+clean(o.family||"Dokument")+"/"+clean(o.ver||"V1")+"_"+clean(file.name);
+    return toB64File(file).then(function(b64){
+      function put(path,n){
+        return api("/contents/docs/"+encPath(path),{method:"PUT",body:JSON.stringify({message:"Cockpit: Datei hochgeladen – "+file.name+" (Web)",content:b64,branch:BRANCH})})
+          .then(function(){return {id:path,path:path};})
+          .catch(function(e){
+            if((e.status===422||e.status===409)&&n<1)return put(path.replace(/(\.[^.\/]+)?$/,"_"+Date.now()+"$1"),n+1);
+            throw e;
+          });
+      }
+      return put(rel,0);
+    });
+  }
   window.claude={use:function(n){
     if(n==="db")return Promise.resolve(db);
     if(n==="user")return Promise.resolve({can:function(){return Promise.resolve(!!tok());}});
     if(n==="sample")return Promise.resolve({json:function(){return Promise.reject({code:"unavailable"});}});
-    if(n==="assets")return Promise.resolve({upload:function(){return Promise.reject({code:"read_only"});}});
+    if(n==="assets")return Promise.resolve({upload:upload});
+    if(n==="downloads")return Promise.resolve({save:function(o){var u=URL.createObjectURL(o.data);var a=document.createElement("a");a.href=u;a.download=o.filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},10000);return Promise.resolve();}});
     return Promise.resolve(null);
   }};
   /* Knopf: Zugriffstoken speichern oder entfernen */
@@ -371,7 +392,7 @@ function render(){
   let pre="";
   if(S.offline)pre+=`<div class="banner">Die Datenbank des Cockpits ist in dieser Ansicht nicht erreichbar. Öffne die Seite angemeldet auf claude.ai, dann erscheinen deine Daten.</div>`;
   else if(S.slow)pre+=`<div class="banner">Die Daten antworten gerade langsam. Angezeigtes kann veraltet sein.</div>`;
-  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen oben rechts „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Die Dateien selbst liegen im GitHub-Ordner „Archiv“ bzw. im PC-Archiv.</div>`;
+  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen oben rechts „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Hoch- und Herunterladen von Dateien geht im Archiv.</div>`;
   if(S.msg)pre+=`<div class="banner">${esc(S.msg)}</div>`;
   $("#main").innerHTML=pre+v();
   S.dirty=false;
@@ -931,7 +952,9 @@ const fext=n=>{const m=/\.([a-z0-9]+)$/i.exec(n||"");return m?m[1].toLowerCase()
 const verNum=v=>{const m=/(\d+)/.exec(v||"");return m?+m[1]:0;};
 const fsize=b=>!b?"":b>=1048576?f2(b/1048576,1)+" MB":Math.max(1,Math.round(b/1024))+" KB";
 const fileMime=f=>f.mime||XMIME[fext(f.name)]||"";
-function fileUrl(f){return f.url||"";}
+const PAGES="https://janekbauer02-cell.github.io/Technikerarbeit/",RAWB="https://raw.githubusercontent.com/janekbauer02-cell/Technikerarbeit/main/docs/";
+const encPath=p=>p.split("/").map(encodeURIComponent).join("/");
+function fileUrl(f){if(f.url)return f.url;if(f.src==="repo"&&f.path)return (location.protocol==="file:"?PAGES:"")+encPath(f.path);return "";}
 function archRows(){return S.data.files.map(f=>Object.assign({},f,{folder:f.folder||(f.deadline?"9 Uploads zu Terminen":"9 Sonstiges"),family:f.family||f.name||"Datei",seq:(f.seq!==""&&f.seq!=null&&isFinite(+f.seq))?+f.seq:verNum(f.ver)}));}
 function archTree(){const t={};archRows().forEach(r=>{const fo=t[r.folder]=t[r.folder]||{};(fo[r.family]=fo[r.family]||[]).push(r);});
   Object.values(t).forEach(fams=>Object.values(fams).forEach(v=>v.sort((a,b)=>(b.seq-a.seq)||(b.date||"").localeCompare(a.date||"")||(b.updated||"").localeCompare(a.updated||""))));return t;}
@@ -955,17 +978,14 @@ Stand laut Cockpit: zuletzt abgeglichen ${st.at?new Date(st.at).toLocaleString("
 const famOrder=fams=>Object.keys(fams).sort((a,b)=>{const oa=Math.min(...fams[a].map(x=>x.order==null?999:x.order)),ob=Math.min(...fams[b].map(x=>x.order==null?999:x.order));return (oa-ob)||a.localeCompare(b,"de");});
 function nextVer(folder,family){const t=archTree();const v=(t[folder]&&t[folder][family])||[];if(!v.length)return "V1";const mx=Math.max(...v.map(x=>x.seq||0));return "V"+(mx+1);}
 
-async function storeFile(file){
-  const e=fext(file.name);let mime=(file.type||"").split(";")[0];
-  if(!NATIVE.test(mime))mime=XMIME[e]||mime||"application/octet-stream";
-  if(NATIVE.test(mime)){const a=await S.assets.upload(file,{type:mime});return {assetId:a.id,size:file.size,mime,src:"asset"};}
-  if(file.size>14*1048576)throw new Error("Datei zu groß (max. 14 MB für Word/Excel)");
-  const buf=new Uint8Array(await file.arrayBuffer());let bin="";for(let i=0;i<buf.length;i+=0x8000)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000));
-  const a=await S.assets.upload(new Blob([btoa(bin)],{type:"text/plain"}),{type:"text/plain"});
-  return {assetId:a.id,size:file.size,mime,src:"asset",enc:"b64"};
+async function storeFile(file,o){
+  const e=fext(file.name);const mime=XMIME[e]||(file.type||"").split(";")[0]||"application/octet-stream";
+  if(/Quotation|Angebot|RM0|IP0|Spez_|\.eml$/i.test(file.name)&&!confirm("Der Dateiname sieht nach einer vertraulichen Betriebsunterlage aus (Angebot, Spezifikation, Mail). Das Repo ist ÖFFENTLICH. Wirklich hochladen?"))throw new Error("Abgebrochen: möglicherweise vertrauliche Datei.");
+  const a=await S.assets.upload(file,Object.assign({type:mime},o||{}));
+  return {src:"repo",path:a.path,size:file.size,mime};
 }
 async function getBlob(f){
-  if(!fileUrl(f))throw new Error("Die Datei liegt im PC-Archiv, nicht in der Web-Fassung.");const r=await fetch(fileUrl(f));if(!r.ok)throw new Error("Datei nicht erreichbar ("+r.status+")");
+  if(!fileUrl(f))throw new Error("Die Datei liegt im PC-Archiv, nicht in der Web-Fassung.");let r=await fetch(fileUrl(f));if(!r.ok&&f.src==="repo"&&f.path)r=await fetch(RAWB+encPath(f.path));if(!r.ok)throw new Error("Datei nicht erreichbar ("+r.status+"). Frisch hochgeladene Dateien sind nach ca. 1 Minute da.");
   if(f.enc==="b64"){const bin=atob((await r.text()).trim());const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:fileMime(f)});}
   return await r.blob();
 }
@@ -993,6 +1013,7 @@ async function dlZip(folders,all,btn){const o=btn.textContent;btn.disabled=true;
   btn.disabled=false;btn.textContent=o;}
 
 function fileBtns(f,small){if(!f||f.missing)return "";const sm=small?" sm":"";
+  if(!fileUrl(f))return (S.canWrite&&!S.offline)?`<button class="btn${sm}" data-upslot="${esc(f.id)}">Datei hinzufügen</button>`:`<span class="small muted">noch nicht im Web-Archiv</span>`;
   const view=VIEWABLE.test(fileMime(f))&&f.enc!=="b64"?`<a class="btn${sm}" href="${esc(fileUrl(f))}" target="_blank" rel="noopener">Öffnen</a>`:"";
   return view+`<button class="btn${sm}${small?"":" pri"}" data-dl="${esc(f.id)}">Herunterladen</button>`;}
 VIEWS.dateien=()=>{
@@ -1000,15 +1021,15 @@ VIEWS.dateien=()=>{
   const folders=Object.keys(t).sort((a,b)=>a.localeCompare(b,"de",{numeric:true}));
   let nDoc=0,nFile=0,nMiss=0;folders.forEach(fo=>Object.values(t[fo]).forEach(v=>{nDoc++;v.forEach(x=>x.missing?nMiss++:nFile++);}));
   const openF=lsGet("archOpen",null);S.archVer=S.archVer||{};
-  let h=`<div class="head"><div><span class="tag">Ablage · auch ohne Laptop</span><h1>Archiv</h1><p>Alle Unterlagen der Technikerarbeit in Ordnern. Jedes Dokument zeigt seine neueste Version; über „Verlauf“ kommst du an jede ältere Version. Graue Einträge sind Versionen, deren Datei noch fehlt – dort kannst du sie nachreichen. Dateien aus deinen Chats legt Claude hier automatisch mit ab.</p></div>
+  let h=`<div class="head"><div><span class="tag">Ablage · auch ohne Laptop</span><h1>Archiv</h1><p>Alle Unterlagen der Technikerarbeit in Ordnern. Jedes Dokument zeigt seine neueste Version; über „Verlauf“ kommst du an jede ältere Version. Hochgeladene Dateien liegen im GitHub-Ordner docs/archiv und sind öffentlich sichtbar. Einträge „noch ohne Datei“ kannst du mit „Datei hinzufügen“ nachreichen.</p></div>
    <div class="facts">${can?`<button class="btn pri" id="archup">Datei hochladen</button>`:""}<button class="btn" id="pcsync" aria-expanded="${S.syncOpen?"true":"false"}">PC-Ordner abgleichen</button><button class="btn" id="zipall">Alles als ZIP</button><button class="btn" id="zipallv">ZIP mit allen Versionen</button></div></div>
    ${(()=>{const st=pcState(),pend=pcPending();const bar=`<div class="toolbar"><span class="small muted">PC-Ordner zuletzt abgeglichen: ${st.at?new Date(st.at).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"noch nie"}</span> ${pend.length?pill(pend.length+" Dateien noch nicht auf dem PC","p-warn"):pill("PC-Ordner aktuell","p-ok")}</div>`;
-     if(!S.syncOpen)return bar;
+     return "";
      return bar+`<div class="panel" style="margin-bottom:14px"><div class="toolbar" style="justify-content:space-between"><b>PC-Ordner an das Archiv angleichen</b><button class="btn sm" id="syncclose">Schließen</button></div>
      <p class="small" style="margin:4px 0 8px">Die Seite selbst kommt nicht an deinen PC. Das macht Claude: PC und Claude-Desktop-App einschalten, Text kopieren, in einen Chat im Projekt Technikerarbeit einfügen und senden. Claude legt dann alles, was fehlt, in <span class="mono">${esc(PCROOT)}</span> ab – mit derselben Ordnerstruktur wie hier, ältere Versionen unter „_Versionen“. Gelöscht wird nichts.</p>
      <textarea class="out" id="copybox" readonly style="min-height:190px">${esc(syncPrompt())}</textarea>
      <div class="toolbar" style="margin-top:8px"><button class="btn pri" id="synccopy">Kopieren</button><span class="small muted">PC gerade nicht erreichbar? Dann „ZIP mit allen Versionen“ laden und in den Ordner entpacken.</span></div></div>`;})()}
-   ${!S.assets&&!S.offline?`<div class="banner">Diese Liste zeigt nur, was es gibt. Die Dateien selbst holst du aus dem GitHub-Ordner „Archiv“.</div>`:""}
+   
    <div class="toolbar">${pill(nDoc+" Dokumente","p-acc")} ${pill(nFile+" Dateien","p-ok")} ${nMiss?pill(nMiss+" Versionen fehlen","p-warn"):""} <input id="archq" type="search" placeholder="Suchen …" aria-label="Archiv durchsuchen" style="flex:1 1 180px;max-width:320px"></div>`;
   if(!folders.length)h+=`<div class="empty">Noch keine Dateien im Archiv.</div>`;
   folders.forEach(fo=>{const fams=t[fo];const ks=famOrder(fams);const isOpen=openF?openF.includes(fo):/Aufgabenstellung|Pflichtenheft/.test(fo);
@@ -1018,11 +1039,11 @@ VIEWS.dateien=()=>{
       h+=`<div class="fam" data-s="${esc(s_)}"><div class="famrow"><div class="fn"><b>${esc(fam)}</b> ${nw?pill(nw.ver||"aktuell","p-ok"):pill("Datei fehlt","p-warn")} ${top.missing&&nw?pill((top.ver||"neuere Version")+" fehlt noch","p-warn"):""}
         <div class="small muted">${nw?esc(nw.name)+" · "+(nw.date?fd(nw.date):"")+(nw.size?" · "+fsize(nw.size):""):esc(top.note||"")}</div></div>
         <div class="facts">${fileBtns(nw)}${can?`<button class="btn" data-upnew="${esc(key)}">Neue Version</button>`:""}<button class="btn" data-vtog="${esc(key)}" aria-expanded="${vOpen}">Verlauf (${vs.length})</button></div></div>
-        <div class="vtree" ${vOpen?"":"hidden"}>${vs.map(v=>`<div class="vnode${v.missing?" miss":""}"><div class="vtxt"><span class="vk">${esc(v.ver||"–")}</span> ${v===nw?pill("neueste","p-ok"):""}${v.missing?pill("fehlt","p-warn"):onPc(v)?pill("auf PC","p-ok"):pill("nicht auf PC","")} <span class="small muted num">${v.date?fd(v.date):""}${v.size?" · "+fsize(v.size):""}</span>
+        <div class="vtree" ${vOpen?"":"hidden"}>${vs.map(v=>`<div class="vnode${v.missing?" miss":""}"><div class="vtxt"><span class="vk">${esc(v.ver||"–")}</span> ${v===nw?pill("neueste","p-ok"):""}${v.missing?pill("fehlt","p-warn"):fileUrl(v)?pill("im Web-Archiv","p-ok"):pill("noch ohne Datei","")} <span class="small muted num">${v.date?fd(v.date):""}${v.size?" · "+fsize(v.size):""}</span>
           <div class="small">${v.missing?"":esc(v.name)}${v.note?`<div class="muted">${nl(v.note)}</div>`:""}</div></div>
           <div class="facts">${v.missing?(can?`<button class="btn sm pri" data-upslot="${esc(v.id)}">Datei hochladen</button>`:""):fileBtns(v,true)}${S.canWrite&&!S.offline?`<button class="btn sm" data-edit="files" data-id="${esc(v.id)}">Bearbeiten</button>`:""}</div></div>`).join("")}</div></div>`;});
     h+=`</div></details>`;});
-  return h+`<p class="note">Word- und Excel-Dateien werden beim Hochladen verpackt gespeichert und beim Herunterladen wieder als Originaldatei ausgegeben. Größenlimit pro Datei: ca. 14 MB.</p>`;
+  return h+`<p class="note">Größenlimit pro Datei: 20 MB. Jeder Upload ist ein Commit im Repo; Claude Code zu Hause holt die Dateien mit „git pull“. Keine vertraulichen Betriebsunterlagen hochladen (öffentliches Repo).</p>`;
 };
 VIEWS_after.dateien=()=>{
   document.querySelectorAll("[data-fold]").forEach(d=>d.addEventListener("toggle",()=>{lsSet("archOpen",[...document.querySelectorAll("[data-fold]")].filter(x=>x.open).map(x=>x.dataset.fold));}));
@@ -1044,7 +1065,7 @@ function openUpload(p){
   const famList=fo=>t[fo]?famOrder(t[fo]):[];
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-label="Datei ins Archiv hochladen">
    <h2>${p.slot?"Fehlende Version nachreichen":p.family?"Neue Version: "+esc(p.family):"Datei ins Archiv hochladen"}</h2>
-   <form class="form" id="upform" onsubmit="return false">
+   <p class="small" style="margin:0 0 8px"><b>Hinweis:</b> Das Repo ist öffentlich. Keine Angebote, Spezifikationen oder Mails des Betriebs hochladen.</p><form class="form" id="upform" onsubmit="return false">
     <label for="u_file">Datei<input id="u_file" type="file" required></label>
     <label for="u_fold">Ordner<select id="u_fold">${folders.map(f=>`<option ${f===fo0?"selected":""}>${esc(f)}</option>`).join("")}<option value="__new">＋ Neuer Ordner …</option></select></label>
     <label for="u_foldn" id="u_foldnl" hidden>Name des neuen Ordners<input id="u_foldn" type="text" placeholder="z. B. 9 CAD-Zeichnungen"></label>
@@ -1062,9 +1083,9 @@ function openUpload(p){
   $("#u_file").onchange=()=>{const f=$("#u_file").files[0];if(f&&!fam.value.trim()){fam.value=f.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ");sugg();}};
   $("#u_go").onclick=async()=>{const f=$("#u_file").files[0];const m=$("#u_msg");if(!f){m.textContent="Bitte zuerst eine Datei wählen.";return;}
     const folder=curFold(),family=fam.value.trim()||f.name;const go=$("#u_go");go.disabled=true;m.textContent="Lädt hoch …";
-    try{const st=await storeFile(f);const v=ver.value.trim()||"V1";const base=p.slot?(S.data.files.find(x=>x.id===p.slot)||{}):{};
+    try{const st=await storeFile(f,{folder,family,ver:ver.value.trim()||"V1"});const v=ver.value.trim()||"V1";const base=p.slot?(S.data.files.find(x=>x.id===p.slot)||{}):{};
       const kind=base.kind||(/Aufgabenstellung/.test(folder)?"Aufgabenstellung":/Pflichtenheft/.test(folder)?"Pflichtenheft":/Projektplan/.test(folder)?"Projektplan":/Recherche/.test(folder)?"Datenblatt":/Schule/.test(folder)?"Schule":"Sonstiges");
-      const rec=Object.assign({},base,st,{name:f.name,folder,family,ver:v,seq:verNum(v)||base.seq||1,date:$("#u_date").value,note:$("#u_note").value,kind,missing:false,by:"Janek"});delete rec.path;delete rec.url;
+      const rec=Object.assign({},base,st,{name:f.name,folder,family,ver:v,seq:verNum(v)||base.seq||1,date:$("#u_date").value,note:$("#u_note").value,kind,missing:false,by:"Janek"});delete rec.enc;delete rec.assetId;delete rec.url;
       const ok=await save("files",p.slot||null,rec);if(ok){S.archVer[folder+"|"+family]=true;const op=lsGet("archOpen",null);if(op&&!op.includes(folder))lsSet("archOpen",op.concat([folder]));closeModal();}else go.disabled=false;}
     catch(e){go.disabled=false;m.textContent="Hochladen hat nicht geklappt: "+(e&&(e.code==="unsupported_type"?"Dateityp wird nicht unterstützt":e.code==="quota_exceeded"?"Speicher voll":e.message)||"unbekannter Fehler");}};
 }

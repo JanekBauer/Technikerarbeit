@@ -18,3 +18,11 @@ Das Token bleibt nur im Browser. Danach speichern „Bearbeiten“ und „Lösch
 in `cockpit/daten/*.json`. Eine GitHub-Action (`.github/workflows/cockpit-bauen.yml`) baut
 `docs/index.html` danach neu; die Seite zeigt Änderungen nach ca. 1 Minute auch nach einem Neuladen.
 Claude liest beim nächsten `git pull` die geänderten Daten (siehe `CLAUDE.md`).
+
+## Dateien hoch- und herunterladen
+Im Archiv gibt es „Datei hochladen“, „Neue Version“ und „Datei hinzufügen“. Die Datei wird als Commit nach
+`docs/archiv/<Ordner>/<Dokument>/<Version>_<Name>` gelegt (max. 20 MB), der Eintrag landet in `cockpit/daten/files.json`.
+Herunterladen geht direkt über die Seite (frisch hochgeladene Dateien nach ca. 1 Minute).
+Das Repo ist öffentlich: keine vertraulichen Betriebsunterlagen hochladen. Dateinamen mit Angebot, Quotation, RM0, IP0, Spez_
+oder .eml löst eine Rückfrage aus.
+Claude Code zu Hause bekommt die Dateien mit `git pull` (Ordner `docs/archiv`).
