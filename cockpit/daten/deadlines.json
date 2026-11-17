@@ -12,5 +12,6 @@
 {"id":"d12","title":"Präsentationsprüfung Tag 1","date":"2027-06-17","approx":false,"kind":"schule","status":"geplant","note":"Termin freihalten"},
 {"id":"d13","title":"Präsentationsprüfung Tag 2","date":"2027-06-18","approx":false,"kind":"schule","status":"geplant","note":"Termin freihalten"},
 {"id":"d14","title":"Variantenauswahl (betrieblicher MS)","date":"2026-12-04","approx":false,"kind":"betrieb","status":"geplant","note":"Im PH V8.7 gesetzt (Janek, 06.11.); Bestätigung Hr. Baidinger offen"},
-{"id":"d15","title":"Konstruktionsfreigabe (betrieblicher MS)","date":"2027-01-22","approx":false,"kind":"betrieb","status":"geplant","note":"Im PH V8.7 gesetzt (Janek, 06.11.); Bestätigung Hr. Baidinger offen"}
+{"id":"d15","title":"Konstruktionsfreigabe (betrieblicher MS)","date":"2027-01-22","approx":false,"kind":"betrieb","status":"geplant","note":"Im PH V8.7 gesetzt (Janek, 06.11.); Bestätigung Hr. Baidinger offen"},
+{"id": "d-test-20270501", "title": "Test", "date": "2027-05-01", "approx": false, "kind": "schule", "status": "geplant", "note": ""}
 ]
