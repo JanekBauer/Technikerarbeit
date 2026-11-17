@@ -12,7 +12,7 @@ Nicht enthalten: vertrauliche Betriebsdateien (Spezifikationen, Angebote, Mails,
 und die Dateien selbst. Die Dateiliste zeigt nur Metadaten.
 
 ## Bearbeiten im Cockpit
-Unten links „Bearbeiten freischalten“ wählen und ein GitHub-Zugriffstoken einfügen
+Oben rechts „Bearbeiten freischalten“ wählen und ein GitHub-Zugriffstoken einfügen
 (fein abgestuftes Token, nur dieses Repo, Berechtigung „Contents: Read and write“).
 Das Token bleibt nur im Browser. Danach speichern „Bearbeiten“ und „Löschen“ direkt als Commit
 in `cockpit/daten/*.json`. Eine GitHub-Action (`.github/workflows/cockpit-bauen.yml`) baut

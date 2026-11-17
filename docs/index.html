@@ -159,7 +159,7 @@ svg text{font-family:var(--f-body)}
 .vnode .vtxt{min-width:0;flex:1 1 240px}
 </style>
 
-<style>#pcsync,#zipall,#zipallv,#updbtn,[data-zip],[data-dl],#archup{display:none!important}</style>
+<style>#pcsync,#zipall,#zipallv,#updbtn,[data-zip],[data-dl],#archup{display:none!important}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
 <div class="app">
   <nav id="nav" aria-label="Bereiche"></nav>
   <main id="main"><div class="empty">Cockpit wird geladen …</div></main>
@@ -201,7 +201,7 @@ svg text{font-family:var(--f-body)}
     });
   }
   function fail(e){
-    alert("Speichern bei GitHub hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nPrüfe das Zugriffstoken (Knopf unten links).");
+    alert("Speichern bei GitHub hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nPrüfe das Zugriffstoken (Knopf oben rechts).");
     throw {code:"write_failed"};
   }
   function label(b,id){return String(b&&(b.title||b.name||b.q||b.text||b.fn||b.family)||id).slice(0,60);}
@@ -229,7 +229,7 @@ svg text{font-family:var(--f-body)}
   /* Knopf: Zugriffstoken speichern oder entfernen */
   var b=document.createElement("button");
   b.id="ghbtn";b.className="btn sm";
-  b.style.cssText="position:fixed;left:12px;bottom:12px;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.3)";
+  b.style.cssText="position:fixed;right:14px;top:8px;z-index:50;font-size:12px;padding:3px 10px;opacity:.8";b.title="GitHub-Zugriffstoken für Bearbeiten und Löschen";
   b.textContent=tok()?"Bearbeiten aktiv · Token ändern":"Bearbeiten freischalten";
   b.onclick=function(){
     var t=prompt("GitHub-Zugriffstoken einfügen. Es bleibt nur in diesem Browser gespeichert.\nLeer lassen und OK = Verbindung trennen.");
@@ -371,7 +371,7 @@ function render(){
   let pre="";
   if(S.offline)pre+=`<div class="banner">Die Datenbank des Cockpits ist in dieser Ansicht nicht erreichbar. Öffne die Seite angemeldet auf claude.ai, dann erscheinen deine Daten.</div>`;
   else if(S.slow)pre+=`<div class="banner">Die Daten antworten gerade langsam. Angezeigtes kann veraltet sein.</div>`;
-  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen unten links „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Die Dateien selbst liegen im GitHub-Ordner „Archiv“ bzw. im PC-Archiv.</div>`;
+  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen oben rechts „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Die Dateien selbst liegen im GitHub-Ordner „Archiv“ bzw. im PC-Archiv.</div>`;
   if(S.msg)pre+=`<div class="banner">${esc(S.msg)}</div>`;
   $("#main").innerHTML=pre+v();
   S.dirty=false;
