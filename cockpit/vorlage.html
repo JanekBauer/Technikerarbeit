@@ -63,6 +63,16 @@ main{padding-block:22px 60px;padding-left:max(24px,env(safe-area-inset-left,0px)
 .fmore{position:relative;display:inline-block}
 .fpop{position:absolute;z-index:30;left:0;top:calc(100% + 4px);min-width:max-content;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .fpop .fchip{max-width:none}
+.w150{max-width:150px}
+.sensT th{white-space:normal;vertical-align:bottom}
+.sensT .fchip{max-width:170px}
+.dmore>summary{color:var(--accent);font-size:13px;white-space:nowrap}
+.dmore>summary::before{content:"▸ "}
+.dmore[open]>summary::before{content:"▾ "}
+.dpop{right:0;left:auto;width:420px;min-width:0;max-width:70vw}
+.dpop dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13px}
+.dpop dt{color:var(--muted);white-space:nowrap}
+.dpop dd{margin:0}
 .kat .fmore>summary{color:var(--accent);margin-top:4px}
 .kat .fmore>summary::before{content:"▸ "}
 .kat .fmore[open]>summary::before{content:"▾ "}
@@ -327,7 +337,7 @@ const LISTS = {
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
   sensors:{coll:"sensors",title:"Sensorvergleich",
-    fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["rep","Wiederholgenauigkeit (mit Einheit, z. B. ±0,1 µm)","text"],["acc","Genauigkeit/Linearität (µm)","num"],["rate","Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
+    fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["variant","Variante/Größe","text"],["range","1 Messbereich (Text)","text"],["fittxt","Deckt Ø 1,0–6,5 mm? (ja/nein/knapp …)","text"],["rep","2 Wiederholgenauigkeit (mit Einheit)","text"],["repcond","2 Bedingungen dazu","area"],["lin","3 Messgenauigkeit / Linearität","text"],["pos","4 Zulässige Lage im Messfeld","area"],["axes","6 Messachsen","text"],["build","7 Bauform / freier Durchgang","area"],["trig","8 Trigger / Encoder","text"],["light","9 Lichtquelle / Laserklasse","text"],["acc","Genauigkeit (µm, Zahl, alt)","num"],["rate","5 Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
   sources:{coll:"sources",title:"Quellenverzeichnis",
     fields:[["nr","Nr.","num"],["kind","Art","select",["Buch","Sammelwerk","Zeitschrift","Internet","Norm","Datenblatt","Besprechung","Sonstiges"]],["text","Quellenangabe (nach UP5-Schema)","area"],["accessed","Stand/Zugriff","date"],["used","Wo verwendet","text"]],def:{kind:"Buch"}},
   doku:{coll:"doku",title:"Doku-Speicher",
@@ -831,21 +841,25 @@ VIEWS.sensoren=()=>{
   const rng=r=>r.rmin!==""&&r.rmin!=null?f2(r.rmin)+"–"+f2(r.rmax)+" mm":"–";
   const fit=r=>r.rmin!==""&&r.rmin!=null&&r.rmax!==""&&r.rmax!=null?(r.rmin<=1&&r.rmax>=6.5?pill("ja","p-ok"):pill("nein","p-bad")):pill("offen");
   let prev="";
+  const fitP=r=>{const t=String(r.fittxt||"");if(!t)return fit(r);const c=/^ja/i.test(t)?(/knapp/i.test(t)?"p-warn":"p-ok"):/^nein/i.test(t)?"p-bad":"";return `<span title="${esc(t)}">${pill(/^ja/i.test(t)?(/knapp/i.test(t)?"knapp":"ja"):/^nein/i.test(t)?"nein":"offen",c)}</span>`;};
+  const det=r=>{const L=[["1 Messbereich",r.range],["Ø 1,0–6,5 mm",r.fittxt],["2 Wiederholgenauigkeit",r.rep],["2 Bedingungen",r.repcond],["3 Genauigkeit/Linearität",r.lin],["4 Lage im Messfeld",r.pos],["5 Abtastrate",r.rate],["6 Messachsen",r.axes],["7 Bauform/Durchgang",r.build],["8 Trigger/Encoder",r.trig],["9 Lichtquelle/Laserklasse",r.light],["Quelle",r.source],["Notiz",r.note]].filter(z=>z[1]!=null&&z[1]!=="");
+    if(!L.length)return `<span class="muted">–</span>`;
+    return `<details class="fmore dmore" data-noedit><summary>9 Punkte</summary><div class="fpop dpop"><dl>${L.map(z=>`<dt>${esc(z[0])}</dt><dd>${esc(z[1])}</dd>`).join("")}</dl></div></details>`;};
   const cols=[["nr","Nr.",r=>`<span class="num">${esc(r.nr||"")}</span>`],
     ["maker","Hersteller",r=>{const m=r.maker===prev?"":esc(r.maker);prev=r.maker;return m;}],
-    ["model","Modell",r=>`<b>${esc(r.model)}</b>`],
+    ["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],
     ["docs","Datenblatt",docs],
-    ["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],
-    ["fit","Ø 1,0–6,5",fit],
-    ["rep","Wiederhol&shy;genauigkeit",r=>`<span class="num">${esc(r.rep||"–")}</span>`],
-    ["acc","Genauigkeit",r=>`<span class="num">${r.acc!==""&&r.acc!=null?f2(r.acc)+" µm":"–"}</span>`],
-    ["rate","Abtastrate",r=>`<span class="small">${esc(r.rate||"–")}</span>`],
-    ["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
+    ["r","1 Messbereich",r=>`<span class="small clamp w150" title="${esc(r.range||"")}">${esc(r.range||rng(r))}</span>`],
+    ["fit","Ø 1,0–6,5",fitP],
+    ["rep","2 Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}"><b>${esc(r.rep||"–")}</b>${r.repcond&&r.repcond!=="–"?` <span class="muted">(${esc(r.repcond)})</span>`:""}</span>`],
+    ["lin","3 Genauig&shy;keit",r=>`<span class="small clamp w150" title="${esc(r.lin||"")}">${esc(r.lin||"–")}</span>`],
+    ["rate","5 Abtastrate",r=>`<span class="small">${esc(r.rate||"–")}</span>`],
+    ["det","Alle Werte",det]];
   const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
   return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Aufbau wie die OneNote-Seite „Sensoren Datenblättern“. Werte nur aus Datenblättern übernehmen, Quelle beim Bearbeiten eintragen. Zeile anklicken zum Bearbeiten.</p></div>${newBtn("sensors","Neuer Sensor")}</div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Was aus jedem Datenblatt herauslesen?</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
-  ${listTable("sensors",on,cols)}
+  <div class="sensT">${listTable("sensors",on,cols)}</div>
   ${rest.length?`<details class="restbox"><summary>Weitere Sensoren aus der Recherche (${rest.length}, nicht auf der OneNote-Seite)</summary>${listTable("sensors",rest,restCols)}</details>`:""}`;
 };
 
