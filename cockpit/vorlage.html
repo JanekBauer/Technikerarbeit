@@ -48,6 +48,28 @@ main{padding-block:22px 60px;padding-left:max(24px,env(safe-area-inset-left,0px)
 .btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:var(--r);cursor:pointer}
 .btn:hover{border-color:var(--accent)}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.katrow{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px}
+.kat{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:8px 10px;min-width:200px}
+.fchip{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:2px 4px 2px 0;max-width:230px;vertical-align:middle;background:var(--panel)}
+.fchip a,.fchip>span{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;color:var(--ink);text-decoration:none;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fchip a:hover{background:var(--accent-soft)}
+.fchip b{font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--bad);letter-spacing:.03em}
+.fchip i{font-style:normal;color:var(--muted);font-size:12px}
+.fdl{border:0;border-left:1px solid var(--line);background:transparent;color:var(--muted);padding:0 8px;cursor:pointer;font-size:12px}
+.fdl:hover{color:var(--accent);background:var(--accent-soft)}
+.fmore>summary{list-style:none;cursor:pointer;display:inline-block}
+.fmore>summary::-webkit-details-marker{display:none}
+.fcount{font-size:12px;color:var(--accent);font-weight:600}
+.fmore{position:relative;display:inline-block}
+.fpop{position:absolute;z-index:30;left:0;top:calc(100% + 4px);min-width:max-content;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.fpop .fchip{max-width:none}
+.kat .fmore>summary{color:var(--accent);margin-top:4px}
+.kat .fmore>summary::before{content:"▸ "}
+.kat .fmore[open]>summary::before{content:"▾ "}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:280px}
+.hintbox,.restbox{margin:10px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:8px 12px}
+.hintbox>summary,.restbox>summary{cursor:pointer;font-weight:600}
+.restbox .tbl{margin-top:8px}
 .btn.sm{padding:3px 8px;font-size:13px}
 .btn.danger{color:var(--bad);border-color:var(--bad)}
 .btn:disabled{opacity:.5;cursor:default}
@@ -305,7 +327,7 @@ const LISTS = {
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
   sensors:{coll:"sensors",title:"Sensorvergleich",
-    fields:[["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["acc","Genauigkeit/Wiederholbarkeit (µm)","num"],["rate","Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
+    fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["rep","Wiederholgenauigkeit (mit Einheit, z. B. ±0,1 µm)","text"],["acc","Genauigkeit/Linearität (µm)","num"],["rate","Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
   sources:{coll:"sources",title:"Quellenverzeichnis",
     fields:[["nr","Nr.","num"],["kind","Art","select",["Buch","Sammelwerk","Zeitschrift","Internet","Norm","Datenblatt","Besprechung","Sonstiges"]],["text","Quellenangabe (nach UP5-Schema)","area"],["accessed","Stand/Zugriff","date"],["used","Wo verwendet","text"]],def:{kind:"Buch"}},
   doku:{coll:"doku",title:"Doku-Speicher",
@@ -791,9 +813,40 @@ VIEWS_after.rechner=()=>{
 };
 
 VIEWS.sensoren=()=>{
-  const rows=S.data.sensors.slice();
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Werte nur aus Datenblättern übernehmen, Quelle eintragen. Mindestens einen zweiten Hersteller neben Keyence prüfen.</p></div>${newBtn("sensors","Neuer Sensor")}</div>`+
-  listTable("sensors",rows,[["maker","Hersteller"],["model","Modell"],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${r.rmin!==""&&r.rmin!=null?f2(r.rmin)+"–"+f2(r.rmax)+" mm":"–"}</span>`],["acc","Genauigkeit",r=>`<span class="num">${r.acc!==""&&r.acc!=null?f2(r.acc)+" µm":"–"}</span>`],["rate","Abtastrate",r=>`<span class="small">${esc(r.rate)}</span>`],["fit","Ø 1,0–6,5 mm",r=>r.rmin!==""&&r.rmin!=null&&r.rmax!==""&&r.rmax!=null?(r.rmin<=1&&r.rmax>=6.5?pill("ja","p-ok"):pill("nein","p-bad")):pill("offen")],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Datenblätter",r=>(r.docs||[]).map(id=>{const f=S.data.files.find(x=>x.id===id);if(!f)return "";const pg=(r.pages||{})[id]||"";const n=(pg.match(/\d+/)||[])[0];const u=fileUrl(f);return `<div style="margin:4px 0 8px"><div class="small"><b>${esc(f.name)}</b></div>${pg?`<div class="small muted">Prospekt/Katalog – ${esc(pg)}</div>`:`<div class="small muted">Datenblatt (ganzes Dokument)</div>`}${u&&n?`<a class="btn sm" href="${esc(u)}#page=${n}" target="_blank" rel="noopener">Öffnen auf S. ${n}</a><button class="btn sm" data-dl="${esc(f.id)}">Herunterladen</button>`:fileBtns(f,true)}</div>`;}).join("")||"–"],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]]);
+  const all=S.data.sensors.slice();
+  const on=all.filter(r=>r.ord!=null&&r.ord!=="").sort((a,b)=>a.ord-b.ord);
+  const rest=all.filter(r=>!(r.ord!=null&&r.ord!==""));
+  const fById=id=>S.data.files.find(x=>x.id===id);
+  const short=n=>String(n||"").replace(/\.pdf$/i,"").replace(/_Datasheet$/i,"").replace(/^cat--/,"").replace(/--de$/,"");
+  const ext=f=>{const m=/\.([a-z0-9]+)$/i.exec(f.name||"");return m?m[1].toUpperCase():"DATEI";};
+  const chip=(f,pg,lab)=>{const u=fileUrl(f);const href=u?esc(u)+(pg?"#page="+pg:""):"";
+    return `<span class="fchip">${href?`<a href="${href}" target="_blank" rel="noopener" title="${esc(f.name)}${pg?" – S. "+pg:""} öffnen"><b>${ext(f)}</b>${esc(lab||short(f.name))}${pg?` <i>S. ${pg}</i>`:""}</a>`:`<span title="noch nicht im Web-Archiv"><b>${ext(f)}</b>${esc(lab||short(f.name))}</span>`}<button class="fdl" data-dl="${esc(f.id)}" title="Herunterladen" aria-label="Herunterladen">⬇</button></span>`;};
+  const docs=r=>{const fs=(r.docs||[]).map(fById).filter(Boolean);if(!fs.length)return `<span class="muted">–</span>`;
+    if(fs.length===1)return `<div data-noedit>${chip(fs[0])}</div>`;
+    return `<details class="fmore" data-noedit><summary>${chip(fs[0])} <span class="fcount">+${fs.length-1}</span></summary><div class="fpop">${fs.slice(1).map(f=>chip(f)).join("")}</div></details>`;};
+  const kat=getTool("sensorkat",{items:[],hint:""});
+  const katHtml=(kat.items||[]).map(k=>{const f=fById(k.file);if(!f)return "";
+    const jumps=(k.pages||[]).map(([t,p])=>chip(f,p,t)).join("");
+    return `<div class="kat"><div class="small muted">${esc(k.label)}</div>${chip(f)}${jumps?`<details class="fmore" data-noedit><summary class="small">Seiten im Katalog (${k.pages.length})</summary><div class="fpop">${jumps}</div></details>`:""}</div>`;}).join("");
+  const rng=r=>r.rmin!==""&&r.rmin!=null?f2(r.rmin)+"–"+f2(r.rmax)+" mm":"–";
+  const fit=r=>r.rmin!==""&&r.rmin!=null&&r.rmax!==""&&r.rmax!=null?(r.rmin<=1&&r.rmax>=6.5?pill("ja","p-ok"):pill("nein","p-bad")):pill("offen");
+  let prev="";
+  const cols=[["nr","Nr.",r=>`<span class="num">${esc(r.nr||"")}</span>`],
+    ["maker","Hersteller",r=>{const m=r.maker===prev?"":esc(r.maker);prev=r.maker;return m;}],
+    ["model","Modell",r=>`<b>${esc(r.model)}</b>`],
+    ["docs","Datenblatt",docs],
+    ["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],
+    ["fit","Ø 1,0–6,5",fit],
+    ["rep","Wiederhol&shy;genauigkeit",r=>`<span class="num">${esc(r.rep||"–")}</span>`],
+    ["acc","Genauigkeit",r=>`<span class="num">${r.acc!==""&&r.acc!=null?f2(r.acc)+" µm":"–"}</span>`],
+    ["rate","Abtastrate",r=>`<span class="small">${esc(r.rate||"–")}</span>`],
+    ["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
+  const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Aufbau wie die OneNote-Seite „Sensoren Datenblättern“. Werte nur aus Datenblättern übernehmen, Quelle beim Bearbeiten eintragen. Zeile anklicken zum Bearbeiten.</p></div>${newBtn("sensors","Neuer Sensor")}</div>
+  <div class="katrow">${katHtml}</div>
+  ${kat.hint?`<details class="hintbox"><summary>Was aus jedem Datenblatt herauslesen?</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
+  ${listTable("sensors",on,cols)}
+  ${rest.length?`<details class="restbox"><summary>Weitere Sensoren aus der Recherche (${rest.length}, nicht auf der OneNote-Seite)</summary>${listTable("sensors",rest,restCols)}</details>`:""}`;
 };
 
 /* ---------- Morphologischer Kasten ---------- */
@@ -1263,6 +1316,7 @@ ${JSON.stringify(ctx)}`;
 /* ---------- Events ---------- */
 document.addEventListener("click",ev=>{
   const dl=ev.target.closest("[data-dl]");if(dl){ev.preventDefault();ev.stopPropagation();const f=S.data.files.find(x=>x.id===dl.dataset.dl);if(f)dlFile(f,dl);return;}
+  if(ev.target.closest("[data-noedit],.fchip a"))return;
   const tt=ev.target.closest("[data-termin]");if(tt&&!S.modalOpen){ev.preventDefault();openTermin(tt.dataset.termin);return;}
   const tk=ev.target.closest("[data-task]");if(tk&&!S.modalOpen){ev.preventDefault();openTask(tk.dataset.task);return;}
   const t=ev.target.closest("[data-new],[data-edit],[data-close]");if(!t)return;
