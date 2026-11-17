@@ -954,7 +954,7 @@ const fsize=b=>!b?"":b>=1048576?f2(b/1048576,1)+" MB":Math.max(1,Math.round(b/10
 const fileMime=f=>f.mime||XMIME[fext(f.name)]||"";
 const PAGES="https://janekbauer02-cell.github.io/Technikerarbeit/",RAWB="https://raw.githubusercontent.com/janekbauer02-cell/Technikerarbeit/main/docs/";
 const encPath=p=>p.split("/").map(encodeURIComponent).join("/");
-function fileUrl(f){if(f.url)return f.url;if(f.src==="repo"&&f.path)return (location.protocol==="file:"?PAGES:"")+encPath(f.path);return "";}
+function fileUrl(f){if(f.url)return f.url;if(f.path)return (location.protocol==="file:"?PAGES:"")+encPath(f.path);return "";}
 function archRows(){return S.data.files.map(f=>Object.assign({},f,{folder:f.folder||(f.deadline?"9 Uploads zu Terminen":"9 Sonstiges"),family:f.family||f.name||"Datei",seq:(f.seq!==""&&f.seq!=null&&isFinite(+f.seq))?+f.seq:verNum(f.ver)}));}
 function archTree(){const t={};archRows().forEach(r=>{const fo=t[r.folder]=t[r.folder]||{};(fo[r.family]=fo[r.family]||[]).push(r);});
   Object.values(t).forEach(fams=>Object.values(fams).forEach(v=>v.sort((a,b)=>(b.seq-a.seq)||(b.date||"").localeCompare(a.date||"")||(b.updated||"").localeCompare(a.updated||""))));return t;}
@@ -985,7 +985,7 @@ async function storeFile(file,o){
   return {src:"repo",path:a.path,size:file.size,mime};
 }
 async function getBlob(f){
-  if(!fileUrl(f))throw new Error("Die Datei liegt im PC-Archiv, nicht in der Web-Fassung.");let r=await fetch(fileUrl(f));if(!r.ok&&f.src==="repo"&&f.path)r=await fetch(RAWB+encPath(f.path));if(!r.ok)throw new Error("Datei nicht erreichbar ("+r.status+"). Frisch hochgeladene Dateien sind nach ca. 1 Minute da.");
+  if(!fileUrl(f))throw new Error("Die Datei liegt im PC-Archiv, nicht in der Web-Fassung.");let r=await fetch(fileUrl(f));if(!r.ok&&f.path)r=await fetch(RAWB+encPath(f.path));if(!r.ok)throw new Error("Datei nicht erreichbar ("+r.status+"). Frisch hochgeladene Dateien sind nach ca. 1 Minute da.");
   if(f.enc==="b64"){const bin=atob((await r.text()).trim());const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:fileMime(f)});}
   return await r.blob();
 }
