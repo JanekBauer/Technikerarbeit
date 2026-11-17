@@ -832,8 +832,9 @@ VIEWS.sensoren=()=>{
   const chip=(f,pg,lab)=>{const u=fileUrl(f);const href=u?esc(u)+(pg?"#page="+pg:""):"";
     return `<span class="fchip">${href?`<a href="${href}" target="_blank" rel="noopener" title="${esc(f.name)}${pg?" – S. "+pg:""} öffnen"><b>${ext(f)}</b>${esc(lab||short(f.name))}${pg?` <i>S. ${pg}</i>`:""}</a>`:`<span title="noch nicht im Web-Archiv"><b>${ext(f)}</b>${esc(lab||short(f.name))}</span>`}<button class="fdl" data-dl="${esc(f.id)}" title="Herunterladen" aria-label="Herunterladen">⬇</button></span>`;};
   const docs=r=>{const fs=(r.docs||[]).map(fById).filter(Boolean);if(!fs.length)return `<span class="muted">–</span>`;
-    if(fs.length===1)return `<div data-noedit>${chip(fs[0])}</div>`;
-    return `<details class="fmore" data-noedit><summary>${chip(fs[0])} <span class="fcount">+${fs.length-1}</span></summary><div class="fpop">${fs.slice(1).map(f=>chip(f)).join("")}</div></details>`;};
+    const pg=f=>(r.pages||{})[f.id]||"";const lb=f=>pg(f)?(/manual|micrometers/i.test(f.name)?"Handbuch":"Katalog"):undefined;
+    if(fs.length===1)return `<div data-noedit>${chip(fs[0],pg(fs[0]),lb(fs[0]))}</div>`;
+    return `<details class="fmore" data-noedit><summary>${chip(fs[0],pg(fs[0]),lb(fs[0]))} <span class="fcount">+${fs.length-1}</span></summary><div class="fpop">${fs.slice(1).map(f=>chip(f,pg(f),lb(f))).join("")}</div></details>`;};
   const kat=getTool("sensorkat",{items:[],hint:""});
   const katHtml=(kat.items||[]).map(k=>{const f=fById(k.file);if(!f)return "";
     const jumps=(k.pages||[]).map(([t,p])=>chip(f,p,t)).join("");
@@ -853,14 +854,15 @@ VIEWS.sensoren=()=>{
     ["fit","Ø 1,0–6,5",fitP],
     ["rep","2 Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}"><b>${esc(r.rep||"–")}</b>${r.repcond&&r.repcond!=="–"?` <span class="muted">(${esc(r.repcond)})</span>`:""}</span>`],
     ["lin","3 Genauig&shy;keit",r=>`<span class="small clamp w150" title="${esc(r.lin||"")}">${esc(r.lin||"–")}</span>`],
-    ["rate","5 Abtastrate",r=>`<span class="small">${esc(r.rate||"–")}</span>`],
+    ["rate","5 Abtastrate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],
     ["det","Alle Werte",det]];
   const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Aufbau wie die OneNote-Seite „Sensoren Datenblättern“. Werte nur aus Datenblättern übernehmen, Quelle beim Bearbeiten eintragen. Zeile anklicken zum Bearbeiten.</p></div>${newBtn("sensors","Neuer Sensor")}</div>
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div>${newBtn("sensors","Neuer Sensor")}</div>
   <div class="katrow">${katHtml}</div>
-  ${kat.hint?`<details class="hintbox"><summary>Was aus jedem Datenblatt herauslesen?</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
+  ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
-  ${rest.length?`<details class="restbox"><summary>Weitere Sensoren aus der Recherche (${rest.length}, nicht auf der OneNote-Seite)</summary>${listTable("sensors",rest,restCols)}</details>`:""}`;
+  ${rest.length?`<details class="restbox"><summary>Weitere Sensoren ohne Nummer (${rest.length})</summary>${listTable("sensors",rest,restCols)}</details>`:""}
+  ${(kat.excluded||[]).length?`<details class="restbox"><summary>Nicht aufgenommen – Messbereich deckt Ø 1,0–6,5 mm nicht ab (${kat.excluded.length})</summary><table class="small"><tbody>${kat.excluded.map(e=>`<tr><td><b>${esc(e[0])}</b></td><td>${esc(e[1])}</td></tr>`).join("")}</tbody></table></details>`:""}`;
 };
 
 /* ---------- Morphologischer Kasten ---------- */
