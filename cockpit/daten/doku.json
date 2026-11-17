@@ -1,0 +1,11 @@
+[
+{"id":"k01","nr":"1.","title":"Einleitung","status":"Idee","pagesPlan":2,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Problem, Ziel, Bearbeitungsschritte; Firmenvorstellung nur so weit nötig"},
+{"id":"k02","nr":"2.","title":"Ist-Zustand und Problemanalyse","status":"Idee","pagesPlan":5,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Rundgang 23.10.: 100-%-Sichtprüfung im WE, Rundheit/Maßhaltigkeit nur über Lieferantendokumente, Fehler fallen beim Laserschneiden auf"},
+{"id":"k03","nr":"3.","title":"Anforderungen","status":"Idee","pagesPlan":4,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Anforderungsliste (F/M/W), Abgrenzung"},
+{"id":"k04","nr":"4.","title":"Messtechnische Grundlagen und Messprinzipien","status":"Idee","pagesPlan":6,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Normbegriffe ISO 1101/12181/14405; Sensorvergleich"},
+{"id":"k05","nr":"5.","title":"Lösungsfindung","status":"Idee","pagesPlan":8,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Funktionsstruktur, Morphologischer Kasten, Varianten"},
+{"id":"k06","nr":"6.","title":"Bewertung und Auswahl","status":"Idee","pagesPlan":4,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Paarweiser Vergleich, Nutzwertanalyse/VDI 2225, Entscheidung Betrieb"},
+{"id":"k07","nr":"7.","title":"Konstruktion der Messanlage","status":"Idee","pagesPlan":10,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. SolidWorks-Baugruppen, Berechnungen (Durchbiegung, Spannkräfte)"},
+{"id":"k08","nr":"8.","title":"Messprozess und Sensorintegration","status":"Idee","pagesPlan":5,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Ablauf vom Einlegen bis zum Prüfergebnis, Taktzeit"},
+{"id":"k09","nr":"9.","title":"Schlussbetrachtung und Ausblick","status":"Idee","pagesPlan":2,"pagesDone":0,"figures":"","refs":"","notes":"Vorschlag Gliederung – anpassen. Soll-Ist-Vergleich gegen PH, Urteil Betrieb, Ausblick (Fließtext)"}
+]
