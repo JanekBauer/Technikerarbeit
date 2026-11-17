@@ -168,25 +168,80 @@ svg text{font-family:var(--f-body)}
 
 <script id="cockpit-data" type="application/json"><!--DATEN--></script>
 <script>
-/* Statische Fassung: ersetzt die Claude-Datenbank durch die eingebetteten Daten (nur Lesen). */
+/* Web-Fassung: ersetzt die Claude-Datenbank. Lesen aus den eingebetteten Daten,
+   Schreiben (Bearbeiten/Löschen) als Commit in cockpit/daten/*.json über die GitHub-API,
+   sobald in diesem Browser ein Zugriffstoken gespeichert ist. */
 (function(){
+  var REPO="janekbauer02-cell/Technikerarbeit",BRANCH="main",DIR="cockpit/daten/";
   var DATA=JSON.parse(document.getElementById("cockpit-data").textContent);
+  var listeners={};
+  function tok(){try{return localStorage.getItem("ta_gh_token")||"";}catch(e){return "";}}
+  function toB64(s){return btoa(unescape(encodeURIComponent(s)));}
+  function fromB64(s){return decodeURIComponent(escape(atob(s.replace(/\s/g,""))));}
+  function api(path,opt){
+    opt=opt||{};
+    opt.headers=Object.assign({"Authorization":"Bearer "+tok(),"Accept":"application/vnd.github+json"},opt.headers||{});
+    return fetch("https://api.github.com/repos/"+REPO+path,opt).then(function(r){
+      if(r.ok)return r.json();
+      return r.text().then(function(t){var e=new Error("GitHub "+r.status+": "+t.slice(0,160));e.status=r.status;throw e;});
+    });
+  }
+  function fmt(arr){return "[\n"+arr.map(function(o){return JSON.stringify(o);}).join(",\n")+"\n]\n";}
+  function snap(c){return {docs:(DATA[c]||[]).map(function(o){var d=Object.assign({},o);var id=d.id;delete d.id;return {id:id,data:function(){return d;}};}),metadata:{fromCache:false}};}
+  function emit(c){(listeners[c]||[]).forEach(function(cb){cb(snap(c));});}
+  function change(c,mutate,msg,tries){
+    tries=tries||0;
+    var path=DIR+c+".json";
+    return api("/contents/"+path+"?ref="+BRANCH).then(function(f){
+      var arr=mutate(JSON.parse(fromB64(f.content)));
+      return api("/contents/"+path,{method:"PUT",body:JSON.stringify({message:msg,content:toB64(fmt(arr)),sha:f.sha,branch:BRANCH})}).then(function(){DATA[c]=arr;emit(c);});
+    }).catch(function(e){
+      if((e.status===409||e.status===422)&&tries<2)return change(c,mutate,msg,tries+1);
+      throw e;
+    });
+  }
+  function fail(e){
+    alert("Speichern bei GitHub hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nPrüfe das Zugriffstoken (Knopf unten links).");
+    throw {code:"write_failed"};
+  }
+  function label(b,id){return String(b&&(b.title||b.name||b.q||b.text||b.fn||b.family)||id).slice(0,60);}
   function coll(c){return {
-    onSnapshot:function(ok){
-      var docs=(DATA[c]||[]).map(function(o){var d=Object.assign({},o);var id=d.id;delete d.id;return {id:id,data:function(){return d;}};});
-      setTimeout(function(){ok({docs:docs,metadata:{fromCache:false}});},0);
-      return function(){};
-    },
-    doc:function(){var ro=function(){return Promise.reject({code:"read_only"});};return {set:ro,delete:ro};}
+    onSnapshot:function(ok){(listeners[c]=listeners[c]||[]).push(ok);setTimeout(function(){ok(snap(c));},0);return function(){};},
+    doc:function(id){return {
+      set:function(body){
+        var obj=Object.assign({id:id},body);
+        return change(c,function(a){var i=a.findIndex(function(x){return x.id===id;});if(i>=0)a[i]=obj;else a.push(obj);return a;},"Cockpit: "+c+" – "+label(body,id)+" gespeichert (Web)").catch(fail);
+      },
+      delete:function(){
+        var old=(DATA[c]||[]).find(function(x){return x.id===id;});
+        return change(c,function(a){return a.filter(function(x){return x.id!==id;});},"Cockpit: "+c+" – "+label(old,id)+" gelöscht (Web)").catch(fail);
+      }
+    };}
   };}
   var db={collection:coll};
   window.claude={use:function(n){
     if(n==="db")return Promise.resolve(db);
-    if(n==="user")return Promise.resolve({can:function(){return Promise.resolve(false);}});
+    if(n==="user")return Promise.resolve({can:function(){return Promise.resolve(!!tok());}});
     if(n==="sample")return Promise.resolve({json:function(){return Promise.reject({code:"unavailable"});}});
     if(n==="assets")return Promise.resolve({upload:function(){return Promise.reject({code:"read_only"});}});
     return Promise.resolve(null);
   }};
+  /* Knopf: Zugriffstoken speichern oder entfernen */
+  var b=document.createElement("button");
+  b.id="ghbtn";b.className="btn sm";
+  b.style.cssText="position:fixed;left:12px;bottom:12px;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.3)";
+  b.textContent=tok()?"Bearbeiten aktiv · Token ändern":"Bearbeiten freischalten";
+  b.onclick=function(){
+    var t=prompt("GitHub-Zugriffstoken einfügen. Es bleibt nur in diesem Browser gespeichert.\nLeer lassen und OK = Verbindung trennen.");
+    if(t===null)return;
+    t=t.trim();
+    try{if(!t){localStorage.removeItem("ta_gh_token");location.reload();return;}localStorage.setItem("ta_gh_token",t);}catch(e){alert("Dieser Browser erlaubt kein Speichern des Tokens.");return;}
+    api("").then(function(r){
+      if(r.permissions&&r.permissions.push){alert("Verbunden mit "+r.full_name+". Du kannst jetzt bearbeiten und löschen.");location.reload();}
+      else{localStorage.removeItem("ta_gh_token");alert("Das Token darf in diesem Repo nichts schreiben. Es braucht „Contents: Read and write“.");}
+    }).catch(function(e){try{localStorage.removeItem("ta_gh_token");}catch(x){}alert("Token wurde abgelehnt: "+e.message);});
+  };
+  document.body.appendChild(b);
 })();
 </script>
 <script>
@@ -316,7 +371,7 @@ function render(){
   let pre="";
   if(S.offline)pre+=`<div class="banner">Die Datenbank des Cockpits ist in dieser Ansicht nicht erreichbar. Öffne die Seite angemeldet auf claude.ai, dann erscheinen deine Daten.</div>`;
   else if(S.slow)pre+=`<div class="banner">Die Daten antworten gerade langsam. Angezeigtes kann veraltet sein.</div>`;
-  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung: Anzeigen ja, Bearbeiten nein. Änderungen führt Claude Code zu Hause aus und veröffentlicht sie über GitHub. Die Dateien selbst liegen im GitHub-Ordner „Archiv“ bzw. im PC-Archiv.</div>`;
+  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen unten links „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Die Dateien selbst liegen im GitHub-Ordner „Archiv“ bzw. im PC-Archiv.</div>`;
   if(S.msg)pre+=`<div class="banner">${esc(S.msg)}</div>`;
   $("#main").innerHTML=pre+v();
   S.dirty=false;

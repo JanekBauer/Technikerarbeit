@@ -1,0 +1,33 @@
+name: Cockpit neu bauen
+
+# Wenn sich die Cockpit-Daten ändern (z. B. durch Bearbeiten im Cockpit oder durch Claude Code),
+# wird docs/index.html automatisch neu erzeugt.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cockpit/daten/**"
+      - "cockpit/vorlage.html"
+      - "cockpit/build.py"
+
+permissions:
+  contents: write
+
+jobs:
+  bauen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Seite bauen
+        run: python3 cockpit/build.py
+      - name: Änderung zurückschreiben
+        run: |
+          if [ -n "$(git status --porcelain docs)" ]; then
+            git config user.name "cockpit-bot"
+            git config user.email "cockpit-bot@users.noreply.github.com"
+            git add docs
+            git commit -m "Cockpit: Seite automatisch neu gebaut"
+            git push
+          else
+            echo "Keine Änderung an docs/"
+          fi

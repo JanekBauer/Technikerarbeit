@@ -1,14 +1,14 @@
 [
-{"id":"p01","name":"Aufgabenstellung","ampel":"gelb","chat":"01 AS/Klärung","order":1,"stand":"AS V4.2 (06.11.) an PH V8.7 angeglichen, 1 Seite; offen: KI-Formulierung (W8), FSL-Prüfung (W5), Unterschriften bis 30.11."},
-{"id":"p02","name":"Pflichtenheft","ampel":"gelb","chat":"02 Pflichtenheft","order":2,"stand":"PH V8.7 final für MS 1 (06.11.), Werte aus Rohrspezifikationen; offen: Freigabe + Unterschrift 20.11., Termin PH-Freigabe im PH anpassen, 5 Formfehler, W10–W14"},
-{"id":"p03","name":"Projektplan (Rillsoft)","ampel":"rot","chat":"03 Projektplan","order":3,"stand":"seit 16.10. unverändert"},
-{"id":"p04","name":"Lösungsansätze (PDF für MS 1)","ampel":"gelb","chat":"05 Messtechnik","order":4,"stand":"1 Idee; Skizze, Denkfragen, 2. Variante, weitere Hersteller fehlen"},
-{"id":"p05","name":"MS-1-Termin + Vor-Ort-Termin","ampel":"rot","chat":"04 Meilensteine","order":5,"stand":"nicht angefragt (Stand 06.11.); MS 1 ca. 16.11."},
-{"id":"p06","name":"Messtechnik-Recherche","ampel":"rot","chat":"05 Messtechnik","order":6,"stand":"nur Keyence betrachtet; PH V8.7 verlangt Ovalität 0,010 mm bei %GRR ≤ 10 % (Streuung < 1 µm) → Herstellervergleich dringend; Übergabe Chat 05 steht aus. Neu im Archiv (06.11.): Keyence-Vorstellung im Betrieb 12.12.2025 mit Vergleichstabelle 7 Mikrometer, LS-9000-Broschüre, Mail und Angebot LS-9030 (Betriebsunterlagen) – in Chat 05 auswerten"},
-{"id":"p07","name":"Spann- und Handhabungskonzept","ampel":"gelb","chat":"06 Spann/Handhabung","order":7,"stand":"Morphologischer Kasten in Chat 06 begonnen (04.11.), V2 am 12.11.: 13 Teilfunktionen + 3 Querschnittsfunktionen, Ideen überwiegend KI-Vorschläge; eigene Ideen nur bei TF1/TF3/TF4; noch keine Gesamtvarianten (Quelle: Cockpit tools/morph, Archiv 20261112_Chat06_Morpho-Kasten_V2)"},
-{"id":"p08","name":"Variantenbewertung","ampel":"grau","chat":"07 Bewertung","order":8,"stand":"noch nicht begonnen"},
-{"id":"p09","name":"CAD-Konstruktion (SolidWorks)","ampel":"grau","chat":"08 CAD","order":9,"stand":"noch nicht begonnen"},
-{"id":"p10","name":"Messprozess, Sensorintegration, Unterlagen","ampel":"grau","chat":"09 Messprozess/Unterlagen","order":10,"stand":"gehört zum Umfang (30.10.); Ablauf nach Variantenwahl"},
-{"id":"p11","name":"Dokumentation","ampel":"grau","chat":"10 Doku","order":11,"stand":"Gliederungsentwurf 19.10.; Doku-Speicher nicht belegt"},
-{"id":"p12","name":"Präsentation","ampel":"grau","chat":"11 Präsentation","order":12,"stand":"ab Mai 2027"}
+{"id": "p01", "name": "Aufgabenstellung", "ampel": "gelb", "chat": "01 AS/Klärung", "order": 1, "stand": "AS V4.2 (06.11.) an PH V8.7 angeglichen, 1 Seite; offen: KI-Formulierung (W8), FSL-Prüfung (W5), Unterschriften bis 30.11."},
+{"id": "p02", "name": "Pflichtenheft", "ampel": "gelb", "chat": "02 Pflichtenheft", "order": 2, "stand": "PH V8.7 final für MS 1 (06.11.), Werte aus Rohrspezifikationen; offen: Freigabe + Unterschrift 20.11., Termin PH-Freigabe im PH anpassen, 5 Formfehler, W10–W14"},
+{"id": "p03", "name": "Projektplan (Rillsoft)", "ampel": "rot", "chat": "03 Projektplan", "order": 3, "stand": "seit 16.10. unverändert"},
+{"id": "p04", "name": "Lösungsansätze (PDF für MS 1)", "ampel": "gelb", "chat": "05 Messtechnik", "order": 4, "stand": "1 Idee; Skizze, Denkfragen, 2. Variante, weitere Hersteller fehlen"},
+{"id": "p05", "name": "MS-1-Termin + Vor-Ort-Termin", "ampel": "rot", "chat": "04 Meilensteine", "order": 5, "stand": "nicht angefragt (Stand 06.11.); MS 1 ca. 16.11."},
+{"id": "p06", "name": "Messtechnik-Recherche", "ampel": "rot", "chat": "05 Messtechnik", "order": 6, "stand": "nur Keyence betrachtet; PH V8.7 verlangt Ovalität 0,010 mm bei %GRR ≤ 10 % (Streuung < 1 µm) → Herstellervergleich dringend; Übergabe Chat 05 steht aus. Neu im Archiv (06.11.): Keyence-Vorstellung im Betrieb 12.12.2025 mit Vergleichstabelle 7 Mikrometer, LS-9000-Broschüre, Mail und Angebot LS-9030 (Betriebsunterlagen) – in Chat 05 auswerten"},
+{"id": "p07", "name": "Spann- und Handhabungskonzept", "ampel": "gelb", "chat": "06 Spann/Handhabung", "order": 7, "stand": "Morphologischer Kasten in Chat 06 begonnen (04.11.), V2 am 12.11.: 13 Teilfunktionen + 3 Querschnittsfunktionen, Ideen überwiegend KI-Vorschläge; eigene Ideen nur bei TF1/TF3/TF4; noch keine Gesamtvarianten (Quelle: Cockpit tools/morph, Archiv 20261112_Chat06_Morpho-Kasten_V2)"},
+{"id": "p08", "name": "Variantenbewertung", "ampel": "grau", "chat": "07 Bewertung", "order": 8, "stand": "noch nicht begonnen"},
+{"id": "p09", "name": "CAD-Konstruktion (SolidWorks)", "ampel": "grau", "chat": "08 CAD", "order": 9, "stand": "noch nicht begonnen"},
+{"id": "p10", "name": "Messprozess, Sensorintegration, Unterlagen", "ampel": "grau", "chat": "09 Messprozess/Unterlagen", "order": 10, "stand": "gehört zum Umfang (30.10.); Ablauf nach Variantenwahl"},
+{"id": "p11", "name": "Dokumentation", "ampel": "grau", "chat": "10 Doku", "order": 11, "stand": "Gliederungsentwurf 19.10.; Doku-Speicher nicht belegt"},
+{"id": "p12", "name": "Präsentation", "ampel": "grau", "chat": "11 Präsentation", "order": 12, "stand": "ab Mai 2027"}
 ]
