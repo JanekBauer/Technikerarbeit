@@ -13,3 +13,6 @@
 - Nach jeder abgeschlossenen Aufgabe: geänderte Dateien committen (Nachricht auf Deutsch: was und warum) und pushen.
 - Ältere Versionen nicht löschen, sondern in den Unterordner `_Versionen` verschieben. Nichts endgültig löschen.
 - Jede KI-Hilfe in `cockpit/daten/kilog.json` bzw. `KI-Logbuch.md` eintragen (Datum, Aufgabe, Art der Hilfe).
+- **Branch-Namen:** Neue Branches heißen `Main_JJJJ-MM-TT_HH-MM`, mit dem Datum und der Uhrzeit (deutsche Zeit,
+  Europe/Berlin) des Erstellungszeitpunkts, z. B. `Main_2026-11-18_16-30`. Die Uhrzeit ermittelt man mit
+  `TZ=Europe/Berlin date +%Y-%m-%d_%H-%M`. Bindestrich statt Doppelpunkt, weil Git Doppelpunkte in Branch-Namen nicht erlaubt.
