@@ -1,0 +1,304 @@
+{
+ "k-20261106-unterlagen": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-06",
+  "ergebnis": "Nur Ablage/Lesen, kein fachlicher Doku-Text erzeugt",
+  "tool": "Claude",
+  "updated": "2026-11-06T15:10:00Z",
+  "zweck": "Ordner 'Unterlagen für das Projekt' gelesen und abgelegt (Keyence-Unterlagen, IP021500507, Spezifikationen inkl. RM021800003); PC-Abgleich 36 Dateien"
+ },
+ "k-20261113-ms1-abgleich": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-13",
+  "ergebnis": "Begriffsangleichung auf Anweisung, kein neuer Fachinhalt; Hinweise auf weitere Abweichungen nur als Feedback",
+  "tool": "Claude",
+  "updated": "2026-11-13T08:15:00Z",
+  "zweck": "Abgleich AS V3 ↔ PH V1 (finale MS-1-Fassungen); Begriff „Rundheit“ in der AS durch „Ovalität“ ersetzt; PH Kap. 6 auf Anweisung geleert; Ablage"
+ },
+ "k-20261113-projektplan": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-13",
+  "ergebnis": "Nur Ablage und Feedback (Terminabweichungen, fehlende Vorgänge); keine Änderung am Plan",
+  "tool": "Claude",
+  "updated": "2026-11-13T14:30:00Z",
+  "zweck": "Projektplan (Stand 13.11.) abgelegt und mit PH V1 abgeglichen"
+ },
+ "k-20261117-datenblaetter": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-17",
+  "fach": false,
+  "help": "Ablage/Organisation, keine Messwerte eingetragen",
+  "purpose": "Datenblätter den Sensoren zugeordnet (Spalte „Datenblätter“ im Sensorvergleich), Sensor RIFTEK RF65x.2D neu angelegt"
+ },
+ "k-abgleich-20261106": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-06",
+  "fach": false,
+  "help": "Skill ta-projektabgleich: Chats, Archiv und Cockpit-Sammlungen abgeglichen, Status gesetzt, Projektstand aktualisiert, Widersprüche W10–W14 angelegt (auf Zustimmung)",
+  "purpose": "Projektabgleich",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-abgleich-20261117": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-17",
+  "fach": false,
+  "help": "Organisation: Cockpit-Status/Enddaten nach Belegen (Archiv 13.11., Entscheidungen 14.11.) aktualisiert, 19 Archivdateien auf den PC übertragen, Projektstand aktualisiert; keine fachlichen Texte",
+  "purpose": "Projektabgleich + PC-Abgleich des Archivs",
+  "updated": "2026-11-17T20:45:00Z"
+ },
+ "k-abgleich2-20261106": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-06",
+  "fach": false,
+  "help": "Fragen gestrichen/umformuliert nach PH V8.7, Enddaten gesetzt, Fragen ↔ offene Punkte angeglichen (Organisation)",
+  "purpose": "Projektabgleich (2. Lauf)",
+  "updated": "2026-11-06T14:35:00Z"
+ },
+ "k-archiv-20261104": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-04",
+  "fach": false,
+  "help": "Projektdokumente als Word auf den PC gespeichert; Archiv mit Ordnern und Versionsverlauf ins Cockpit eingebaut, 35 vorhandene Dateien eingestellt (Organisation, kein fachlicher Text)",
+  "purpose": "Ablage: Dateien auf PC + Archiv im Cockpit",
+  "updated": "2026-11-04T15:45:00Z"
+ },
+ "k-as-v31-20261105": {
+  "chat": "01 AS/Klärung",
+  "date": "2026-11-05",
+  "fach": false,
+  "help": "Begriff „Elektronikplan“ und Messprozess inkl. Sensorintegration ins Ziel eingetragen",
+  "purpose": "AS V3.1",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-as-v4-20261106": {
+  "chat": "01 AS/Klärung",
+  "date": "2026-11-06",
+  "fach": true,
+  "help": "AS V4 von der KI aus PH V8.7 abgeleitet und formuliert (auf Anweisung, keine neuen Fachinhalte); Werte 2 mm/10 % entfernt",
+  "purpose": "AS V4/V4.1",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-chatmenue-20261107": {
+  "art": "Organisation: Projektdokument überarbeitet (Pfade, Termine, Eckdaten); keine fachlichen Doku-Texte",
+  "chat": "00 Cockpit",
+  "date": "2026-11-07",
+  "fach": false,
+  "zweck": "Chat-Menü (Prompt-Bibliothek) auf AS V4.2 / PH V8.7 aktualisiert"
+ },
+ "k-grr-20261106": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-11-06",
+  "fach": true,
+  "help": "Websuche Standardwerte MSA (AIAG %GRR, VDA Band 5) – Wert stammt aus KI-Recherche",
+  "purpose": "Anf. 2.4",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-ph-spez-20261106": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-11-06",
+  "fach": true,
+  "help": "Auswertung der Rohrspezifikationen; Eintragen von Spezifikationsdaten und Janeks Entscheidungen; sprachliche Formulierung einzelner Anforderungen; Zusammenführung paralleler Stände; Ablage",
+  "purpose": "PH V8–V8.7",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-ph-v7-20261105": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-11-05",
+  "fach": false,
+  "help": "Klärung Unterschrift PH (UP-Auswertung); Vorschlag zweier betrieblicher MS-Termine (KI-Vorschlag, gekennzeichnet); Änderungsdoku auf V7 zurückgesetzt; Umsetzung W1/W3",
+  "purpose": "PH V7",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-ph-v85-20261106": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-06",
+  "fach": false,
+  "help": "Belegte Werte und Fakten aus den drei Rohrspezifikationen in PH V8.4 eingetragen (mit Quelle), Widersprüche zu Länge/Wandstärke als ZU PRÜFEN markiert, Änderungsdoku ergänzt. Keine Entscheidungen getroffen.",
+  "purpose": "PH V8.5 – Abgleich mit Rohrspezifikationen",
+  "updated": "2026-11-06T11:10:00Z"
+ },
+ "k-widersprueche-20261105": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-05",
+  "fach": false,
+  "help": "Chats durchsucht, Status der Widersprüche im Cockpit gepflegt; Projektstand aktualisiert",
+  "purpose": "Widerspruchsprüfung",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ "k-wochenstatus-20261105": {
+  "chat": "Routine",
+  "date": "2026-11-05",
+  "fach": false,
+  "help": "Automatischer Wochenstatus: Abgleich Projektdokumente, Memory und Cockpit-Daten, Ampel, Fristen, offene Punkte (Organisation, kein fachlicher Text). Quelle: claude/Wochenstatus_TA.md (05.11.2026)",
+  "purpose": "Wochenstatus",
+  "updated": "2026-11-05T17:25:00Z"
+ },
+ "k-wochenstatus-20261112": {
+  "chat": "Routine",
+  "date": "2026-11-12",
+  "fach": false,
+  "help": "Abgleich Projektdokumente, Memory und Cockpit; Statusbericht; Cockpit-Daten aktualisiert (p06, p07, q12, neue Widersprüche W15/W16 aus Archivdateien). Keine fachlichen Texte für AS/PH/Doku.",
+  "purpose": "Wöchentlicher Statusbericht (geplante Aufgabe)",
+  "updated": "2026-11-12T20:00:00Z"
+ },
+ "k01": {
+  "chat": "",
+  "date": "2026-10-16",
+  "fach": false,
+  "help": "Feedback Projektplan; PH-Gerüst aus Schulvorlage (Inhalte aus AS, offene Punkte markiert)",
+  "purpose": "Projektplan, Pflichtenheft"
+ },
+ "k02": {
+  "chat": "00 Cockpit",
+  "date": "2026-10-19",
+  "fach": false,
+  "help": "Kompendium UP0–UP7, Chat-Menü, Projektstand, Status-Übersicht",
+  "purpose": "Organisation"
+ },
+ "k03": {
+  "chat": "00 Cockpit",
+  "date": "2026-10-20",
+  "fach": false,
+  "help": "Checkliste/Fragensammlung Ersttermin",
+  "purpose": "Vorbereitung Betrieb"
+ },
+ "k04": {
+  "chat": "00 Cockpit",
+  "date": "2026-10-22",
+  "fach": false,
+  "help": "Word-Vorlage Gesprächsprotokoll",
+  "purpose": "Vorbereitung Betrieb"
+ },
+ "k05": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-24",
+  "fach": false,
+  "help": "Prüfung PH-Entwurf (Feedback); Einarbeitung von Janeks Angaben zum Ist-Zustand; Änderungsdoku + Fragenliste",
+  "purpose": "PH Kap. 2"
+ },
+ "k06": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Fragenkatalog (Excel) nach Hauptmerkmalliste Pahl/Beitz",
+  "purpose": "Anforderungsliste"
+ },
+ "k07": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Entfernen der Automatisierungsbezüge auf Anweisung; Fragenkatalog (Excel)",
+  "purpose": "PH V3"
+ },
+ "k08": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Einarbeitung von Janeks Notizen, Konsistenzprüfung, Hinweise auf Widersprüche",
+  "purpose": "PH V4/V5"
+ },
+ "k09": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Sprachliche Überarbeitung eines Absatzes, Rechtschreibung, Logo",
+  "purpose": "PH Kap. 2"
+ },
+ "k10": {
+  "chat": "02 Pflichtenheft",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Eintragen der vorgegebenen Änderungen; Kap. 6 aus bestehender Liste; Abgleich PH ↔ AS (nur Hinweise)",
+  "purpose": "PH V6"
+ },
+ "k11": {
+  "chat": "01 AS/Klärung",
+  "date": "2026-10-30",
+  "fach": true,
+  "help": "Kritik AS V2; Ausformulierung von Titel, Problemstellung und Ziel der AS V3 durch KI (Basis: Janeks Notizen, PH V5)",
+  "purpose": "Aufgabenstellung"
+ },
+ "k12": {
+  "chat": "01 AS/Klärung",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Übertragung in Word-Vorlage, Formatierung, Logo; Ergänzung Messprozess auf Anweisung",
+  "purpose": "Aufgabenstellung"
+ },
+ "k13": {
+  "chat": "05 Messtechnik",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Normbegriffe (ISO 1101/12181/14405/10579); Abgleich Lösungsidee mit PH V5 und Keyence-Katalogen; Denkfragen",
+  "purpose": "Messtechnik"
+ },
+ "k14": {
+  "chat": "00 Cockpit",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Checkliste MS 1 (Word); Statusabgleich; Projektstand aktualisiert",
+  "purpose": "Projektsteuerung"
+ },
+ "k15": {
+  "chat": "Routine",
+  "date": "2026-10-30",
+  "fach": false,
+  "help": "Automatische Zusammenfassung der Projektdokumente",
+  "purpose": "Wochenrückblick"
+ },
+ "k16": {
+  "chat": "00 Cockpit",
+  "date": "2026-11-03",
+  "fach": false,
+  "help": "Konzept TA-Cockpit (Claude Doc) und Bau des Cockpit-Artefakts mit Übernahme der Daten aus dem Projektstand",
+  "purpose": "Organisation"
+ },
+ "kl-20261112-chat06-morph": {
+  "chat": "06 Spann/Handhabung",
+  "date": "2026-11-12",
+  "fach": true,
+  "help": "Teilfunktionen von der KI überarbeitet und ergänzt (auflagern/ausrichten, sichern, Rohrtyp vorgeben, Anfang/Ende erkennen, Position zuordnen, entnehmen, Messsystem prüfen, 3 Querschnittsfunktionen); je Zeile 4–5 Lösungsideen von der KI (im Kasten mit „KI:“ gekennzeichnet), grobe F-Hinweise und Abhängigkeiten gesetzt. Janeks eigene Ideen unverändert. Auswahl und Gesamtvarianten: Janek.",
+  "purpose": "Morphologischer Kasten: Teilfunktionen und Ideenfindung",
+  "updated": "2026-11-12T09:26:00.000Z"
+ },
+ "kl-20261113-chat06-sensorwerte": {
+  "chat": "06 Spann/Handhabung",
+  "date": "2026-11-13",
+  "fach": false,
+  "help": "Aus Janeks Datenblättern (Keyence, Micro-Epsilon, Riftek) je Sensor 9 Vergleichswerte abgelesen und als Excel-Tabelle zusammengestellt; keine Bewertung, Auswahl durch Janek.",
+  "purpose": "Sensorvergleich für TF7–TF9",
+  "updated": "2026-11-13T14:30:00Z"
+ },
+ "mw14j1fy8rinx": {
+  "chat": "Routine",
+  "date": "2026-11-03",
+  "fach": false,
+  "help": "Analyse der Notiz, Umsetzungsschritte, Vorschläge für offene Punkte, Übergabeblock (Organisation, kein fachlicher Text)",
+  "purpose": "Cockpit: Notiz zu „Protokoll an Baidinger + Nachricht MS 1 an Graudejus“ prüfen",
+  "updated": "2026-11-03T20:11:57.838Z"
+ },
+ "mw2i7hlkr242q": {
+  "chat": "Routine",
+  "date": "2026-11-04",
+  "fach": false,
+  "help": "Zusammenhänge, Entscheidungsfragen und je ein gebündelter Auftrag (Prompt) pro Chat (Organisation, kein fachlicher Text)",
+  "purpose": "Cockpit: Sammel-Auftrag für 5 Widersprüche",
+  "updated": "2026-11-04T19:22:39.704Z"
+ },
+ "mw6aqsziugo9w": {
+  "chat": "Routine",
+  "date": "2026-11-07",
+  "fach": false,
+  "help": "Erklärung des Vorgehens in Schritten (Organisation, kein fachlicher Text)",
+  "purpose": "Cockpit: offenen Punkt „Chat-Menü Abschnitt A + Pfade auf AS V4 aktualisieren“ erklären",
+  "updated": "2026-11-07T11:04:48.701Z"
+ },
+ "mw6aywnq3p445": {
+  "chat": "Routine",
+  "date": "2026-11-07",
+  "fach": false,
+  "help": "Erklärung des Vorgehens in Schritten (Organisation, kein fachlicher Text)",
+  "purpose": "Cockpit: offenen Punkt „Doku-Speicher + KI-Logbuch pflegen (jetzt im Cockpit)“ erklären",
+  "updated": "2026-11-07T11:11:06.710Z"
+ }
+}

@@ -1,6 +1,6 @@
 # Abgleich-Pakete (Chat → GitHub-App)
 
-Dieser Ordner nimmt die Abgleich-Pakete aus dem Chat „00 Cockpit“ auf (Skill `cockpit/skill/SKILL.md`).
+Hier liegen das Abgleich-Skript `abgleich.py` (Diff und Schreibliste Repo ↔ Claude-Artefakt) sowie der Paket-Weg als Rückfall, falls kein Schreibzugriff besteht. Den Hauptablauf steuert der Skill `cockpit/skill/ta-projektabgleich/SKILL.md`.
 
 - `eingang/` – neue, noch nicht verarbeitete Pakete `paket_JJJJ-MM-TT_HH-MM.json`
 - `_Verarbeitet/` – bereits verarbeitete Pakete (nichts wird gelöscht, nur verschoben)
