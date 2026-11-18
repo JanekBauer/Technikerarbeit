@@ -45,6 +45,9 @@ main{padding-block:22px 60px;padding-left:max(24px,env(safe-area-inset-left,0px)
 .grid{display:grid;gap:14px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.wide{grid-column:1/-1}
+a.big{display:block;color:inherit;text-decoration:none}
+a.big:hover{border-color:var(--accent)}
 .btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:var(--r);cursor:pointer}
 .btn:hover{border-color:var(--accent)}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -130,7 +133,7 @@ ul.clean{list-style:none;margin:0;padding:0}
 .form .chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:14px}
 .form .chk input{width:auto}
 .mact{display:flex;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap}
-.calc{display:grid;gap:10px}
+.calc{display:grid;gap:10px;align-content:start;min-width:0}
 .calc .in{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .calc label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
 .calc input,.calc select{font:inherit;font-size:15px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2);color:var(--ink);width:100%}
@@ -140,8 +143,8 @@ ul.clean{list-style:none;margin:0;padding:0}
 .mk td input,.mk th input,.mk td textarea{font:inherit;font-size:13.5px;line-height:1.35;width:100%;min-width:160px;border:1px solid transparent;background:transparent;color:var(--ink);padding:3px 4px;border-radius:4px}
 .mk td textarea{display:block;resize:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;field-sizing:content;min-height:1.9em}
 .mk td.nr{font-weight:600;white-space:nowrap;color:var(--muted);vertical-align:top;padding-top:8px}
-.mk .deps{display:flex;flex-wrap:wrap;gap:4px;min-width:110px}
-.mk .depchip{font:inherit;font-size:12px;padding:2px 7px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
+.mk .deps{display:flex;flex-wrap:wrap;gap:2px;min-width:120px;max-width:330px}
+.mk .depchip{font:inherit;font-size:10.5px;line-height:1.2;padding:1px 3px;min-width:30px;text-align:center;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
 .mk .depchip.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 .mk .depchip:disabled{cursor:default}
 .mk td input:hover,.mk td input:focus,.mk td textarea:hover,.mk td textarea:focus{border-color:var(--line);background:var(--panel2)}
@@ -364,7 +367,7 @@ svg text{font-family:var(--f-body)}
 "use strict";
 /* ---------- Konfiguration ---------- */
 const NAV = [
-  ["Steuerung",[["start","Übersicht"],["aufgaben","Offene Punkte","tasks"],["zeitleiste","Zeitleiste","deadlines"],["fragen","Fragen Betrieb","questions"]]],
+  ["Steuerung",[["start","Übersicht"],["aufgaben","Offene Punkte","tasks"],["zeitleiste","Terminleiste","deadlines"],["fragen","Fragen an den Betrieb","questions"]]],
   ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"],["entscheidungen","Entscheidungen","decisions"],["widersprueche","Widersprüche","conflicts"]]],
   ["Lösungsphase",[["rechner","Rechner"],["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"]]],
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
@@ -550,38 +553,44 @@ const byNr=(a,b)=>String(a.nr).localeCompare(String(b.nr),"de",{numeric:true});
 /* ---------- Ansichten ---------- */
 const VIEWS={}, VIEWS_after={};
 
+function timelineSvg(){
+  const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
+  const t0=new Date(2026,9,1),t1=new Date(2027,6,1);const W=1000,X0=40,X1=970;
+  const x=d=>X0+(pd(d)-t0)/(t1-t0)*(X1-X0);
+  let svg=`<svg viewBox="0 0 ${W} 200" width="100%" role="img" aria-label="Zeitleiste der Termine" style="min-width:640px">`;
+  svg+=`<line x1="${X0}" y1="100" x2="${X1}" y2="100" stroke="var(--line)" stroke-width="2"/>`;
+  for(let m=0;m<=9;m++){const d=new Date(2026,9+m,1);const xx=X0+(d-t0)/(t1-t0)*(X1-X0);
+    svg+=`<line x1="${xx}" y1="94" x2="${xx}" y2="106" stroke="var(--muted)"/><text x="${xx}" y="122" font-size="11" text-anchor="middle" fill="var(--muted)">${d.toLocaleDateString("de-DE",{month:"short"})}${m===0||d.getMonth()===0?" "+String(d.getFullYear()).slice(2):""}</text>`;}
+  const tx=X0+(today()-t0)/(t1-t0)*(X1-X0);
+  if(tx>=X0&&tx<=X1)svg+=`<line x1="${tx}" y1="20" x2="${tx}" y2="180" stroke="var(--accent)" stroke-dasharray="4 3"/><text x="${tx+4}" y="30" font-size="11" fill="var(--accent)">heute</text>`;
+  const lanes={betrieb:[],schule:[]};
+  all.forEach((d,i)=>{const xx=Math.max(X0,Math.min(X1,x(d.date)));const up=d.kind==="betrieb";const lane=lanes[up?"betrieb":"schule"];
+    let lvl=0;while(lane.some(p=>p[1]===lvl&&Math.abs(p[0]-xx)<26))lvl++;lane.push([xx,lvl]);
+    const y=up?82-lvl*20:118+16+lvl*20;
+    const col=d.status==="erledigt"?"var(--ok)":up?"var(--warn)":"var(--accent)";
+    svg+=`<line x1="${xx}" y1="100" x2="${xx}" y2="${y}" stroke="${col}" stroke-width="1"/><circle class="tlink" data-termin="${esc(d.id)}" cx="${xx}" cy="${y}" r="9" fill="${col}"><title>${esc(d.title)}</title></circle><text x="${xx}" y="${y+4}" font-size="10" text-anchor="middle" fill="var(--panel)" font-weight="600">${i+1}</text>`;});
+  svg+=`<text x="${X0}" y="14" font-size="12" fill="var(--muted)">Betrieb ▲</text><text x="${X0}" y="196" font-size="12" fill="var(--muted)">Schule ▼</text></svg>`;
+  return svg;
+}
+
 VIEWS.start=()=>{
   const dl=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date).sort((a,b)=>a.date<b.date?-1:1);
   const doku=S.data.deadlines.find(d=>/Abgabe Dokumentation/i.test(d.title||""));
   const nxt=dl.find(d=>days(d.date)>=0)||dl[0];
   const open=S.data.tasks.filter(t=>t.status!=="erledigt");
   const over=open.filter(t=>t.due&&days(t.due)<0);
-  const q1=S.data.questions.filter(q=>q.status!=="beantwortet"&&q.prio==="1");
-  const conf=S.data.conflicts.filter(c=>c.status!=="geklärt");
-  const kiF=S.data.kilog.filter(k=>k.fach);
-  const fNo=S.data.reqs.filter(r=>r.art==="F"&&![r.min,r.exact,r.max].some(v=>v!==""&&v!=null)&&!r.noValue);
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
-  let h=`<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
+  return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
     <p>Konzeption und Konstruktion einer automatisierten Messanlage zur Prüfung von Rohren im Wareneingang · BD Gamer Lasertechnik, Bruchsal</p></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</span></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</span><a class="btn" href="#dateien">Archiv öffnen</a></div></div>
   <div class="hero">
-    <div class="big"><div class="l">Nächster Termin</div><div class="n">${nxt?(days(nxt.date)<0?"–":days(nxt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nxt?esc(nxt.title)+" · "+(nxt.approx?"ca. ":"")+fd(nxt.date):"Keine Termine angelegt"}</div></div>
-    <div class="big"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></div>
-    <div class="big" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></div>
+    <a class="big" href="#zeitleiste"><div class="l">Nächster Termin</div><div class="n">${nxt?(days(nxt.date)<0?"–":days(nxt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nxt?esc(nxt.title)+" · "+(nxt.approx?"ca. ":"")+fd(nxt.date):"Keine Termine angelegt"}</div></a>
+    <a class="big" href="#zeitleiste"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></a>
+    <a class="big" href="#aufgaben" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
-  <div class="grid g2">
-   <div class="panel"><h3>Termine</h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>
-   <div class="panel"><h3>Achtung</h3><ul class="warnlist">
-     <li>${pill(q1.length,q1.length?"p-warn":"p-ok")} offene Fragen mit Priorität 1 an den Betrieb · <a href="#fragen">ansehen</a></li>
-     <li>${pill(fNo.length,fNo.length?"p-bad":"p-ok")} Festanforderungen ohne Wert · <a href="#anforderungen">ansehen</a></li>
-     <li>${pill(conf.length,conf.length?"p-warn":"p-ok")} offene Widersprüche · <a href="#widersprueche">ansehen</a></li>
-     <li>${pill(kiF.length,kiF.length?"p-bad":"p-ok")} KI-Einträge mit fachlichem Text · <a href="#ki-logbuch">ansehen</a></li>
-     <li>${pill(over.length,over.length?"p-bad":"p-ok")} überfällige Punkte</li></ul>
-     <p class="note">Bewertung der TA: Vorgehen 40 %, Ausarbeitung 30 %, Projektverlauf 30 %. Selbstständigkeit und eingehaltene Meilensteine zählen im Projektverlauf.</p></div>
-  </div>`;
-  return h;
+  <div class="panel" style="overflow-x:auto;margin-bottom:14px"><h3>Terminleiste <a class="small" href="#zeitleiste">alle Termine öffnen</a></h3>${timelineSvg()}</div>
+  <div class="panel"><h3>Termine <a class="small" href="#zeitleiste">in der Terminleiste</a></h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>`;
 };
-
 VIEWS_after.start=()=>{
 document.querySelectorAll("[data-pkmv]").forEach(b=>b.onclick=async()=>{const [i,dd]=b.dataset.pkmv.split("|").map(Number);const pk=S.data.packages.slice().sort((a,b)=>(a.order||99)-(b.order||99));const j=i+dd;if(j<0||j>=pk.length)return;const t=pk[i];pk[i]=pk[j];pk[j]=t;b.disabled=true;for(let k=0;k<pk.length;k++){if(pk[k].order!==k+1)await save("packages",pk[k].id,Object.assign({},pk[k],{order:k+1}));}});};
 
@@ -602,35 +611,21 @@ VIEWS_after.aufgaben=()=>{const a=$("#tfst"),b=$("#tfwho");const up=()=>{lsSet("
 
 VIEWS.zeitleiste=()=>{
   const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
-  const t0=new Date(2026,9,1),t1=new Date(2027,6,1);const W=1000,X0=40,X1=970;
-  const x=d=>X0+(pd(d)-t0)/(t1-t0)*(X1-X0);
-  let svg=`<svg viewBox="0 0 ${W} 200" width="100%" role="img" aria-label="Zeitleiste der Termine" style="min-width:640px">`;
-  svg+=`<line x1="${X0}" y1="100" x2="${X1}" y2="100" stroke="var(--line)" stroke-width="2"/>`;
-  for(let m=0;m<=9;m++){const d=new Date(2026,9+m,1);const xx=X0+(d-t0)/(t1-t0)*(X1-X0);
-    svg+=`<line x1="${xx}" y1="94" x2="${xx}" y2="106" stroke="var(--muted)"/><text x="${xx}" y="122" font-size="11" text-anchor="middle" fill="var(--muted)">${d.toLocaleDateString("de-DE",{month:"short"})}${m===0||d.getMonth()===0?" "+String(d.getFullYear()).slice(2):""}</text>`;}
-  const tx=X0+(today()-t0)/(t1-t0)*(X1-X0);
-  if(tx>=X0&&tx<=X1)svg+=`<line x1="${tx}" y1="20" x2="${tx}" y2="180" stroke="var(--accent)" stroke-dasharray="4 3"/><text x="${tx+4}" y="30" font-size="11" fill="var(--accent)">heute</text>`;
-  const lanes={betrieb:[],schule:[]};
-  all.forEach((d,i)=>{const xx=Math.max(X0,Math.min(X1,x(d.date)));const up=d.kind==="betrieb";const lane=lanes[up?"betrieb":"schule"];
-    let lvl=0;while(lane.some(p=>p[1]===lvl&&Math.abs(p[0]-xx)<26))lvl++;lane.push([xx,lvl]);
-    const y=up?82-lvl*20:118+16+lvl*20;
-    const col=d.status==="erledigt"?"var(--ok)":up?"var(--warn)":"var(--accent)";
-    svg+=`<line x1="${xx}" y1="100" x2="${xx}" y2="${y}" stroke="${col}" stroke-width="1"/><circle class="tlink" data-termin="${esc(d.id)}" cx="${xx}" cy="${y}" r="9" fill="${col}"><title>${esc(d.title)}</title></circle><text x="${xx}" y="${y+4}" font-size="10" text-anchor="middle" fill="var(--panel)" font-weight="600">${i+1}</text>`;});
-  svg+=`<text x="${X0}" y="14" font-size="12" fill="var(--muted)">Betrieb ▲</text><text x="${X0}" y="196" font-size="12" fill="var(--muted)">Schule ▼</text></svg>`;
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Zeitleiste</h1><p>Schulische und betriebliche Termine von Oktober 2026 bis Juli 2027. Grün = erledigt. Termin antippen für Details, Notizen und Dateien. Der verbindliche Projektplan bleibt in Rillsoft.</p></div>${newBtn("deadlines","Neuer Termin")}</div>
+  const svg=timelineSvg();
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Terminleiste</h1><p>Schulische und betriebliche Termine von Oktober 2026 bis Juli 2027. Grün = erledigt. Termin antippen für Details, Notizen und Dateien. Der verbindliche Projektplan bleibt in Rillsoft.</p></div>${newBtn("deadlines","Neuer Termin")}</div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px">${svg}</div>`+
   listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>(r.approx?"ca. ":"")+dueCell(r.date,r.status==="erledigt")],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]]);
 };
 
 VIEWS.fragen=()=>{
-  const rows=S.data.questions.slice().sort((a,b)=>(a.status===b.status?0:a.status==="offen"?-1:1)||(a.prio||"9").localeCompare(b.prio||"9"));
-  const open=rows.filter(q=>q.status!=="beantwortet");
-  const txt=`Fragen an Herrn Baidinger – Stand ${new Date().toLocaleDateString("de-DE")}\n\n`+["1","2"].map(p=>{const qs=open.filter(q=>(q.prio||"2")===p);return qs.length?`Priorität ${p}\n`+qs.map((q,i)=>`${i+1}. ${q.q}${q.topic?" ("+q.topic+")":""}`).join("\n"):"";}).filter(Boolean).join("\n\n");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Erst dann gilt ein Wert als belegt.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="qlist">Liste für Freitag</button>${newBtn("questions","Neue Frage")}</div></div>
-  <div id="qout" hidden class="panel" style="margin-bottom:14px"><div class="toolbar"><b>Zum Mitnehmen oder Mailen</b><button class="btn sm" id="qcopy">Kopieren</button></div><textarea class="out" id="copybox" readonly>${esc(txt)}</textarea></div>`+
+  const f=lsGet("qFilter",{st:"alle"});
+  const sorted=S.data.questions.slice().sort((x,y)=>(x.status===y.status?0:x.status==="offen"?-1:1)||(x.prio||"9").localeCompare(y.prio||"9"));
+  const rows=f.st==="alle"?sorted:sorted.filter(q=>f.st==="offen"?q.status!=="beantwortet":q.status==="beantwortet");
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Erst dann gilt ein Wert als belegt.</p></div>${newBtn("questions","Neue Frage")}</div>
+  <div class="toolbar"><select id="qfst" aria-label="Status"><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="beantwortet" ${f.st==="beantwortet"?"selected":""}>Nur beantwortete</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
   listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["topic","Bezug",r=>`<span class="small">${esc(r.topic)}</span>`],["status","Status",r=>stPill(r.status)],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
 };
-VIEWS_after.fragen=()=>{const b=$("#qlist");if(b)b.onclick=()=>{$("#qout").hidden=!$("#qout").hidden;};const c=$("#qcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);};
+VIEWS_after.fragen=()=>{const s=$("#qfst");if(s)s.onchange=()=>{lsSet("qFilter",{st:s.value});render();};};
 
 VIEWS.anforderungen=()=>{
   const rows=S.data.reqs.slice().sort(byNr);const W=reqWarnings();
@@ -656,27 +651,23 @@ VIEWS.entscheidungen=()=>{
 VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);};
 
 VIEWS.widersprueche=()=>{
-  const rows=S.data.conflicts.slice().sort((a,b)=>(a.status==="geklärt")-(b.status==="geklärt"));
-  const ro=!S.canWrite||S.offline;
-  const open=rows.filter(c=>c.status!=="geklärt");
-  let h=`<div class="head"><div><span class="tag">Pflichtenheft</span><h1>Widersprüche</h1><p>Abgleich Aufgabenstellung ↔ Pflichtenheft ↔ Ausschreibung. Vor jeder Freigabe muss die Liste leer sein.</p></div>
-   <div class="facts">${newBtn("conflicts","Neuer Widerspruch")}</div></div>`;
-  const doneN=rows.length-open.length;
-  if(!rows.length)h+=`<div class="empty">Keine Widersprüche erfasst.</div>`;
-  if(doneN)h+=`<div class="toolbar" style="margin-bottom:8px"><span class="small muted">${doneN} geklärt${S.cfShowDone?"":" (ausgeblendet)"}</span><button class="btn sm" id="cfshowdone">${S.cfShowDone?"Geklärte ausblenden":"Geklärte anzeigen"}</button></div>`;
-  if(rows.length&&!open.length&&!S.cfShowDone)h+=`<div class="empty">Alle Widersprüche geklärt.</div>`;
-  rows.forEach((c,ci)=>{const done=c.status==="geklärt";if(done&&!S.cfShowDone)return;
-    h+=`<div class="panel" style="margin-bottom:12px;${done?"opacity:.7":""}">
-     <div class="famrow"><div class="fn"><span class="num muted">W${ci+1}</span> <b>${nl(c.text)}</b><div class="small muted">${esc(c.between||"")}</div></div>
-      <div class="facts">${stPill(c.status)}${c.resolved?`<span class="small muted num">${fd(c.resolved)}</span>`:""}</div></div>
-     ${c.note?`<p class="small" style="margin:6px 0 0">${nl(c.note)}</p>`:""}
-     <div class="facts" style="margin-top:8px">${!ro?`<button class="btn sm" data-edit="conflicts" data-id="${esc(c.id)}">Bearbeiten</button>`:""}${!ro&&!done?`<button class="btn sm" data-cfdone="${esc(c.id)}">Als geklärt markieren</button>`:""}</div></div>`;});
-  return h;
+  const f=lsGet("cfFilter",{st:"offen"});
+  const sorted=S.data.conflicts.slice().sort((x,y)=>String(x.id).localeCompare(String(y.id)));
+  const rows=f.st==="alle"?sorted:sorted.filter(c=>f.st==="geklärt"?c.status==="geklärt":c.status!=="geklärt");
+  return `<div class="head"><div><span class="tag">Pflichtenheft</span><h1>Widersprüche</h1><p>Abgleich Aufgabenstellung ↔ Pflichtenheft ↔ Ausschreibung. Vor jeder Freigabe muss die Liste leer sein. Zeile antippen zum Bearbeiten, dort auch den Status ändern.</p></div>${newBtn("conflicts","Neuer Widerspruch")}</div>
+  <div class="toolbar"><select id="cffst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="geklärt" ${f.st==="geklärt"?"selected":""}>Nur geklärte</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
+  listTable("conflicts",rows,[["id","Nr.",r=>`<span class="num">${esc(cfLabel(r))}</span>`],["text","Widerspruch"],["between","Zwischen",r=>`<span class="small">${esc(r.between||"")}</span>`],["status","Status",r=>stPill(r.status)],["resolved","Geklärt am",r=>r.resolved?fd(r.resolved):'<span class="muted">–</span>']]);
 };
-VIEWS_after.widersprueche=()=>{
-  const sd=$("#cfshowdone");if(sd)sd.onclick=()=>{S.cfShowDone=!S.cfShowDone;render();};
-  document.querySelectorAll("[data-cfdone]").forEach(b=>b.onclick=async()=>{const c=S.data.conflicts.find(x=>x.id===b.dataset.cfdone);if(!c)return;b.disabled=true;await save("conflicts",c.id,Object.assign({},c,{status:"geklärt",resolved:new Date().toISOString().slice(0,10)}));});
-};
+VIEWS_after.widersprueche=()=>{const s=$("#cffst");if(s)s.onchange=()=>{lsSet("cfFilter",{st:s.value});render();};};
+function cfLabel(r){const m=/(\d+)/.exec(String(r.id||""));return m?"W"+m[1]:"–";}
+
+VIEWS_after.sensoren=()=>{const sx=$("#sxlsx");if(sx)sx.onclick=async()=>{
+  const F=LISTS.sensors.fields;
+  const rows=sensorOrder().map(s=>F.map(([k,_l,t])=>{const v=s[k];if(v==null)return "";if(t==="bool")return v?"ja":"nein";if(t==="num"){const n=Number(String(v).replace(",","."));return v!==""&&isFinite(n)?n:String(v);}return String(v);}));
+  sx.disabled=true;
+  try{const b=await buildXlsx("Sensorvergleich",F.map(f=>f[1]),rows);await saveBlob("Sensorvergleich_"+new Date().toISOString().slice(0,10)+".xlsx",b);}
+  catch(e){alert2("Excel-Datei konnte nicht erstellt werden: "+(e&&e.message||e));}
+  sx.disabled=false;};};
 
 /* ---------- Rechner ---------- */
 const MAT={nitinol:{n:"Nitinol (austenitisch)",E:75,rho:6.45},nitinolM:{n:"Nitinol (martensitisch)",E:35,rho:6.45},steel:{n:"Edelstahl 1.4404/316L",E:193,rho:8.0},tantal:{n:"Tantal",E:186,rho:16.6}};
@@ -703,7 +694,7 @@ VIEWS.rechner=()=>{
     <label for="c_th">Einlegen/Entnehmen (s)<input id="c_th" type="number" step="any" value="${esc(c.th)}"></label></div>
     <div class="res" id="r_takt"></div>
     <p class="note">n = L/Δx + 1 Querschnitte; t = n·(t_Messung + t_Verfahren) + t_Handling. Alternative zur schrittweisen Messung: Helix-Abtastung (Rohr dreht, Achse fährt gleichzeitig) – ob zulässig, ist eine offene Frage an den Betrieb.</p></div>
-   <div class="panel calc"><h3>Messbereich und Genauigkeit der Sensoren</h3>
+   <div class="panel calc wide"><h3>Messbereich und Genauigkeit der Sensoren</h3>
     <div class="in"><label for="c_dmin">Kleinster Ø (mm)<input id="c_dmin" type="number" step="any" value="${esc(c.dmin)}"></label>
     <label for="c_dmax">Größter Ø (mm)<input id="c_dmax" type="number" step="any" value="${esc(c.dmax)}"></label>
     <label for="c_tol">Toleranz T (µm)<input id="c_tol" type="number" step="any" value="${esc(c.tol)}"></label></div>
@@ -740,6 +731,21 @@ VIEWS_after.rechner=()=>{
   ids.forEach(k=>{const el=$("#c_"+k);if(el){el.oninput=run;el.onchange=run;}});run();
 };
 
+function xlsxCol(i){let s="";i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
+function xmlEsc(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+async function buildXlsx(sheetName,headers,rows){
+  const JSZip=await loadZip();const z=new JSZip();
+  const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const cell=(v,ref)=>{if(typeof v==="number"&&isFinite(v))return `<c r="${ref}"><v>${v}</v></c>`;if(v===""||v==null)return "";return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(v)}</t></is></c>`;};
+  const sd=[headers,...rows].map((r,ri)=>`<row r="${ri+1}">${r.map((v,ci)=>cell(v,xlsxCol(ci)+(ri+1))).join("")}</row>`).join("");
+  z.file("[Content_Types].xml",H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
+  z.file("_rels/.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+  z.file("xl/workbook.xml",H+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+xmlEsc(sheetName)+'" sheetId="1" r:id="rId1"/></sheets></workbook>');
+  z.file("xl/_rels/workbook.xml.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>');
+  z.file("xl/worksheets/sheet1.xml",H+'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+sd+'</sheetData></worksheet>');
+  return z.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+}
+function sensorOrder(){const all=S.data.sensors.slice();const hasOrd=r=>r.ord!=null&&r.ord!=="";return all.filter(hasOrd).sort((a,b)=>a.ord-b.ord).concat(all.filter(r=>!hasOrd(r)));}
 VIEWS.sensoren=()=>{
   const all=S.data.sensors.slice();
   const on=all.filter(r=>r.ord!=null&&r.ord!=="").sort((a,b)=>a.ord-b.ord);
@@ -775,7 +781,7 @@ VIEWS.sensoren=()=>{
     ["rate","5 Abtastrate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],
     ["det","Alle Werte",det]];
   const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div>${newBtn("sensors","Neuer Sensor")}</div>
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>

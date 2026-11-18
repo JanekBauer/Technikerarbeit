@@ -1,4 +1,12 @@
 [
 {"id": "q1", "nr": 1, "kind": "Buch", "text": "Feldhusen, Jörg; Grote, Karl-Heinrich (Hrsg.): Pahl/Beitz Konstruktionslehre. Methoden und Anwendung erfolgreicher Produktentwicklung. 8. Auflage. Berlin, Heidelberg: Springer Vieweg, 2013.", "used": "Anforderungsliste, Bewertung (Kap. 6.2, 6.4)", "accessed": ""},
-{"id": "q2", "nr": 2, "kind": "Datenblatt", "text": "KEYENCE Deutschland GmbH: Optische Inline Messtechnik – Präzise messen direkt in der Fertigung (Produktflyer).", "used": "Sensorvergleich", "accessed": "2026-10-30"}
+{"id": "q2", "nr": 2, "kind": "Datenblatt", "text": "KEYENCE Deutschland GmbH: Optische Inline Messtechnik – Präzise messen direkt in der Fertigung (Produktflyer).", "used": "Sensorvergleich", "accessed": "2026-10-30"},
+{"id": "q3", "nr": 3, "kind": "Datenblatt", "text": "KEYENCE Deutschland GmbH: LS-9000 Produktbroschüre (deutsch). Ausgabe und Erscheinungsjahr ZU PRÜFEN.", "used": "Sensorvergleich", "accessed": "2026-01-13"},
+{"id": "q4", "nr": 4, "kind": "Datenblatt", "text": "KEYENCE Deutschland GmbH: Datenblätter LS-9006, LS-9006D, LS-9006M, LS-9030, LS-9030D, LS-9030M, LS-9120M (PDF). Ausgabe und Datum ZU PRÜFEN.", "used": "Sensorvergleich", "accessed": "2026-11-13"},
+{"id": "q5", "nr": 5, "kind": "Datenblatt", "text": "Micro-Epsilon: optoCONTROL ODC – Produktkatalog (deutsch). Ausgabe und Erscheinungsjahr ZU PRÜFEN.", "used": "Sensorvergleich", "accessed": "2026-11-13"},
+{"id": "q6", "nr": 6, "kind": "Datenblatt", "text": "2D Optical Micrometers (englisch, PDF). Hersteller und Ausgabe ZU PRÜFEN.", "used": "Sensorvergleich", "accessed": "2026-11-13"},
+{"id": "q7", "nr": 7, "kind": "Datenblatt", "text": "TM-X5006 Datasheet (PDF). Hersteller und Ausgabe ZU PRÜFEN.", "used": "Sensorvergleich", "accessed": "2026-11-13"},
+{"id": "q8", "nr": 8, "kind": "Norm", "text": "AIAG: Measurement Systems Analysis (MSA), Reference Manual. Ausgabe und Jahr ZU PRÜFEN.", "used": "Anforderungsliste (Anf. 2.4, %GRR)", "accessed": ""},
+{"id": "q9", "nr": 9, "kind": "Norm", "text": "VDI 2225: Konstruktionsmethodik, technisch-wirtschaftliches Konstruieren. Blatt und Ausgabe ZU PRÜFEN.", "used": "Bewertung der Varianten", "accessed": ""},
+{"id": "q10", "nr": 10, "kind": "Norm", "text": "ISO 1101, ISO 12181, ISO 14405, ISO 10579 (Geometrische Produktspezifikation und Tolerierung). Titel, Teile und Ausgaben ZU PRÜFEN.", "used": "Begriffe Messtechnik (Doku, Kap. 4)", "accessed": ""}
 ]
