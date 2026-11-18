@@ -517,8 +517,8 @@ function openEditor(key,id,preset){
   });
   const ro=!S.canWrite||S.offline;
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(L.title)}">
-    <h2>${id?"Bearbeiten":"Neu"}: ${esc(L.title)}</h2><form class="form" id="edform">${f}</form>
-    <div class="mact"><div>${id&&!ro?`<button class="btn danger" id="delbtn">Löschen</button>`:""}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${id?"Bearbeiten":"Neu"}: ${esc(L.title)}</h2>${id&&!ro?`<button class="btn danger" id="delbtn">Löschen</button>`:""}</div><form class="form" id="edform">${f}</form>
+    <div class="mact"><div></div>
     <div style="display:flex;gap:8px"><button class="btn" data-close="1">Abbrechen</button>${ro?"":`<button class="btn pri" id="savebtn">Speichern</button>`}</div></div></div></div>`;
   const first=$("#edform [data-k]");if(first)first.focus();
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
