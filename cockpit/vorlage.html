@@ -344,7 +344,7 @@ svg text{font-family:var(--f-body)}
   /* Leiste unten links: offene Browser-Änderungen und Aktualisieren-Knopf */
   var bar=document.createElement("div");
   bar.id="pendbar";
-  bar.style.cssText="display:none;position:fixed;left:12px;top:10px;width:206px;z-index:60;align-items:center;flex-wrap:wrap;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;box-shadow:0 4px 14px rgba(0,0,0,.15);font-size:12px";
+  bar.style.cssText="display:none;position:fixed;left:12px;top:10px;width:206px;z-index:40;align-items:center;flex-wrap:wrap;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;box-shadow:0 4px 14px rgba(0,0,0,.15);font-size:12px";
   bar.innerHTML='<span id="pendtxt"></span><button class="btn sm" id="pendundo">Verwerfen</button><button class="btn sm pri" id="pendgo">Aktualisieren</button>';
   document.body.appendChild(bar);
   function showBar(){var n=pendCount();bar.style.display="flex";document.getElementById("pendtxt").textContent=n?(n+(n===1?" Änderung":" Änderungen")+" nur im Browser"):"Alles gespeichert";document.getElementById("pendundo").style.display=n?"":"none";document.getElementById("pendgo").textContent=n?"Aktualisieren":"Seite neu laden";}
