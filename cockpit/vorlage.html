@@ -189,7 +189,7 @@ svg text{font-family:var(--f-body)}
 .vnode .vtxt{min-width:0;flex:1 1 240px}
 </style>
 
-<style>#zipall,#zipallv,[data-zip]{display:none!important}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
+<style>#zipall,#zipallv,[data-zip]{display:none!important}@media(max-width:760px){#pendbar{top:auto!important;bottom:10px!important;width:auto!important}}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
 <div class="app">
   <nav id="nav" aria-label="Bereiche"></nav>
   <main id="main"><div class="empty">Cockpit wird geladen …</div></main>
@@ -344,16 +344,16 @@ svg text{font-family:var(--f-body)}
   /* Leiste unten links: offene Browser-Änderungen und Aktualisieren-Knopf */
   var bar=document.createElement("div");
   bar.id="pendbar";
-  bar.style.cssText="display:none;position:fixed;left:14px;bottom:14px;z-index:60;align-items:center;flex-wrap:wrap;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px";
+  bar.style.cssText="display:none;position:fixed;left:12px;top:12px;width:206px;z-index:60;align-items:center;flex-wrap:wrap;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px";
   bar.innerHTML='<span id="pendtxt"></span><button class="btn sm" id="pendundo">Verwerfen</button><button class="btn sm pri" id="pendgo">Aktualisieren</button>';
   document.body.appendChild(bar);
-  function showBar(){var n=pendCount();bar.style.display=n?"flex":"none";document.getElementById("pendtxt").textContent=n+(n===1?" Änderung":" Änderungen")+" nur im Browser";}
+  function showBar(){var n=pendCount();bar.style.display="flex";document.getElementById("pendtxt").textContent=n?(n+(n===1?" Änderung":" Änderungen")+" nur im Browser"):"Alles gespeichert";document.getElementById("pendundo").style.display=n?"":"none";document.getElementById("pendgo").textContent=n?"Aktualisieren":"Seite neu laden";}
   document.getElementById("pendundo").onclick=function(){if(confirm("Alle nicht übernommenen Änderungen verwerfen?"))discard();};
   document.getElementById("pendgo").onclick=function(){
-    var g=this;g.disabled=true;g.textContent="…";busy=true;
+    var g=this;if(!pendCount()){location.reload();return;}g.disabled=true;g.textContent="…";busy=true;
     flush().then(function(){busy=false;showBar();})
       .catch(function(e){busy=false;showBar();alert("Aktualisieren hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nDie Änderungen bleiben im Browser. Bitte erneut versuchen.");})
-      .then(function(){g.disabled=false;g.textContent="Aktualisieren";});
+      .then(function(){g.disabled=false;showBar();});
   };
   window.addEventListener("beforeunload",function(e){if(pendCount()){e.preventDefault();e.returnValue="";}});
   /* Offene Änderungen nach dem Neuladen wieder anzeigen */
@@ -472,7 +472,7 @@ function getTool(id,def){return S.tmp["tool_"+id]||(tool(id)?JSON.parse(JSON.str
 
 /* ---------- Rendering ---------- */
 function navHtml(){
-  let h=`<div class="brand"><b>TA-Cockpit</b><span>Messanlage für Rohre · BD Gamer</span></div>`;
+  let h=`<div style="height:84px"></div>`;
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
