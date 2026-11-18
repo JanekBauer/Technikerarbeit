@@ -221,17 +221,66 @@ svg text{font-family:var(--f-body)}
   function fmt(arr){return "[\n"+arr.map(function(o){return JSON.stringify(o);}).join(",\n")+"\n]\n";}
   function snap(c){return {docs:(DATA[c]||[]).map(function(o){var d=Object.assign({},o);var id=d.id;delete d.id;return {id:id,data:function(){return d;}};}),metadata:{fromCache:false}};}
   function emit(c){(listeners[c]||[]).forEach(function(cb){cb(snap(c));});}
-  function change(c,mutate,msg,tries){
-    tries=tries||0;
-    var path=DIR+c+".json";
-    return api("/contents/"+path+"?ref="+BRANCH).then(function(f){
-      var arr=mutate(JSON.parse(fromB64(f.content)));
-      return api("/contents/"+path,{method:"PUT",body:JSON.stringify({message:msg,content:toB64(fmt(arr)),sha:f.sha,branch:BRANCH})}).then(function(){DATA[c]=arr;emit(c);});
-    }).catch(function(e){
-      if((e.status===409||e.status===422)&&tries<2)return change(c,mutate,msg,tries+1);
-      throw e;
-    });
+  /* Änderungen bleiben zuerst im Browser und sind sofort sichtbar. „Aktualisieren“ schreibt alle
+     offenen Änderungen in EINEM Commit auf main (also nur ein Seitenneubau statt vieler). */
+  var PKEY="ta_pending",PEND={},busy=false;
+  function loadPend(){try{PEND=JSON.parse(localStorage.getItem(PKEY)||"{}")||{};}catch(e){PEND={};}}
+  function savePend(){try{if(Object.keys(PEND).length)localStorage.setItem(PKEY,JSON.stringify(PEND));else localStorage.removeItem(PKEY);}catch(e){}}
+  function pendCount(){return Object.keys(PEND).reduce(function(n,c){return n+PEND[c].msgs.length;},0);}
+  function change(c,mutate,msg){
+    if(!tok())return Promise.reject(new Error("Kein Zugriffstoken"));
+    if(busy)return Promise.reject(new Error("Bitte kurz warten, die Aktualisierung läuft."));
+    var before=JSON.parse(JSON.stringify(DATA[c]||[]));
+    if(!PEND[c])PEND[c]={base:before,local:null,msgs:[]};
+    var arr=mutate(JSON.parse(JSON.stringify(DATA[c]||[])));
+    DATA[c]=arr;PEND[c].local=arr;PEND[c].msgs.push(msg);
+    savePend();emit(c);showBar();
+    return Promise.resolve();
   }
+  /* Eintragsweise Zusammenführung: geänderte Einträge aus dem Browser setzen, alles andere bleibt wie auf GitHub */
+  function byId(a){var m={};(a||[]).forEach(function(x){m[x.id]=x;});return m;}
+  function mergeEntries(remote,base,local){
+    var b=byId(base),l=byId(local),out=remote.slice();
+    Object.keys(Object.assign({},b,l)).forEach(function(id){
+      if(JSON.stringify(b[id]||null)===JSON.stringify(l[id]||null))return;
+      if(!l[id]){out=out.filter(function(x){return x.id!==id;});return;}
+      var i=out.findIndex(function(x){return x.id===id;});
+      if(i>=0)out[i]=l[id];else out.push(l[id]);
+    });
+    return out;
+  }
+  function commitMsg(msgs){return "Cockpit: "+msgs.length+" Änderung"+(msgs.length===1?"":"en")+" aktualisiert (Web)\n\n"+msgs.join("\n");}
+  function flush(tries){
+    tries=tries||0;
+    var cs=Object.keys(PEND);
+    if(!cs.length)return Promise.resolve();
+    var msgs=[];cs.forEach(function(c){msgs=msgs.concat(PEND[c].msgs);});
+    var head,tree;
+    return api("/git/ref/heads/"+BRANCH).then(function(r){head=r.object.sha;return api("/git/commits/"+head);})
+      .then(function(cm){
+        tree=cm.tree.sha;
+        return Promise.all(cs.map(function(c){
+          return api("/contents/"+DIR+c+".json?ref="+BRANCH).then(function(f){
+            return {c:c,merged:mergeEntries(JSON.parse(fromB64(f.content)),PEND[c].base,PEND[c].local)};
+          });
+        }));
+      })
+      .then(function(rs){
+        return Promise.all(rs.map(function(x){
+          return api("/git/blobs",{method:"POST",body:JSON.stringify({content:fmt(x.merged),encoding:"utf-8"})})
+            .then(function(b){return {path:DIR+x.c+".json",mode:"100644",type:"blob",sha:b.sha};});
+        }))
+        .then(function(entries){return api("/git/trees",{method:"POST",body:JSON.stringify({base_tree:tree,tree:entries})});})
+        .then(function(t){return api("/git/commits",{method:"POST",body:JSON.stringify({message:commitMsg(msgs),tree:t.sha,parents:[head]})});})
+        .then(function(cm){return api("/git/refs/heads/"+BRANCH,{method:"PATCH",body:JSON.stringify({sha:cm.sha})});})
+        .then(function(){rs.forEach(function(x){DATA[x.c]=x.merged;emit(x.c);});PEND={};savePend();});
+      })
+      .catch(function(e){
+        if(e.status===422&&tries<2)return flush(tries+1);
+        throw e;
+      });
+  }
+  function discard(){Object.keys(PEND).forEach(function(c){DATA[c]=PEND[c].base;emit(c);});PEND={};savePend();showBar();}
   function fail(e){
     alert("Speichern bei GitHub hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nPrüfe das Zugriffstoken (Knopf oben rechts).");
     throw {code:"write_failed"};
@@ -295,6 +344,25 @@ svg text{font-family:var(--f-body)}
     }).catch(function(e){try{localStorage.removeItem("ta_gh_token");}catch(x){}alert("Token wurde abgelehnt: "+e.message);});
   };
   document.body.appendChild(b);
+  /* Leiste unten links: offene Browser-Änderungen und Aktualisieren-Knopf */
+  var bar=document.createElement("div");
+  bar.id="pendbar";
+  bar.style.cssText="display:none;position:fixed;left:14px;bottom:14px;z-index:60;align-items:center;flex-wrap:wrap;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px";
+  bar.innerHTML='<span id="pendtxt"></span><button class="btn sm" id="pendundo">Verwerfen</button><button class="btn sm pri" id="pendgo">Aktualisieren</button>';
+  document.body.appendChild(bar);
+  function showBar(){var n=pendCount();bar.style.display=n?"flex":"none";document.getElementById("pendtxt").textContent=n+(n===1?" Änderung":" Änderungen")+" nur im Browser";}
+  document.getElementById("pendundo").onclick=function(){if(confirm("Alle nicht übernommenen Änderungen verwerfen?"))discard();};
+  document.getElementById("pendgo").onclick=function(){
+    var g=this;g.disabled=true;g.textContent="…";busy=true;
+    flush().then(function(){busy=false;showBar();})
+      .catch(function(e){busy=false;showBar();alert("Aktualisieren hat nicht geklappt:\n"+(e&&e.message||e)+"\n\nDie Änderungen bleiben im Browser. Bitte erneut versuchen.");})
+      .then(function(){g.disabled=false;g.textContent="Aktualisieren";});
+  };
+  window.addEventListener("beforeunload",function(e){if(pendCount()){e.preventDefault();e.returnValue="";}});
+  /* Offene Änderungen nach dem Neuladen wieder anzeigen */
+  loadPend();
+  Object.keys(PEND).forEach(function(c){if(PEND[c].local)DATA[c]=PEND[c].local;});
+  showBar();
 })();
 </script>
 <script>
