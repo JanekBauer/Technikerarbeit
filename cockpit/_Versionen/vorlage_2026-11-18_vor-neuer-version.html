@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>TA-Cockpit (NEU – Test)</title>
+<title>TA-Cockpit Messanlage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -190,28 +190,6 @@ svg text{font-family:var(--f-body)}
 </style>
 
 <style>#zipall,#zipallv,[data-zip]{display:none!important}@media(max-width:760px){#ghbtn{top:auto!important;bottom:10px}}</style>
-<style>
-#palette{position:fixed;inset:0;background:rgba(10,15,20,.45);display:none;align-items:flex-start;justify-content:center;padding:12vh 12px 12px;z-index:70}
-#palette.on{display:flex}
-#palette .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(640px,100%);box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
-#palette input{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:17px;padding:14px 16px;outline:none}
-#palette ul{list-style:none;margin:0;padding:6px;max-height:52vh;overflow:auto}
-#palette li{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:8px;cursor:pointer}
-#palette li.sel,#palette li:hover{background:var(--accent-soft)}
-#palette li .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:92px}
-#palette li .t{flex:1;min-width:0}
-#palette .hint{padding:8px 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
-.board{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:12px;overflow-x:auto;align-items:start}
-.bcol{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:8px;min-height:120px}
-.bcol.over{outline:2px dashed var(--accent)}
-.bh{display:flex;justify-content:space-between;padding:2px 4px 8px}
-.bcard{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;cursor:pointer;font-size:14px}
-.bcard:hover{border-color:var(--accent)}
-.bcard.drag{opacity:.4}
-.vswitch{display:inline-flex;gap:6px}
-h3 a.small{color:var(--accent);font-weight:400;margin-left:8px;font-size:13px;text-decoration:none}
-h3 a.small:hover{text-decoration:underline}
-</style>
 <div class="app">
   <nav id="nav" aria-label="Bereiche"></nav>
   <main id="main"><div class="empty">Cockpit wird geladen …</div></main>
@@ -224,7 +202,7 @@ h3 a.small:hover{text-decoration:underline}
    Schreiben (Bearbeiten/Löschen) als Commit in cockpit/daten/*.json über die GitHub-API,
    sobald in diesem Browser ein Zugriffstoken gespeichert ist. */
 (function(){
-  var REPO="janekbauer02-cell/Technikerarbeit",BRANCH="main_neu",DIR="cockpit/daten/";
+  var REPO="janekbauer02-cell/Technikerarbeit",BRANCH="main",DIR="cockpit/daten/";
   var DATA=JSON.parse(document.getElementById("cockpit-data").textContent);
   var listeners={};
   function tok(){try{return localStorage.getItem("ta_gh_token")||"";}catch(e){return "";}}
@@ -490,7 +468,7 @@ function getTool(id,def){return S.tmp["tool_"+id]||(tool(id)?JSON.parse(JSON.str
 
 /* ---------- Rendering ---------- */
 function navHtml(){
-  let h=`<div style="padding:0 0 14px"><button class="btn pri" id="pendgo" style="width:100%">Aktualisieren</button><button class="btn" id="srchbtn" style="width:100%;margin-top:8px;text-align:left">Suchen und Befehle <span class="muted small">Strg+K</span></button></div>`;
+  let h=`<div style="padding:0 0 14px"><button class="btn pri" id="pendgo" style="width:100%">Aktualisieren</button></div>`;
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
@@ -504,7 +482,7 @@ function navHtml(){
 function render(){
   $("#nav").innerHTML=navHtml();
   const v=VIEWS[S.view]||VIEWS.start;
-  let pre=`<div class="banner" style="border-color:var(--accent)"><b>Neue Version (Test)</b> · Änderungen aus dieser Datei werden nur auf dem Branch „main_neu“ gespeichert, nicht auf „main“. Suche und Befehle: Strg+K.</div>`;
+  let pre="";
   if(S.offline)pre+=`<div class="banner">Die Daten des Cockpits sind gerade nicht erreichbar. Bitte die Seite neu laden.</div>`;
   else if(S.slow)pre+=`<div class="banner">Die Daten antworten gerade langsam. Angezeigtes kann veraltet sein.</div>`;
   if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen oben rechts „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Hoch- und Herunterladen von Dateien geht im Archiv.</div>`;
@@ -569,33 +547,6 @@ function sortDue(a,b){const da=a.due||"9999",dbb=b.due||"9999";if(da!==dbb)retur
 const byNr=(a,b)=>String(a.nr).localeCompare(String(b.nr),"de",{numeric:true});
 
 /* ---------- Ansichten ---------- */
-/* ---------- Suche, Befehle und Wochenübersicht ---------- */
-const SRC=[
- ["tasks","Punkt","aufgaben",r=>r.title,r=>[r.note,r.who,r.chat]],
- ["deadlines","Termin","zeitleiste",r=>r.title,r=>[r.note,r.date]],
- ["questions","Frage","fragen",r=>r.q,r=>[r.answer,r.topic]],
- ["reqs","Anforderung","anforderungen",r=>(r.nr?r.nr+" ":"")+String(r.text||"").split("\n")[0],r=>[r.group,r.text,r.source]],
- ["decisions","Entscheidung","entscheidungen",r=>r.text,r=>[r.source,r.docs]],
- ["conflicts","Widerspruch","widersprueche",r=>r.text,r=>[r.between,r.note]],
- ["sources","Quelle","quellen",r=>r.text,r=>[r.used,r.kind]],
- ["doku","Kapitel","doku",r=>(r.nr?r.nr+" ":"")+(r.title||""),r=>[r.notes,r.figures]],
- ["sensors","Sensor","sensoren",r=>[r.maker,r.model,r.variant].filter(Boolean).join(" "),r=>[r.principle,r.range]],
- ["files","Datei","dateien",r=>(r.family?r.family+" – ":"")+(r.name||""),r=>[r.ver,r.note,r.folder]],
- ["kilog","KI-Logbuch","ki-logbuch",r=>r.purpose||r.zweck,r=>[r.help,r.ergebnis,r.chat]],
-];
-const NEWS=[["tasks","Neuer offener Punkt"],["deadlines","Neuer Termin"],["questions","Neue Frage an den Betrieb"],["reqs","Neue Anforderung"],["decisions","Neue Entscheidung"],["conflicts","Neuer Widerspruch"],["sources","Neue Quelle"],["doku","Neues Kapitel"],["sensors","Neuer Sensor"]];
-function weekChanges(){
-  const lim=Date.now()-7*864e5;const out=[];
-  SRC.forEach(([c,kind,view,lab])=>{if(c==="kilog"||c==="files")return;(S.data[c]||[]).forEach(r=>{const u=r.updated?Date.parse(r.updated):0;if(u>=lim)out.push({kind,label:String(lab(r)||"(ohne Titel)").slice(0,90),at:u,coll:c});});});
-  return out.sort((a,b)=>b.at-a.at);
-}
-function weekReport(){
-  const wk=weekChanges();const T=new Date().toLocaleDateString("de-DE");const lim=Date.now()-7*864e5;
-  const open=S.data.tasks.filter(t=>t.status!=="erledigt").sort(sortDue).slice(0,5);
-  const nxt=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date&&days(d.date)>=0).sort((a,b)=>a.date<b.date?-1:1).slice(0,3);
-  const done=S.data.tasks.filter(t=>t.status==="erledigt"&&t.updated&&Date.parse(t.updated)>=lim);
-  return `Wochenbericht Technikerarbeit – Stand ${T}\n\nErledigt (letzte 7 Tage):\n${done.length?done.map(t=>"- "+t.title).join("\n"):"- –"}\n\nGeändert in den letzten 7 Tagen: ${wk.length} Einträge\n\nNächste Schritte:\n${open.map(t=>"- "+t.title+(t.due?" (bis "+fd(t.due)+")":"")).join("\n")}\n\nNächste Termine:\n${nxt.map(d=>"- "+fd(d.date)+": "+d.title).join("\n")}`;
-}
 const VIEWS={}, VIEWS_after={};
 
 function timelineSvg(){
@@ -624,12 +575,6 @@ VIEWS.start=()=>{
   const nxt=dl.find(d=>days(d.date)>=0)||dl[0];
   const open=S.data.tasks.filter(t=>t.status!=="erledigt");
   const over=open.filter(t=>t.due&&days(t.due)<0);
-  const dk=S.data.doku.slice();const pPlan=dk.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),pDone=dk.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
-  const dkSt=["Idee","Notizen","Entwurf","fertig"].map(s=>[s,dk.filter(r=>r.status===s).length]);
-  const wLeft=doku?Math.max(0,Math.ceil(days(doku.date)/7)):null;
-  const wk=weekChanges();
-  const dokuPanel=`<a class="panel" href="#doku" style="display:block;color:inherit;text-decoration:none"><h3>Dokumentation</h3><div class="toolbar" style="justify-content:space-between"><span class="num">${f2(pDone,0)} von ${f2(pPlan,0)} Seiten</span><span class="small muted">${wLeft!=null?"noch "+wLeft+" Wochen bis zur Abgabe":""}</span></div><div class="bar" style="margin:6px 0 10px"><i style="width:${pPlan?Math.min(100,pDone/pPlan*100):0}%"></i></div><div class="small muted">${dkSt.map(([s,n])=>n+" "+s).join(" · ")}</div></a>`;
-  const weekPanel=`<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Diese Woche geändert</h3><button class="btn sm" id="wkcopy">Wochenbericht kopieren</button></div>${wk.length?`<div style="margin:6px 0 8px">${Object.entries(wk.reduce((m,x)=>(m[x.kind]=(m[x.kind]||0)+1,m),{})).map(([k,n])=>pill(n+" "+k,"p-acc")).join(" ")}</div><ul class="clean">${wk.slice(0,6).map(x=>`<li class="small" style="padding:3px 0"><span class="muted">${esc(x.kind)}</span> · ${esc(x.label)}</li>`).join("")}</ul>${wk.length>6?`<p class="note">… und ${wk.length-6} weitere</p>`:""}`:'<p class="muted small">Seit sieben Tagen nichts geändert.</p>'}</div>`;
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
   return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
     <p>Konzeption und Konstruktion einer automatisierten Messanlage zur Prüfung von Rohren im Wareneingang · BD Gamer Lasertechnik, Bruchsal</p></div>
@@ -640,75 +585,33 @@ VIEWS.start=()=>{
     <a class="big" href="#aufgaben" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px"><h3>Terminleiste <a class="small" href="#zeitleiste">alle Termine öffnen</a></h3>${timelineSvg()}</div>
-  <div class="grid g2" style="margin-bottom:14px;align-items:start">${dokuPanel}${weekPanel}</div>
   <div class="panel"><h3>Termine <a class="small" href="#zeitleiste">in der Terminleiste</a></h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>`;
 };
 VIEWS_after.start=()=>{
-  const wb=$("#wkcopy");if(wb)wb.onclick=()=>copyText(weekReport(),wb);
 document.querySelectorAll("[data-pkmv]").forEach(b=>b.onclick=async()=>{const [i,dd]=b.dataset.pkmv.split("|").map(Number);const pk=S.data.packages.slice().sort((a,b)=>(a.order||99)-(b.order||99));const j=i+dd;if(j<0||j>=pk.length)return;const t=pk[i];pk[i]=pk[j];pk[j]=t;b.disabled=true;for(let k=0;k<pk.length;k++){if(pk[k].order!==k+1)await save("packages",pk[k].id,Object.assign({},pk[k],{order:k+1}));}});};
 
 VIEWS.aufgaben=()=>{
   const f=lsGet("taskFilter",{who:"",st:"offen"});
-  const view=lsGet("taskView","tabelle");
-  const can=S.canWrite&&!S.offline;
   let rows=S.data.tasks.slice();
   if(f.st==="offen")rows=rows.filter(t=>t.status!=="erledigt");
   if(f.st==="über")rows=rows.filter(t=>t.status!=="erledigt"&&t.due&&days(t.due)<0);
   if(f.st==="erledigt")rows=rows.filter(t=>t.status==="erledigt");
   if(f.who)rows=rows.filter(t=>t.who===f.who);
   rows.sort(sortDue);
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Was wer bis wann erledigen muss. Antippen zum Bearbeiten.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
-  const who=`<select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select>`;
-  const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
-  if(view==="board"){
-    const all=S.data.tasks.filter(t=>!f.who||t.who===f.who);
-    const cols=["offen","in Arbeit","wartet","erledigt"];
-    const board=cols.map(c=>{
-      let items=all.filter(t=>(t.status||"offen")===c);
-      if(c==="erledigt")items=items.sort((x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")));else items=items.sort(sortDue);
-      const shown=c==="erledigt"?items.slice(0,6):items;
-      return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${items.length}</span></div>${shown.map(t=>`<div class="bcard" ${can?'draggable="true"':""} data-bid="${esc(t.id)}" data-task="${esc(t.id)}"><div>${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`).join("")||'<div class="empty small">–</div>'}${items.length>shown.length?`<div class="small muted" style="padding:4px">… ${items.length-shown.length} weitere (Tabelle, Filter „Erledigt“)</div>`:""}</div>`;}).join("");
-    return head+`<div class="toolbar">${sw}${who}<span class="muted small">${all.length} Punkte</span></div><div class="board">${board}</div>`;
-  }
-  return head+`<div class="toolbar">${sw}<select id="tfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Offen</option><option value="über" ${f.st==="über"?"selected":""}>Überfällig</option><option value="erledigt" ${f.st==="erledigt"?"selected":""}>Erledigt</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select>${who}<span class="muted small">${rows.length} Einträge</span></div>`+
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Was wer bis wann erledigen muss. Antippen zum Bearbeiten.</p></div>${newBtn("tasks","Neuer Punkt")}</div>
+  <div class="toolbar"><select id="tfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Offen</option><option value="über" ${f.st==="über"?"selected":""}>Überfällig</option><option value="erledigt" ${f.st==="erledigt"?"selected":""}>Erledigt</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select>
+  <select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select><span class="muted small">${rows.length} Einträge</span></div>`+
   listTable("tasks",rows,[["prio","P",r=>`<span class="num">${esc(r.prio||"")}</span>`],["title","Punkt"],["who","Wer"],["due","Bis",r=>dueCell(r.due,r.status==="erledigt")],["status","Status",r=>stPill(r.status)],["chat","Chat",r=>`<span class="small">${esc(r.chat||"")}</span>`]]);
 };
-VIEWS_after.aufgaben=()=>{
-  const f=lsGet("taskFilter",{who:"",st:"offen"});
-  const a=$("#tfst"),b=$("#tfwho");
-  const up=()=>{lsSet("taskFilter",{st:a?a.value:f.st,who:b?b.value:""});render();};
-  if(a)a.onchange=up;if(b)b.onchange=up;
-  document.querySelectorAll("[data-tv]").forEach(x=>x.onclick=()=>{lsSet("taskView",x.dataset.tv);render();});
-  document.querySelectorAll(".bcard[draggable]").forEach(c=>{
-    c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.bid);e.dataTransfer.effectAllowed="move";c.classList.add("drag");});
-    c.addEventListener("dragend",()=>c.classList.remove("drag"));});
-  document.querySelectorAll(".bcol").forEach(col=>{
-    col.addEventListener("dragover",e=>{e.preventDefault();col.classList.add("over");});
-    col.addEventListener("dragleave",()=>col.classList.remove("over"));
-    col.addEventListener("drop",async e=>{e.preventDefault();col.classList.remove("over");const id=e.dataTransfer.getData("text/plain");const t=S.data.tasks.find(x=>x.id===id);if(!t||(t.status||"offen")===col.dataset.col)return;await save("tasks",id,Object.assign({},t,{status:col.dataset.col}));});});
-};
+VIEWS_after.aufgaben=()=>{const a=$("#tfst"),b=$("#tfwho");const up=()=>{lsSet("taskFilter",{st:a.value,who:b.value});render();};if(a)a.onchange=up;if(b)b.onchange=up;};
 
 VIEWS.zeitleiste=()=>{
   const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
   const svg=timelineSvg();
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Terminleiste</h1><p>Schulische und betriebliche Termine von Oktober 2026 bis Juli 2027. Grün = erledigt. Termin antippen für Details, Notizen und Dateien. Der verbindliche Projektplan bleibt in Rillsoft.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Terminleiste</h1><p>Schulische und betriebliche Termine von Oktober 2026 bis Juli 2027. Grün = erledigt. Termin antippen für Details, Notizen und Dateien. Der verbindliche Projektplan bleibt in Rillsoft.</p></div>${newBtn("deadlines","Neuer Termin")}</div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px">${svg}</div>`+
   listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>(r.approx?"ca. ":"")+dueCell(r.date,r.status==="erledigt")],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]]);
 };
-
-function icsEsc(s){return String(s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");}
-function icsFold(l){const o=[];let s=l;while(s.length>60){o.push(s.slice(0,60));s=" "+s.slice(60);}o.push(s);return o.join("\r\n");}
-function buildIcs(){
-  const ymd=s=>s.replace(/-/g,"");
-  const nextDay=s=>{const d=pd(s);d.setDate(d.getDate()+1);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");};
-  const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
-  const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TA-Cockpit//Technikerarbeit//DE","CALSCALE:GREGORIAN","X-WR-CALNAME:Technikerarbeit Termine"];
-  S.data.deadlines.filter(d=>d.date&&d.status!=="erledigt").forEach(d=>{
-    L.push("BEGIN:VEVENT","UID:"+d.id+"@ta-cockpit","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+ymd(d.date),"DTEND;VALUE=DATE:"+nextDay(d.date),"SUMMARY:"+icsEsc((d.approx?"ca. ":"")+d.title),"DESCRIPTION:"+icsEsc((d.kind==="betrieb"?"Betrieb":"Schule")+(d.note?" – "+d.note:"")),"END:VEVENT");});
-  L.push("END:VCALENDAR");
-  return L.map(icsFold).join("\r\n")+"\r\n";
-}
-VIEWS_after.zeitleiste=()=>{const b=$("#icsbtn");if(b)b.onclick=async()=>{b.disabled=true;try{await saveBlob("Termine_Technikerarbeit.ics",new Blob([buildIcs()],{type:"text/calendar"}));}catch(e){alert2("Kalenderdatei konnte nicht erstellt werden.");}b.disabled=false;};};
 
 VIEWS.fragen=()=>{
   const f=lsGet("qFilter",{st:"alle"});
@@ -1212,7 +1115,6 @@ function renderTask(first){
 
 /* ---------- Events ---------- */
 document.addEventListener("click",ev=>{
-  if(ev.target.closest("#srchbtn")){palOpenUi();return;}
   const dl=ev.target.closest("[data-dl]");if(dl){ev.preventDefault();ev.stopPropagation();const f=S.data.files.find(x=>x.id===dl.dataset.dl);if(f)dlFile(f,dl);return;}
   if(ev.target.closest("[data-noedit],.fchip a"))return;
   const tt=ev.target.closest("[data-termin]");if(tt&&!S.modalOpen){ev.preventDefault();openTermin(tt.dataset.termin);return;}
@@ -1226,46 +1128,6 @@ document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&S.modalOpen)close
 function route(){const h=(location.hash||"").slice(1);S.view=VIEWS[h]?h:"start";if(S.modalOpen){$("#modal").innerHTML="";S.modalOpen=false;}render();window.scrollTo(0,0);}
 window.addEventListener("hashchange",route);
 const v0=(location.hash||"").slice(1);if(VIEWS[v0])S.view=v0;
-/* ---------- Suchpalette ---------- */
-const pal=document.createElement("div");pal.id="palette";
-pal.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="Suche"><input id="palq" type="text" placeholder="Suchen oder Befehl eingeben …" autocomplete="off" aria-label="Suche"><ul id="pall"></ul><div class="hint">Pfeiltasten wählen · Enter öffnen · Esc schließen</div></div>';
-document.body.appendChild(pal);
-let palSel=0,palItems=[];
-function palOpen(c,view,id){
-  if(c==="tasks"){openTask(id);return;}
-  if(c==="deadlines"){openTermin(id);return;}
-  if(S.canWrite&&!S.offline&&LISTS[c]){openEditor(c,id);return;}
-  location.hash="#"+view;
-}
-function palBuild(q){
-  const nrm=s=>String(s||"").toLowerCase().replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  const t=nrm(q).trim().split(/\s+/).filter(Boolean);
-  const hit=(label,extra)=>{const l=nrm(label);const h=l+" "+extra.map(nrm).join(" ");if(!t.every(w=>h.includes(w)))return -1;return t.every(w=>l.includes(w))?2:1;};
-  const out=[];
-  NAV.forEach(g=>g[1].forEach(([k,l])=>{if(!t.length||hit(l,[])>=0)out.push({k:"Seite",label:l,score:3,go:()=>{location.hash="#"+k;}});}));
-  if(S.canWrite&&!S.offline)NEWS.forEach(([c,l])=>{if(!t.length||hit(l,[])>=0)out.push({k:"Neu anlegen",label:l,score:t.length?1.5:0,go:()=>openEditor(c,null)});});
-  if(t.length)SRC.forEach(([c,kind,view,lab,ext])=>{(S.data[c]||[]).forEach(r=>{const s=hit(lab(r),ext(r));if(s>=0)out.push({k:kind,label:String(lab(r)||"(ohne Titel)").slice(0,140),score:s,go:()=>palOpen(c,view,r.id)});});});
-  out.sort((a,b)=>b.score-a.score);
-  return out.slice(0,40);
-}
-function palRender(){
-  palItems=palBuild($("#palq").value);palSel=Math.min(palSel,Math.max(0,palItems.length-1));
-  $("#pall").innerHTML=palItems.length?palItems.map((it,i)=>`<li data-pi="${i}" class="${i===palSel?"sel":""}"><span class="k">${esc(it.k)}</span><span class="t">${esc(it.label)}</span></li>`).join(""):'<li style="cursor:default" class="muted">Nichts gefunden.</li>';
-  const el=$("#pall .sel");if(el)el.scrollIntoView({block:"nearest"});
-}
-function palOpenUi(){if(S.modalOpen)return;pal.classList.add("on");const q=$("#palq");q.value="";palSel=0;palRender();q.focus();}
-function palClose(){pal.classList.remove("on");}
-function palGo(i){const it=palItems[i];if(!it)return;palClose();it.go();}
-pal.addEventListener("click",e=>{if(e.target===pal){palClose();return;}const li=e.target.closest("[data-pi]");if(li)palGo(+li.dataset.pi);});
-$("#palq").addEventListener("input",()=>{palSel=0;palRender();});
-$("#palq").addEventListener("keydown",e=>{
-  if(e.key==="ArrowDown"){e.preventDefault();palSel=Math.min(palItems.length-1,palSel+1);palRender();}
-  else if(e.key==="ArrowUp"){e.preventDefault();palSel=Math.max(0,palSel-1);palRender();}
-  else if(e.key==="Enter"){e.preventDefault();palGo(palSel);}
-  else if(e.key==="Escape"){e.preventDefault();palClose();}});
-document.addEventListener("keydown",e=>{
-  if((e.ctrlKey||e.metaKey)&&String(e.key).toLowerCase()==="k"){e.preventDefault();pal.classList.contains("on")?palClose():palOpenUi();}
-  else if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||"")&&!S.modalOpen){e.preventDefault();palOpenUi();}});
 boot();
 })();
 </script>

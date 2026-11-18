@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Baut docs/index.html aus cockpit/vorlage.html und den Daten in cockpit/daten/*.json.
-Gibt es cockpit/vorlage_neu.html, entsteht zusätzlich docs/index_neu.html (Testversion).
 
 Aufruf (im Repo-Hauptordner):  python cockpit/build.py
 Jede Datei daten/<sammlung>.json enthält eine Liste von Einträgen (mit "id").
@@ -14,14 +13,10 @@ for datei in sorted((basis / "daten").glob("*.json")):
 
 # </ im JSON entschärfen, damit das <script>-Element nicht vorzeitig endet
 roh = json.dumps(daten, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+html = (basis / "vorlage.html").read_text(encoding="utf-8").replace("<!--DATEN-->", roh)
 
 ziel = basis.parent / "docs"
 ziel.mkdir(exist_ok=True)
-for quelle, ausgabe in (("vorlage.html", "index.html"), ("vorlage_neu.html", "index_neu.html")):
-    q = basis / quelle
-    if not q.exists():
-        continue
-    html = q.read_text(encoding="utf-8").replace("<!--DATEN-->", roh)
-    (ziel / ausgabe).write_text(html, encoding="utf-8")
-    print(f"docs/{ausgabe} geschrieben:", len(html) // 1024, "KB;", sum(len(v) for v in daten.values()), "Einträge in", len(daten), "Sammlungen")
+(ziel / "index.html").write_text(html, encoding="utf-8")
 (ziel / ".nojekyll").write_text("", encoding="utf-8")
+print("docs/index.html geschrieben:", len(html) // 1024, "KB;", sum(len(v) for v in daten.values()), "Einträge in", len(daten), "Sammlungen")
