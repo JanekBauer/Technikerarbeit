@@ -987,8 +987,7 @@ async function dlZip(folders,all,btn){const o=btn.textContent;btn.disabled=true;
 
 function fileBtns(f,small){if(!f||f.missing)return "";const sm=small?" sm":"";
   if(!fileUrl(f))return (S.canWrite&&!S.offline)?`<button class="btn${sm}" data-upslot="${esc(f.id)}">Datei hinzufügen</button>`:`<span class="small muted">noch nicht im Web-Archiv</span>`;
-  const view=VIEWABLE.test(fileMime(f))&&f.enc!=="b64"?`<a class="btn${sm}" href="${esc(fileUrl(f))}" target="_blank" rel="noopener">Öffnen</a>`:"";
-  return view+`<button class="btn${sm}${small?"":" pri"}" data-dl="${esc(f.id)}">Herunterladen</button>`;}
+  return `<button class="btn${sm}${small?"":" pri"}" data-dl="${esc(f.id)}">Herunterladen</button>`;}
 VIEWS.dateien=()=>{
   const t=archTree();const can=S.assets&&S.canWrite&&!S.offline;
   const folders=Object.keys(t).sort((a,b)=>a.localeCompare(b,"de",{numeric:true}));
