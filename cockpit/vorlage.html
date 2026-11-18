@@ -566,8 +566,6 @@ VIEWS.start=()=>{
   const conf=S.data.conflicts.filter(c=>c.status!=="geklärt");
   const kiF=S.data.kilog.filter(k=>k.fach);
   const fNo=S.data.reqs.filter(r=>r.art==="F"&&![r.min,r.exact,r.max].some(v=>v!==""&&v!=null)&&!r.noValue);
-  const steps=open.slice().sort(sortDue).slice(0,3);
-  const pk=S.data.packages.slice().sort((a,b)=>(a.order||99)-(b.order||99));
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
   let h=`<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
     <p>Konzeption und Konstruktion einer automatisierten Messanlage zur Prüfung von Rohren im Wareneingang · BD Gamer Lasertechnik, Bruchsal</p></div>
@@ -582,11 +580,7 @@ VIEWS.start=()=>{
     <div class="big" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></div>
   </div>
   <div class="grid g2">
-   <div class="panel"><h3>Die 3 nächsten Schritte</h3><ul class="clean">${steps.length?steps.map((t,i)=>`<li class="step click" data-task="${esc(t.id)}" role="button" tabindex="0" aria-label="${esc(t.title)} – erklären"><b class="k">${i+1}</b><div>${esc(t.title)}<div class="small muted">${esc(t.who||"")}${t.chat?" · Chat "+esc(t.chat):""} · ${dueCell(t.due,false)}</div><div class="go">${t.ai?"Erklärung ansehen ›":"Antippen: Was muss ich tun? ›"}</div></div></li>`).join(""):`<li class="empty">Keine offenen Punkte.</li>`}</ul>
-    <div style="margin-top:8px"><a class="btn sm" href="#aufgaben">Alle offenen Punkte</a></div></div>
    <div class="panel"><h3>Termine</h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>
-   <div class="panel"><h3>Arbeitspakete</h3>${pk.length?pk.map((p,pi)=>`<div class="amp"><span class="dot d-${esc(p.ampel)}" title="${esc(p.ampel)}"></span><div><a href="#" data-edit="packages" data-id="${esc(p.id)}" style="color:var(--ink);text-decoration:none"><b>${esc(p.name)}</b></a><div class="small muted">${esc(p.stand||"")}</div></div>${S.canWrite&&!S.offline?`<span style="white-space:nowrap"><button class="btn sm" data-pkmv="${pi}|-1" ${pi===0?"disabled":""} aria-label="Arbeitspaket nach oben">↑</button> <button class="btn sm" data-pkmv="${pi}|1" ${pi===pk.length-1?"disabled":""} aria-label="Arbeitspaket nach unten">↓</button></span>`:""}</div>`).join(""):'<div class="empty">Noch keine Arbeitspakete.</div>'}
-    <div style="margin-top:8px">${newBtn("packages","Arbeitspaket hinzufügen")}</div></div>
    <div class="panel"><h3>Achtung</h3><ul class="warnlist">
      <li>${pill(q1.length,q1.length?"p-warn":"p-ok")} offene Fragen mit Priorität 1 an den Betrieb · <a href="#fragen">ansehen</a></li>
      <li>${pill(fNo.length,fNo.length?"p-bad":"p-ok")} Festanforderungen ohne Wert · <a href="#anforderungen">ansehen</a></li>
