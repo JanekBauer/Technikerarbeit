@@ -19,5 +19,6 @@
 {"id": "e18", "date": "2026-11-06", "text": "Elektronikplan = Schaltplan Pneumatik + E-Plan, keine Programmierung", "source": "Janek (Cockpit)", "docs": "PH, AS", "check": false},
 {"id": "e19", "date": "2026-11-14", "text": "Bei Terminabweichungen gelten die Daten aus dem PH V1; der Projektplan wird daran angepasst", "source": "Janek", "docs": "PH V1, Projektplan", "check": false},
 {"id": "e20", "date": "2026-11-14", "text": "Bauer_TA_AS_V3.docx vom 13.11. ist die Originalfassung der AS; die alte AS V3 vom 30.10. wird verworfen (aus dem Archiv gelöscht)", "source": "Janek", "docs": "AS", "check": false},
-{"id": "e21", "date": "2026-11-14", "text": "MS 1 am Fr. 20.11.2026, 9:30–10:30 Uhr", "source": "Janek / Hr. Graudejus de Olio", "docs": "Projektplan, Termine", "check": false}
+{"id": "e21", "date": "2026-11-14", "text": "MS 1 am Fr. 20.11.2026, 9:30–10:30 Uhr", "source": "Janek / Hr. Graudejus de Olio", "docs": "Projektplan, Termine", "check": false},
+{"id": "e-20261118-termine", "date": "2026-11-18", "text": "Terminabgleich Pflichtenheft V1 ↔ Projektplan (13.11.) ↔ Cockpit: PH-Freigabe 27.11.26 · Variantenauswahl 11.12.26 · Konstruktionsfreigabe 15.01.27 · MS 2 15.01.27 · MS 3 19.03.27 · Übergabe/Projektabschluss 05.03.27. AS-Frist 08.01.27 bleibt eigener Termin. Projektplan in Rillsoft anzupassen.", "source": "Janek (Terminabgleich)", "docs": "Pflichtenheft V1, Projektplan 13.11., Cockpit Termine", "check": false}
 ]

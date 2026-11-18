@@ -1,14 +1,14 @@
 [
-{"id":"d01","title":"Kick-off im Betrieb","date":"2026-10-23","approx":false,"kind":"betrieb","status":"erledigt","note":""},
-{"id":"d04","title":"PH-Freigabe + Unterschrift im Betrieb","date":"2026-11-27","approx":false,"kind":"betrieb","status":"geplant","note":"Verschoben auf Fr. 27.11. (Entscheidung Janek 13.11.; steht so im PH V1)","updated":"2026-11-14T10:00:00Z"},
-{"id":"d05","title":"MS 1 – Projektplanung und -vorbereitung","date":"2026-11-20","approx":false,"kind":"schule","status":"geplant","note":"Fr. 20.11.2026, 9:30–10:30 Uhr, mit Hr. Graudejus de Olio vereinbart (Janek, 14.11.)","updated":"2026-11-18T18:01:31.799Z"},
-{"id":"d07","title":"Gesetzliche Frist finale AS","date":"2027-01-08","approx":true,"kind":"schule","status":"geplant","note":"Anfang Januar 2027"},
-{"id":"d08","title":"MS 2 – Projektdurchführung","date":"2027-02-15","approx":true,"kind":"schule","status":"geplant","note":"verschoben auf ca. Mitte Feb. (Terminübersicht: Mitte Jan.) – schriftlich sichern"},
-{"id":"d09","title":"Übergabe / Projektabschluss im Betrieb","date":"2027-02-26","approx":false,"kind":"betrieb","status":"geplant","note":""},
-{"id":"d10","title":"MS 3 – Projektabschluss","date":"2027-03-15","approx":true,"kind":"schule","status":"geplant","note":"Mitte März; Verschiebung ungeklärt"},
-{"id":"d11","title":"Abgabe Dokumentation","date":"2027-04-05","approx":false,"kind":"schule","status":"geplant","note":"10:00 Uhr im Sekretariat, gesetzliche Frist"},
-{"id":"d12","title":"Präsentationsprüfung Tag 1","date":"2027-06-17","approx":false,"kind":"schule","status":"geplant","note":"Termin freihalten"},
-{"id":"d13","title":"Präsentationsprüfung Tag 2","date":"2027-06-18","approx":false,"kind":"schule","status":"geplant","note":"Termin freihalten"},
-{"id":"d14","title":"Variantenauswahl (betrieblicher MS)","date":"2026-12-04","approx":false,"kind":"betrieb","status":"geplant","note":"Im PH V8.7 gesetzt (Janek, 06.11.); Bestätigung Hr. Baidinger offen","updated":"2026-11-06T14:25:00Z"},
-{"id":"d15","title":"Konstruktionsfreigabe (betrieblicher MS)","date":"2027-01-22","approx":false,"kind":"betrieb","status":"geplant","note":"Im PH V8.7 gesetzt (Janek, 06.11.); Bestätigung Hr. Baidinger offen","updated":"2026-11-06T14:25:00Z"}
+{"id": "d01", "title": "Kick-off im Betrieb", "date": "2026-10-23", "approx": false, "kind": "betrieb", "status": "erledigt", "note": ""},
+{"id": "d04", "title": "PH-Freigabe + Unterschrift im Betrieb", "date": "2026-11-27", "approx": false, "kind": "betrieb", "status": "geplant", "note": "Festgelegt 18.11.: Fr. 27.11.26. Pflichtenheft V1 und Cockpit stimmen. Im Projektplan (Rillsoft) auf 27.11. setzen.", "updated": "2026-11-18T21:00:00Z"},
+{"id": "d05", "title": "MS 1 – Projektplanung und -vorbereitung", "date": "2026-11-20", "approx": false, "kind": "schule", "status": "geplant", "note": "Fr. 20.11.2026, 9:30–10:30 Uhr, mit Hr. Graudejus de Olio vereinbart (Janek, 14.11.)", "updated": "2026-11-18T18:01:31.799Z"},
+{"id": "d07", "title": "Gesetzliche Frist finale AS", "date": "2027-01-08", "approx": true, "kind": "schule", "status": "geplant", "note": "Anfang Januar 2027"},
+{"id": "d08", "title": "MS 2 – Projektdurchführung", "date": "2027-01-15", "approx": false, "kind": "schule", "status": "geplant", "note": "Festgelegt 18.11.: 15.01.27 (Janek). Projektplan (M2) wird angepasst. Vorher Abstimmung schriftlich sichern.", "updated": "2026-11-18T21:00:00Z"},
+{"id": "d09", "title": "Übergabe / Projektabschluss im Betrieb", "date": "2027-03-05", "approx": false, "kind": "betrieb", "status": "geplant", "note": "Festgelegt 18.11.: 05.03.27 (Janek). Pflichtenheft und Cockpit angepasst, Projektplan wird angepasst.", "updated": "2026-11-18T21:00:00Z"},
+{"id": "d10", "title": "MS 3 – Projektabschluss", "date": "2027-03-19", "approx": false, "kind": "schule", "status": "geplant", "note": "Festgelegt 18.11.: 19.03.27 (Projektplan M3). Cockpit angepasst.", "updated": "2026-11-18T21:00:00Z"},
+{"id": "d11", "title": "Abgabe Dokumentation", "date": "2027-04-05", "approx": false, "kind": "schule", "status": "geplant", "note": "10:00 Uhr im Sekretariat, gesetzliche Frist"},
+{"id": "d12", "title": "Präsentationsprüfung Tag 1", "date": "2027-06-17", "approx": false, "kind": "schule", "status": "geplant", "note": "Termin freihalten"},
+{"id": "d13", "title": "Präsentationsprüfung Tag 2", "date": "2027-06-18", "approx": false, "kind": "schule", "status": "geplant", "note": "Termin freihalten"},
+{"id": "d14", "title": "Variantenauswahl (betrieblicher MS)", "date": "2026-12-11", "approx": false, "kind": "betrieb", "status": "geplant", "note": "Festgelegt 18.11.: 11.12.26 (Janek). Pflichtenheft und Cockpit angepasst, Projektplan wird angepasst.", "updated": "2026-11-18T21:00:00Z"},
+{"id": "d15", "title": "Konstruktionsfreigabe (betrieblicher MS)", "date": "2027-01-15", "approx": false, "kind": "betrieb", "status": "geplant", "note": "Festgelegt 18.11.: 15.01.27 (Janek). Pflichtenheft und Cockpit angepasst, Projektplan wird angepasst.", "updated": "2026-11-18T21:00:00Z"}
 ]
