@@ -13,5 +13,3 @@
 - Nach jeder abgeschlossenen Aufgabe: geänderte Dateien committen (Nachricht auf Deutsch: was und warum) und pushen.
 - Ältere Versionen nicht löschen, sondern in den Unterordner `_Versionen` verschieben. Nichts endgültig löschen.
 - Jede KI-Hilfe in `cockpit/daten/kilog.json` bzw. `KI-Logbuch.md` eintragen (Datum, Aufgabe, Art der Hilfe).
-- Vertrauliche Betriebsunterlagen (Rohrspezifikationen, Prüfanweisung, Angebote, Mails, Fotos
-  aus „1 Betrieb & Ausschreibung“) niemals committen; das Repo ist öffentlich.
