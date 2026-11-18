@@ -1,0 +1,320 @@
+{
+ "mw14li5a6uoot": {
+  "chat": "04 Meilensteine",
+  "due": "2026-11-05",
+  "note": "Aus Notiz zu „Protokoll an Baidinger + Nachricht MS 1 an Graudejus“ (03.11.2026)",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Terminfenster für Graudejus-Termin (MS 1) nach PH-Freigabe festlegen und Datum vor 2026-11-16 prüfen",
+  "updated": "2026-11-04T19:10:37.004Z",
+  "who": "Janek"
+ },
+ "t-as-angleichen-rest": {
+  "chat": "01 AS/Klärung",
+  "due": "2026-11-20",
+  "note": "13.11.: „Rundheit“ → „Ovalität“ in der AS umgesetzt (Archiv as-v3-ms1). Rest: W8 – beim MS 1 am 20.11. mit Hr. Graudejus de Olio klären.",
+  "prio": "2",
+  "status": "in Arbeit",
+  "title": "AS V3 (MS 1 final): Texte selbst prüfen/überarbeiten bzw. KI-Anteil offenlegen (W8)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t-kontaktstellen": {
+  "chat": "06 Spann-/Handhabung",
+  "due": "2026-11-27",
+  "note": "Aus PH V8.3 (Messprinzip, 5.3) auf Wunsch von Janek ins Cockpit verschoben (06.11.2026); vor Variantenauswahl 04.12. klären",
+  "prio": "2",
+  "status": "offen",
+  "title": "Zulässige Kontaktstellen und Kontaktwerkstoffe für Auflage/Führung der Rohre mit Hr. Baidinger klären (vgl. PH Anf. 3.2: keine Beschädigung, sauber und ölfrei)",
+  "updated": "2026-11-06T10:36:00Z",
+  "who": "Janek"
+ },
+ "t-pc-abgleich": {
+  "chat": "00 Cockpit",
+  "due": "2026-11-09",
+  "note": "17.11. (Chat 00): 19 fehlende Archivdateien auf den PC übertragen, ältere Fassungen nach _Versionen; tools/pcsync aktualisiert",
+  "prio": "3",
+  "status": "erledigt",
+  "title": "Cockpit-Archiv mit PC abgleichen („PC-Ordner abgleichen“)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t-ph-aenderungsdoku-md": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "Aus Übergabe Chat 02, 06.11. Seit 13.11. gilt PH V1 mit Kap. 6 auf Stand 0 → MD als „Archiv bis V8.7“ kennzeichnen. Neues Enddatum 27.11. (vor PH-Freigabe), Abgleich 17.11.",
+  "prio": "3",
+  "status": "offen",
+  "title": "claude/PH_Aenderungsdoku_und_Fragenliste.md auf V8.7 nachziehen oder als Archiv bis V7 kennzeichnen",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t-ph-formfehler": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "13.11. erledigt laut PH V1: Rundheit → Ovalität (5×), 5.1 Platzbedarf F → W, Kap. 6 geleert (damit „1.5→1.2“ hinfällig). Rest offen; vor PH-Freigabe 27.11.",
+  "prio": "2",
+  "status": "in Arbeit",
+  "title": "PH: restliche Formfehler prüfen (2.3 Wert unter exakt/max., Maßstab bei 4.1/2.6/2.7)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t-ph-freigabe-termin": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-13",
+  "note": "13.11.: im PH V1 (MS 1 final) steht PH-Freigabe 27.11.2026 (Entscheidung Janek 13.11.; Archiv ph-v1-ms1) – Abgleich 17.11.",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "PH: betriebliche MS „PH-Freigabe“ auf neuen Termin setzen",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t-ph-werte-bestaetigen": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "PH-Freigabe auf 27.11. verschoben (Entscheidung Janek 13.11.) – Enddatum angepasst, Abgleich 17.11.",
+  "prio": "1",
+  "status": "offen",
+  "title": "Mit der PH-Unterschrift am 27.11. von Hr. Baidinger bestätigen lassen: Spezifikationswerte dürfen im PH stehen; betriebl. MS 04.12./22.01.; Werkstoffe, Automatisierungsgrad, Angebote/Abgrenzung, Messprozess",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t01": {
+  "chat": "00 Cockpit",
+  "due": "2026-11-06",
+  "note": "Stand Projektstand 30.10.2026",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Bestätigung per Mail (Ø, Länge, Angebote ja/Bestellung nein, Messprozessentwicklung)",
+  "updated": "2026-11-06T13:58:44.144Z",
+  "who": "Janek"
+ },
+ "t02": {
+  "chat": "04 Meilensteine",
+  "due": "2026-11-09",
+  "note": "14.11.: Termin MS 1 vereinbart – Fr. 20.11.2026, 9:30–10:30 Uhr (Janek)",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "MS-1-Termin (ca. 16.11.) + Vor-Ort-Termin bei Hr. Graudejus de Olio anfragen; AS V4.2 mitschicken; FSL-Prüfung, KI-Regel/Selbstständigkeitserklärung, MS-Verschiebung schriftlich klären; PH-Unterschrift erst 20.11. erklären",
+  "updated": "2026-11-14T10:00:00Z",
+  "who": "Janek"
+ },
+ "t03": {
+  "chat": "01 AS/Klärung",
+  "due": "2026-11-06",
+  "note": "Stand Projektstand 30.10.2026",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Problemstellung und Ziel der AS V3 selbst überarbeiten, Messprozessentwicklung aufnehmen",
+  "updated": "2026-11-06T13:59:01.408Z",
+  "who": "Janek"
+ },
+ "t04": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-06",
+  "note": "06.11.: bewusst nicht mehr nötig (Entscheidung Janek, Cockpit) – Problemstellung stützt sich auf das Lieferanten-Defizit; Frage an Betrieb ebenfalls gestrichen",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Folge der Rohrfehler für den Betrieb (Ausschuss, Kosten, Reklamation)",
+  "updated": "2026-11-06T14:35:00Z",
+  "who": "Baidinger"
+ },
+ "t05": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-06",
+  "note": "06.11.: Ersetzt durch Ovalität (Ø max − Ø min) NiTi ≤ 0,010 mm, Edelstahl ≤ 0,025 mm aus den Rohrspezifikationen – PH V8.7 Anf. 2.1 (Chat 02)",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Anf. 2.1 Rundheit „10 %“ – wovon? Rundheitstoleranz",
+  "updated": "2026-11-06T14:20:00Z",
+  "who": "Baidinger"
+ },
+ "t06": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-20",
+  "note": "Frage war bis 13.11. fällig – Antwort nicht belegt (Abgleich 17.11.). Neues Enddatum: nächster Projekttag Fr. 20.11., spätestens mit PH-Unterschrift 27.11. · Ø ± 13 µm ✓ · Taktzeit W ohne Wert ✓",
+  "prio": "1",
+  "status": "in Arbeit",
+  "title": "Anf. 2.4: %GRR ≤ 10 % von Hr. Baidinger bestätigen lassen (Ø-Toleranz ± 13 µm ✓ geklärt; Taktzeit-Richtwert optional bis 20.11.)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Baidinger"
+ },
+ "t07": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-20",
+  "note": "Frage war bis 13.11. fällig – Antwort nicht belegt (Abgleich 17.11.). Neues Enddatum: Projekttag Fr. 20.11.",
+  "prio": "1",
+  "status": "in Arbeit",
+  "title": "Anf. 2.3 „alle 2 mm“ entlang der Länge (≈ 1500 Messstellen)? Helixabtastung zulässig?",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Baidinger"
+ },
+ "t08": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-06",
+  "note": "Stand Projektstand 30.10.2026",
+  "prio": "2",
+  "status": "erledigt",
+  "title": "Umfang Pneumatik-/Elektroplan vs. Abgrenzung Steuerung",
+  "updated": "2026-11-06T13:59:39.775Z",
+  "who": "Baidinger"
+ },
+ "t09": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-06",
+  "note": "06.11.: Variantenauswahl 04.12.2026 und Konstruktionsfreigabe 22.01.2027 im PH V8.7 gesetzt (Janek, Chat 02); Bestätigung Hr. Baidinger nicht belegt",
+  "prio": "2",
+  "status": "erledigt",
+  "title": "Variantenauswahl/Konstruktionsfreigabe als betriebl. MS wieder aufnehmen oder Begründung",
+  "updated": "2026-11-06T14:20:00Z",
+  "who": "Janek"
+ },
+ "t10": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "Weiter offen (W12). Neues Enddatum 27.11. (vor PH-Freigabe), Abgleich 17.11.",
+  "prio": "2",
+  "status": "offen",
+  "title": "Auslegungsberechnungen bewusst gestrichen? (fachliche Tiefe der Doku)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t11": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-06",
+  "note": "05./06.11.: W1, W3 (PH V7), W2 (AS V3.1), AS V4 an PH V8.7 angeglichen (Chat 01/02); Rest W4 im Widerspruchs-Bereich",
+  "prio": "1",
+  "status": "erledigt",
+  "title": "Widersprüche PH V6 ↔ AS V3 auflösen → PH V7",
+  "updated": "2026-11-06T14:20:00Z",
+  "who": "Janek"
+ },
+ "t12": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "Gilt jetzt für PH V1 (13.11.); Aktualisierung nicht belegt. Neues Enddatum 27.11., Abgleich 17.11.",
+  "prio": "3",
+  "status": "offen",
+  "title": "Inhaltsverzeichnis PH V1 in Word aktualisieren (Strg+A, F9)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t13": {
+  "chat": "00 Cockpit",
+  "due": "2026-11-03",
+  "note": "Stand Projektstand 30.10.2026",
+  "prio": "3",
+  "status": "erledigt",
+  "title": "AS V3 + PH V6 lokal in C:\\_Janek_Bauer\\Cloude\\Technikerarbeit ablegen",
+  "updated": "2026-11-04T19:10:45.730Z",
+  "who": "Janek"
+ },
+ "t14": {
+  "chat": "01 AS/Klärung",
+  "due": "2026-11-30",
+  "note": "14.11.: Bauer_TA_AS_V3.docx vom 13.11. ist die gültige AS (Entscheidung Janek, e20); FSL-Prüfung offen (W5). Termin ca. 2 Wochen nach MS 1 (20.11.) → prüfen, ob 30.11. bleibt",
+  "prio": "2",
+  "status": "offen",
+  "title": "Unterschriften AS V3 (MS 1 final, 13.11.) einholen (Baidinger + Stempel, Graudejus de Olio, Janek) → PDF + DOCX an FSL",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t15": {
+  "chat": "03 Projektplan",
+  "due": "2026-11-19",
+  "note": "13.11. aktualisiert (Projektplan_Janek_Bauer.pdf). 14.11.: Termine aus dem PH V1 sind maßgeblich – Plan daran angleichen (Variantenauswahl 04.12., Konstruktionsfreigabe 22.01., Übergabe 26.02., MS 1 20.11.)",
+  "prio": "1",
+  "status": "offen",
+  "title": "Projektplan Rillsoft aktualisieren (MS, Messprozessentwicklung, Pneumatik-/Elektroplan, Angebote, Doku prozessbegleitend) → PDF",
+  "updated": "2026-11-14T10:00:00Z",
+  "who": "Janek"
+ },
+ "t17": {
+  "chat": "02 Pflichtenheft",
+  "due": "2026-11-27",
+  "note": "06.11.: Spezifikationen Edelstahl + 2× NiTi + Normen ✓ · Sperrvermerk nein ✓ · Tantal-Spezifikation RM021800003 Rev. 2 liegt seit 06.11. im Archiv ✓ · offen: QM-Ansprechpartner namentlich, Druckluft (später), Vereinbarung V5. Enddatum mit PH-Unterschrift 27.11. (Abgleich 17.11.)",
+  "prio": "2",
+  "status": "in Arbeit",
+  "title": "Rest klären: QM-Ansprechpartner für Ist-Zustand (bis 20.11.), Tantal-Spezifikation (bis 27.11.), Vereinbarung V5; Druckluft erst bis 15.01.2027",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t18": {
+  "ai": {
+   "at": "2026-11-07T11:11:06.363Z",
+   "brauchst": [
+    "Gliederungsentwurf Doku vom 19.10.",
+    "TA UP5 Formatvorlage (V10) mit der KI-Regel",
+    "AS V4.2 und PH V8.7 (aktuelle Stände)",
+    "Deine Erinnerung oder Chat-Verläufe, wo du KI genutzt hast"
+   ],
+   "chat": "10 Doku",
+   "fertig": "Der Doku-Ordner mit Struktur existiert und ist im Cockpit eingetragen. Das KI-Logbuch enthält alle bisherigen KI-Nutzungen. Du weißt, wie du künftig einträgst.",
+   "fragen": [
+    "Wie genau soll das KI-Logbuch aussehen? Gibt es eine Vorgabe von Hr. Graudejus oder der FSL (Fachschulleitung)?",
+    "Muss das Logbuch der Doku beigelegt oder nur auf Nachfrage vorgelegt werden?",
+    "Wo soll der Doku-Speicher liegen (PC, Schul-Cloud, Firmenlaufwerk)? Wegen vertraulicher Rohrspezifikationen ist das noch zu klären."
+   ],
+   "schritte": [
+    "Lege einen Ordner für die Doku an (z. B. 'Doku') mit Unterordnern nach Gliederung. Nimm den Gliederungsentwurf vom 19.10. als Grundlage. Der Ordner soll im Cockpit/PC-Abgleich auftauchen.",
+    "Sortiere vorhandene Doku-Bausteine ein: aktuelle AS V4.2, PH V8.7, Recherche-Notizen, Protokolle. Lege alte Versionen in einen Unterordner 'Archiv'.",
+    "Lege eine Logbuch-Datei an (z. B. Tabelle) mit Spalten: Datum, Dokument/Kapitel, Zweck der KI-Nutzung (nur Sprache? Struktur? Recherche?), Prompt in Stichworten, was du übernommen hast, was du selbst geändert hast.",
+    "Trage rückwirkend ein, wo du KI bisher genutzt hast. Dazu gehören die KI-ausformulierten AS-Texte (W8) und die %GRR-Websuche (AIAG MSA). Schreibe ehrlich auf, was die KI gemacht hat.",
+    "Lege eine feste Regel fest: Jede KI-Nutzung trägst du am selben Tag ein. Die KI schreibt keine fachlichen Texte für Doku, AS oder PH, nur sprachliche Optimierung deiner eigenen Texte.",
+    "Hake den Punkt im Cockpit ab und notiere den Speicherort. Gleiche danach den PC-Ordner mit dem Cockpit-Archiv ab (Punkt bis 09.11.)."
+   ],
+   "worum": "Du richtest den Doku-Speicher ein und führst das KI-Logbuch. Das Logbuch belegt, wo KI nur sprachlich geholfen hat. Das ist wichtig, weil die Selbstständigkeitserklärung (Formatvorlage V10: KI nur sprachlich) und die offene KI-Formulierung in der AS (W8) sonst Probleme machen. Der Punkt ist bis 08.11. fällig."
+  },
+  "chat": "10 Doku",
+  "due": "2026-11-19",
+  "note": "Fällig war 08.11., Erledigung nicht belegt. Neues Enddatum 19.11. – das KI-Logbuch brauchst du beim MS 1 am 20.11. für die Klärung der KI-Regel (W8). Abgleich 17.11.",
+  "prio": "2",
+  "status": "offen",
+  "title": "Doku-Speicher + KI-Logbuch pflegen (jetzt im Cockpit)",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ },
+ "t19": {
+  "ai": {
+   "at": "2026-11-07T11:04:48.350Z",
+   "brauchst": [
+    "Cockpit (Chat 00) mit dem Chat-Menü Abschnitt A",
+    "Datei claude/Aufgabenstellung_Bauer_TA_V4.md",
+    "TA_Chat-Menue_Prompts.docx (falls das Menü dort auch geführt wird)"
+   ],
+   "chat": "00 Cockpit",
+   "fertig": "Im Chat-Menü Abschnitt A steht nur noch der Pfad claude/Aufgabenstellung_Bauer_TA_V4.md. Alte AS-Pfade (V2, V3) kommen nicht mehr vor, und der Punkt ist im Cockpit auf erledigt gesetzt.",
+   "fragen": [
+    "Steht Abschnitt A nur im Cockpit oder auch in TA_Chat-Menue_Prompts.docx? Dann musst Du beide Stellen ändern.",
+    "Soll die ältere AS-Datei V3 (.docx) im Menü gar nicht mehr genannt werden oder nur als Archiv?"
+   ],
+   "schritte": [
+    "Öffne das Cockpit (Chat 00) und suche den Abschnitt A im Chat-Menü.",
+    "Suche dort alle Stellen, die auf AS V2 oder V3 zeigen, also Bauer_TA_AS_V2.docx, Bauer_TA_AS_V3.docx oder Aufgabenstellung_Bauer_TA_V3.docx.",
+    "Ersetze diese Pfade durch claude/Aufgabenstellung_Bauer_TA_V4.md.",
+    "Prüfe auch Versionsangaben im Text: Die AS ist jetzt V4 (Stand V4.2 vom 06.11.). Ändere V2 oder V3 auf V4, wo die AS gemeint ist.",
+    "Lies Abschnitt A einmal komplett durch. Es darf kein Hinweis auf eine alte AS-Datei übrig bleiben.",
+    "Setze den Punkt im Cockpit auf erledigt und speichere das Cockpit-Archiv."
+   ],
+   "worum": "Das Chat-Menü im Cockpit (Abschnitt A) verweist noch auf alte Dateien und Pfade der Aufgabenstellung (AS). Seit gestern (06.11.) liegt die AS V4 als claude/Aufgabenstellung_Bauer_TA_V4.md vor. Heute ist der Termin, damit alle Chats mit derselben Version arbeiten."
+  },
+  "chat": "00 Cockpit",
+  "due": "2026-11-07",
+  "note": "07.11. (Chat 00): claude/TA_Chat-Menue_Prompts.md aktualisiert – Abschnitt A neu (AS V4.2, PH V8.7, Termine, Widersprüche W4–W14), alle Prompts auf claude/Aufgabenstellung_Bauer_TA_V4.md bzw. „neueste AS-Datei“; AS V2/V3 nur noch als Archiv erwähnt. Kein .docx des Menüs vorhanden.",
+  "prio": "3",
+  "status": "erledigt",
+  "title": "Chat-Menü Abschnitt A + Pfade auf AS V4 aktualisieren",
+  "updated": "2026-11-07T11:15:00Z",
+  "who": "Janek"
+ },
+ "t20": {
+  "chat": "05 Messtechnik",
+  "due": "2026-11-19",
+  "note": "Fällig war 09.11.; Chat 05 (zuletzt 12.11.) und Chat 06 (13.11.) haben keinen Übergabeblock. Neues Enddatum 19.11. (vor MS 1, Lösungsansätze). Abgleich 17.11.",
+  "prio": "2",
+  "status": "offen",
+  "title": "Übergabeblock Chat 05 erzeugen und ins Cockpit (Chat 00) übertragen",
+  "updated": "2026-11-17T20:45:00Z",
+  "who": "Janek"
+ }
+}

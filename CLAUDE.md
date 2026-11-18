@@ -11,6 +11,7 @@
 - Daten ändern: JSON-Datei bearbeiten (ein Eintrag pro Zeile, `id` beibehalten), danach
   `python cockpit/build.py` ausführen und `cockpit/daten` plus `docs/index.html` zusammen committen.
 - Nach jeder abgeschlossenen Aufgabe: geänderte Dateien committen (Nachricht auf Deutsch: was und warum) und pushen.
+- **Projektabgleich:** Auf Zuruf „Projektabgleich“ führt der Skill `cockpit/skill/ta-projektabgleich/SKILL.md` GitHub-Repo, Claude-Artefakt und Chat-Stand in einem Lauf zusammen (Repo gewinnt bei Wertkonflikten; Skript `cockpit/abgleich/abgleich.py`). Nicht automatisch starten.
 - Ältere Versionen nicht löschen, sondern in den Unterordner `_Versionen` verschieben. Nichts endgültig löschen.
 - Jede KI-Hilfe in `cockpit/daten/kilog.json` bzw. `KI-Logbuch.md` eintragen (Datum, Aufgabe, Art der Hilfe).
 - **Branch-Namen:** Neue Branches heißen `Main_JJJJ-MM-TT_HH-MM`, mit dem Datum und der Uhrzeit (deutsche Zeit,
