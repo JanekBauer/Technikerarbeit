@@ -406,10 +406,10 @@ const LISTS = {
     fields:[["name","Arbeitspaket","text"],["ampel","Ampel","select",["gruen","gelb","rot","grau"]],["stand","Stand","area"],["chat","Chat","select",CHATS],["order","Reihenfolge","num"]],
     def:{ampel:"grau"}},
   questions:{coll:"questions",title:"Fragen an den Betrieb",
-    fields:[["q","Frage","area"],["prio","Priorität","select",["1","2"]],["topic","Bezug (z. B. Anf. 2.1)","text"],["status","Status","select",["offen","beantwortet"]],["answer","Antwort","area"],["source","Quelle (wer)","text"],["date","Datum Antwort","date"]],
+    fields:[["q","Frage","area"],["prio","Priorität","select",["1","2"]],["topic","Bezug (z. B. Anf. 2.1)","text"],["due","Fällig bis","date"],["status","Status","select",["offen","beantwortet"]],["answer","Antwort","area"],["source","Quelle (wer)","text"],["date","Datum Antwort","date"]],
     def:{prio:"1",status:"offen"}},
   reqs:{coll:"reqs",title:"Anforderungsliste",
-    fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","Notiz","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
+    fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"decisions",title:"Entscheidungen",
     fields:[["date","Datum","date"],["text","Entscheidung","area"],["source","Quelle","text"],["docs","Betroffene Dokumente","text"],["check","Noch prüfen/bestätigen","bool"]],def:{}},
@@ -559,11 +559,17 @@ function reqWarnings(){
     if(r.art==="–")return;
     const hasVal=[r.min,r.exact,r.max].some(v=>v!==""&&v!=null);
     if(r.art==="F"&&!hasVal&&!r.noValue)out.push([r,"Festanforderung ohne Wert"]);
-    if(r.status!=="bestätigt")out.push([r,r.status==="Notiz"?"nur Notiz, Bestätigung fehlt":"offen"]);
+    if(r.status!=="bestätigt")out.push([r,"offen"]);
     if(!r.source)out.push([r,"Quelle fehlt"]);
     if(/%/.test([r.min,r.exact,r.max].join(""))&&!/(von|bezogen|vom)/i.test(r.note||""))out.push([r,"Prozentwert ohne Bezug"]);
   });
   return out;
+}
+const REQ_SORTS=[["nr","Nr."],["art","Art: F, M, W"],["status","Status: offen zuerst"],["artstatus","Art, dann Status"]];
+function reqSorted(list,mode){
+  const ar=r=>({F:0,M:1,W:2}[r.art]??3), st=r=>r.status==="bestätigt"?1:0;
+  const cmp={art:(x,y)=>ar(x)-ar(y),status:(x,y)=>st(x)-st(y),artstatus:(x,y)=>(ar(x)-ar(y))||(st(x)-st(y))}[mode]||(()=>0);
+  return list.slice().sort((x,y)=>cmp(x,y)||byNr(x,y));
 }
 function sortDue(a,b){const da=a.due||"9999",dbb=b.due||"9999";if(da!==dbb)return da<dbb?-1:1;return (a.prio||"9")<(b.prio||"9")?-1:1;}
 const byNr=(a,b)=>String(a.nr).localeCompare(String(b.nr),"de",{numeric:true});
@@ -716,32 +722,33 @@ VIEWS.fragen=()=>{
   const rows=f.st==="alle"?sorted:sorted.filter(q=>f.st==="offen"?q.status!=="beantwortet":q.status==="beantwortet");
   return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Erst dann gilt ein Wert als belegt.</p></div>${newBtn("questions","Neue Frage")}</div>
   <div class="toolbar"><select id="qfst" aria-label="Status"><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="beantwortet" ${f.st==="beantwortet"?"selected":""}>Nur beantwortete</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
-  listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["topic","Bezug",r=>`<span class="small">${esc(r.topic)}</span>`],["status","Status",r=>stPill(r.status)],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
+  listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["topic","Bezug",r=>`<span class="small">${esc(r.topic)}</span>`],["due","Fällig",r=>dueCell(r.due,r.status==="beantwortet")],["status","Status",r=>stPill(r.status)],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
 };
 VIEWS_after.fragen=()=>{const s=$("#qfst");if(s)s.onchange=()=>{lsSet("qFilter",{st:s.value});render();};};
 
 VIEWS.anforderungen=()=>{
-  const rows=S.data.reqs.slice().sort(byNr);const W=reqWarnings();
+  const rsort=lsGet("reqSort","nr");const rows=reqSorted(S.data.reqs,rsort);const W=reqWarnings();
   const wfor=r=>W.filter(w=>w[0]===r).map(w=>w[1]);
   const fOpen=rows.filter(r=>r.art==="F"&&r.status!=="bestätigt").length;
   return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 3</span><h1>Anforderungsliste</h1><p>F = Festanforderung (muss erfüllt sein, wird nicht gewichtet), M = Mindestanforderung, W = Wunschanforderung. Werte nur mit Quelle und Datum vom Betrieb als „bestätigt“ markieren.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reqcopy">Als Tabelle kopieren</button>${newBtn("reqs","Neue Anforderung")}</div></div>
-  <div class="toolbar">${pill(rows.length+" Anforderungen","p-acc")} ${pill(rows.filter(r=>r.status==="bestätigt").length+" bestätigt","p-ok")} ${pill(fOpen+" F noch nicht bestätigt",fOpen?"p-warn":"p-ok")}</div>`+
+  <div class="toolbar"><select id="reqsort" aria-label="Sortierung">${REQ_SORTS.map(([v,l])=>`<option value="${v}" ${rsort===v?"selected":""}>${l}</option>`).join("")}</select>${pill(rows.length+" Anforderungen","p-acc")} ${pill(rows.filter(r=>r.status==="bestätigt").length+" bestätigt","p-ok")} ${pill(fOpen+" F noch nicht bestätigt",fOpen?"p-warn":"p-ok")}</div>`+
   listTable("reqs",rows,[["nr","Nr.",r=>`<span class="num">${esc(r.nr)}</span>`],["art","Art",r=>r.art&&r.art!=="–"?pill(r.art,r.art==="F"?"p-bad":r.art==="M"?"p-warn":"p-acc"):""],["text","Anforderung",r=>`${r.group?`<div class="small muted">${esc(r.group)}</div>`:""}${nl(r.text)}`],["min","min.",r=>`<span class="num">${esc(r.min)}</span>`],["exact","exakt",r=>`<span class="num">${esc(r.exact)}</span>`],["max","max.",r=>`<span class="num">${esc(r.max)}</span>`],["unit","Einheit"],["status","Status",r=>stPill(r.status)],["source","Quelle",r=>`<span class="small">${esc(r.source)}${r.date?"<br>"+fd(r.date):""}</span>`],["w","Prüfung",r=>{const w=wfor(r);return w.length?w.map(x=>pill(x,"p-warn")).join(" "):pill("ok","p-ok");}]])+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(["Nr.\tArt\tAnforderung\tSymbol\tmin.\texakt\tmax.\tEinheit"].concat(rows.map(r=>[r.nr,r.art,(r.text||"").replace(/\n/g," "),r.sym,r.min,r.exact,r.max,r.unit].map(v=>v==null?"":v).join("\t"))).join("\n"))}</textarea>`;
 };
-VIEWS_after.anforderungen=()=>{const b=$("#reqcopy");if(b)b.onclick=()=>copyText($("#copybox").value,b);};
+VIEWS_after.anforderungen=()=>{const b=$("#reqcopy");if(b)b.onclick=()=>copyText($("#copybox").value,b);const rs=$("#reqsort");if(rs)rs.onchange=()=>{lsSet("reqSort",rs.value);render();};};
 
 VIEWS.entscheidungen=()=>{
   const tab=lsGet("decTab","dec");
-  const dec=S.data.decisions.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const dsort=lsGet("decSort","date");
+  const dec=S.data.decisions.slice().sort((a,b)=>(dsort==="date"?0:((!!b.check)-(!!a.check))*(dsort==="open"?1:-1))||(b.date||"").localeCompare(a.date||""));
   const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
   return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Entscheidungen & Änderungen</h1><p>Wer hat wann was entschieden. Die Änderungsdoku lässt sich als Tabelle in Word einfügen (Kapitel 6 des Pflichtenhefts).</p></div></div>
-  <div class="toolbar"><button class="btn ${tab==="dec"?"pri":""}" data-tab="dec">Entscheidungen (${dec.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-tab="ch">Änderungsdoku PH (${ch.length})</button><span style="flex:1"></span>${tab==="dec"?newBtn("decisions","Neue Entscheidung"):`<button class="btn" id="chcopy">Für Word kopieren</button>`+newBtn("changes","Neue Änderung")}</div>`+
-  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["text","Entscheidung"],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["check","",r=>r.check?pill("bestätigen","p-warn"):""]])
+  <div class="toolbar"><button class="btn ${tab==="dec"?"pri":""}" data-tab="dec">Entscheidungen (${dec.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-tab="ch">Änderungsdoku PH (${ch.length})</button><span style="flex:1"></span>${tab==="dec"?`<select id="decsort" aria-label="Sortierung"><option value="date" ${dsort==="date"?"selected":""}>Nach Datum</option><option value="open" ${dsort==="open"?"selected":""}>Offene zuerst</option><option value="done" ${dsort==="done"?"selected":""}>Bestätigte zuerst</option></select>`+newBtn("decisions","Neue Entscheidung"):`<button class="btn" id="chcopy">Für Word kopieren</button>`+newBtn("changes","Neue Änderung")}</div>`+
+  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["text","Entscheidung"],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["check","Status",r=>r.check?pill("offen","p-warn"):pill("bestätigt","p-ok")]])
   :listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]])+`<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`);
 };
-VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);};
+VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);const ds=$("#decsort");if(ds)ds.onchange=()=>{lsSet("decSort",ds.value);render();};};
 
 VIEWS.widersprueche=()=>{
   const f=lsGet("cfFilter",{st:"offen"});
