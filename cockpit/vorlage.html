@@ -385,11 +385,11 @@ h3 a.small:hover{text-decoration:underline}
 "use strict";
 /* ---------- Konfiguration ---------- */
 const NAV = [
-  ["Steuerung",[["start","Übersicht"],["aufgaben","Offene Punkte","tasks"],["zeitleiste","Terminleiste","deadlines"],["fragen","Fragen an den Betrieb","questions"]]],
-  ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"],["entscheidungen","Entscheidungen","decisions"],["widersprueche","Widersprüche","conflicts"]]],
-  ["Lösungsphase",[["rechner","Rechner"],["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"]]],
-  ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
-  ["Ablage",[["dateien","Archiv","files"]]]
+  ["Steuerung",[["start","Übersicht"],["zeitleiste","Terminleiste","deadlines"],["fragen","Fragen an den Betrieb","questions"],["aufgaben","Offene Punkte","tasks"],["entscheidungen","Entscheidungen","decisions"],["widersprueche","Widersprüche","conflicts"]]],
+  ["Ablage",[["dateien","Archiv","files"]]],
+  ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"]]],
+  ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"],["rechner","Rechner"]]],
+  ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]]
 ];
 const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files"];
 const WHO = ["Janek","Baidinger","Graudejus","FSL"];
@@ -668,25 +668,24 @@ VIEWS.start=()=>{
   const dokuPanel=`<a class="panel" href="#doku" style="display:block;color:inherit;text-decoration:none"><h3>Dokumentation</h3><div class="toolbar" style="justify-content:space-between"><span class="num">${f2(pDone,0)} von ${f2(pPlan,0)} Seiten</span><span class="small muted">${wLeft!=null?"noch "+wLeft+" Wochen bis zur Abgabe":""}</span></div><div class="bar" style="margin:6px 0 10px"><i style="width:${pPlan?Math.min(100,pDone/pPlan*100):0}%"></i></div><div class="small muted">${dkSt.map(([s,n])=>n+" "+s).join(" · ")}</div></a>`;
   const curStart=wpStart(Date.now());const curCh=wpChanges(curStart,wpNext(curStart));
   const kindCount={};curCh.forEach(x=>{kindCount[x.kind]=(kindCount[x.kind]||0)+1;});
-  const weekPanel=`<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Wochenbericht · ${esc(wpRange(curStart))}</h3><span class="num small">${curCh.length} Änderungen</span></div>
+  const weekPanel=`<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0"><a href="#" data-wp="${curStart}" style="color:inherit;text-decoration:none">Wochenbericht · ${esc(wpRange(curStart))}</a></h3><span class="num small">${curCh.length} Änderungen</span></div>
     <div style="margin:8px 0">${Object.entries(kindCount).map(([k,n])=>pill(n+" "+k,"p-acc")).join(" ")||'<span class="muted small">Noch nichts geändert.</span>'}</div>
-    ${curCh.length?`<ul class="clean">${curCh.slice(0,5).map(x=>`<li class="small" style="padding:3px 0"><span class="muted">${esc(x.kind)}</span> · ${esc(x.label)}</li>`).join("")}</ul>`:""}
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn pri sm" data-wp="${curStart}">Bericht öffnen</button><button class="btn sm" data-wpcopy="${curStart}">Kopieren</button></div></div>`;
+    ${curCh.length?`<ul class="clean">${curCh.slice(0,5).map(x=>`<li class="small" style="padding:3px 0"><span class="muted">${esc(x.kind)}</span> · ${esc(x.label)}</li>`).join("")}</ul>`:""}</div>`;
   const past=wpList(curStart).slice(1,20);
   const pastPanel=`<div class="panel"><h3>Frühere Wochenberichte</h3>${past.length?`<ul class="clean">${past.map(s=>{const n=wpChanges(s,wpNext(s)).length;return `<li style="padding:6px 0;border-bottom:1px solid var(--line)"><a href="#" data-wp="${s}" style="display:flex;justify-content:space-between;gap:8px;color:inherit;text-decoration:none"><span>${esc(wpRange(s))}</span><span class="muted small">${n} Änderungen</span></a></li>`;}).join("")}</ul>`:'<p class="muted small">Noch keine früheren Berichte.</p>'}</div>`;
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
-  return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
-    <p>Konzeption und Konstruktion einer automatisierten Messanlage zur Prüfung von Rohren im Wareneingang · BD Gamer Lasertechnik, Bruchsal</p></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</span><a class="btn" href="#dateien">Archiv öffnen</a></div></div>
+  return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer</span><h1>Übersicht</h1>
+    <p class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</p></div></div>
   <div class="hero">
     <a class="big" ${nxt?`href="#" data-termin="${esc(nxt.id)}"`:'href="#zeitleiste"'}><div class="l">Nächster Termin</div><div class="n">${nxt?(days(nxt.date)<0?"–":days(nxt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nxt?esc(nxt.title)+" · "+(nxt.approx?"ca. ":"")+fd(nxt.date):"Keine Termine angelegt"}</div></a>
     <a class="big" href="#zeitleiste"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></a>
     <a class="big" href="#aufgaben" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px"><h3>Terminleiste <a class="small" href="#zeitleiste">alle Termine öffnen</a></h3>${timelineSvg()}</div>
-  <div class="grid g2" style="margin-bottom:14px;align-items:start">${dokuPanel}${weekPanel}</div>
-  <div style="margin-bottom:14px">${pastPanel}</div>
-  <div class="panel"><h3>Termine <a class="small" href="#zeitleiste">in der Terminleiste</a></h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>`;
+  <div class="grid g2" style="align-items:start">
+    <div>${weekPanel}</div>
+    <div style="display:grid;gap:14px">${pastPanel}${dokuPanel}</div>
+  </div>`;
 };
 VIEWS_after.start=()=>{
   document.querySelectorAll("[data-wp]").forEach(x=>x.addEventListener("click",ev=>{ev.preventDefault();openWeek(+x.dataset.wp);}));
