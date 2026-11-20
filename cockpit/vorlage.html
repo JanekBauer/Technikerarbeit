@@ -391,13 +391,13 @@ const NAV = [
   ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"],["rechner","Rechner"]]],
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]]
 ];
-const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach"];
+const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen"];
 const WHO = ["Janek","Baidinger","Graudejus","FSL"];
 const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektplan","04 Meilensteine","05 Messtechnik","06 Spann/Handhabung","07 Bewertung","08 CAD","09 Messprozess/Unterlagen","10 Doku","11 Präsentation"];
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Aufgabe","area"],["who","Wer","select",WHO],["due","Bis","date"],["status","Status","select",["offen","in Arbeit","erledigt"]],["prio","Priorität","select",["1","2","3"]],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
+    fields:[["title","Aufgabe","area"],["who","Wer führt durch","select",WHO],["ask","Wen fragen","select",WHO],["due","Bis","date"],["status","Status","select",["offen","in Arbeit","erledigt"]],["prio","Priorität","select",["1","2","3"]],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
@@ -412,13 +412,13 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"tasks",title:"Entscheidung",
-    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer entscheidet","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Fällig bis","date"],["prio","Priorität","select",["1","2","3"]],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"]],["reason","Begründung (warum)","area"],["date","Datum","date"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
+    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"]],["ask","Wen fragen","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Fällig bis","date"],["prio","Priorität","select",["1","2","3"]],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"]],["reason","Begründung (warum)","area"],["date","Datum","date"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
     fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
-    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Bis","date"],["prio","Priorität","select",["1","2","3"]],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
+    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"]],["ask","Wen fragen","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Bis","date"],["prio","Priorität","select",["1","2","3"]],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
@@ -531,6 +531,9 @@ function listTable(key,rows,cols,opt){
 }
 function newBtn(key,label){return S.canWrite&&!S.offline?`<button class="btn pri" data-new="${key}">${label||"Neu"}</button>`:"";}
 
+const PERSON_KEYS=["who","ask","by"];
+const groupOf=k=>PERSON_KEYS.includes(k)?"person":k;
+function optsFor(group,base){const extra=(S.data.optionen||[]).filter(o=>o.feld===group).map(o=>o.wert);return [...new Set([...base,...extra])];}
 function openEditor(key,id,preset){
   const L=LISTS[key];const rec=id?(S.data[L.coll].find(x=>x.id===id)||{}):Object.assign({},L.def,preset||{});
   S.modalOpen=true;
@@ -538,7 +541,7 @@ function openEditor(key,id,preset){
   L.fields.forEach(([k,lab,type,opts])=>{
     const v=rec[k]==null?"":rec[k];const fid="f_"+key+"_"+k;
     if(type==="area")f+=`<label for="${fid}">${lab}<textarea id="${fid}" data-k="${k}">${esc(v)}</textarea></label>`;
-    else if(type==="select")f+=`<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${opts.map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>`;
+    else if(type==="select")f+=`<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(groupOf(k),opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>${S.canWrite&&!S.offline?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${groupOf(k)}" style="margin:4px 0 8px">+ neue Option</button>`:""}`;
     else if(type==="bool")f+=`<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
     else f+=`<label for="${fid}">${lab}<input id="${fid}" data-k="${k}" type="${type==="date"?"date":type==="num"?"number":"text"}" ${type==="num"?'step="any"':""} value="${esc(v)}"></label>`;
   });
@@ -547,6 +550,7 @@ function openEditor(key,id,preset){
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${id?"Bearbeiten":"Neu"}: ${esc(L.title)}</h2>${id&&!ro&&(key==="tasks"||key==="decisions")?`<button class="btn" id="pfbtn">Ins Postfach</button>`:""}${id&&!ro?`<button class="btn danger" id="delbtn">Löschen</button>`:""}</div><form class="form" id="edform">${f}</form>
     <div class="mact"><div></div>
     <div style="display:flex;gap:8px"><button class="btn" data-close="1">Abbrechen</button>${ro?"":`<button class="btn pri" id="savebtn">Speichern</button>`}</div></div></div></div>`;
+  document.querySelectorAll("[data-addopt]").forEach(b=>b.onclick=async()=>{const v=(prompt("Neue Option (Person oder Abteilung):")||"").trim();if(!v)return;const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
   const first=$("#edform [data-k]");if(first)first.focus();
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
     const obj=Object.assign({},rec);
@@ -560,7 +564,7 @@ function openEditor(key,id,preset){
 }
 async function toPostfach(coll,id,rec){
   const ent=rec.typ==="entscheidung"||coll==="decisions";
-  const entry={kind:ent?"entscheidung":"aufgabe",title:rec.title||rec.text||"",detail:rec.note||"",vorschlag:rec.source||"",who:rec.who||"",due:rec.due||"",prio:rec.prio||"2",stand:rec.status||"offen",date:rec.date||"",status:"neu",altColl:"tasks",alt:rec};
+  const entry={kind:ent?"entscheidung":"aufgabe",title:rec.title||rec.text||"",detail:rec.note||"",vorschlag:rec.source||"",who:rec.who||"",ask:rec.ask||"",due:rec.due||"",prio:rec.prio||"2",stand:rec.status||"offen",date:rec.date||"",status:"neu",altColl:"tasks",alt:rec};
   const ok=await save("postfach",nid(),entry);
   if(ok){await del(coll,id);closeModal();}
 }
@@ -725,7 +729,7 @@ VIEWS.aufgaben=()=>{
       let items=all.filter(t=>(t.status||"offen")===c);
       if(c==="erledigt")items=items.sort((x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")));else items=items.sort(sortDue);
       const shown=c==="erledigt"?items.slice(0,6):items;
-      return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${items.length}</span></div>${shown.map(t=>`<div class="bcard" ${can?'draggable="true"':""} data-bid="${esc(t.id)}" data-task="${esc(t.id)}"><div>${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`).join("")||'<div class="empty small">–</div>'}${items.length>shown.length?`<div class="small muted" style="padding:4px">… ${items.length-shown.length} weitere (Tabelle, Filter „Erledigt“)</div>`:""}</div>`;}).join("");
+      return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${items.length}</span></div>${shown.map(t=>`<div class="bcard" ${can?'draggable="true"':""} data-bid="${esc(t.id)}" data-task="${esc(t.id)}"><div>${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.ask?" · fragen: "+esc(t.ask):""}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`).join("")||'<div class="empty small">–</div>'}${items.length>shown.length?`<div class="small muted" style="padding:4px">… ${items.length-shown.length} weitere (Tabelle, Filter „Erledigt“)</div>`:""}</div>`;}).join("");
     return head+`<div class="toolbar">${sw}${who}<span class="muted small">${all.length} Punkte</span></div><div class="board">${board}</div>`;
   }
   return head+`<div class="toolbar">${sw}<select id="tfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Offen</option><option value="über" ${f.st==="über"?"selected":""}>Überfällig</option><option value="erledigt" ${f.st==="erledigt"?"selected":""}>Erledigt</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select>${who}<span class="muted small">${rows.length} Einträge</span></div>`+
@@ -771,7 +775,7 @@ VIEWS.offen=()=>{
   const board=cols.map(c=>{
     const list=S.data.tasks.filter(t=>(t.status||"offen")===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
-    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
+    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.ask?" · fragen: "+esc(t.ask):""}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
   return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Alles, was zu tun ist. Entscheidungen stehen hier auch: dieselbe Karte wie unter Entscheidungen, der Status gilt überall. Karten ziehen ändert den Status.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
@@ -816,7 +820,7 @@ async function pfAccept(id,pre){
     if(!m){alert2("Diese Art ist unbekannt. Bitte im Eintrag die Zielkategorie wählen.");return;}
     target=m[0];obj=m[1];
   }
-  if(target==="tasks"){if(p.who)obj.who=p.who;if(p.due)obj.due=p.due;if(p.prio)obj.prio=p.prio;}
+  if(target==="tasks"){if(p.who)obj.who=p.who;if(p.ask)obj.ask=p.ask;if(p.due)obj.due=p.due;if(p.prio)obj.prio=p.prio;}
   const newId=nid();
   const ok=await save(target,newId,obj);
   if(ok)await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:target+"/"+newId}));
