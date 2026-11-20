@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}.frow>div{min-width:0}.mfield{margin:8px 0}.mlab{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}.mchecks{display:flex;flex-wrap:wrap;gap:6px 14px}
+</style></head><body>
 <title>TA-Cockpit Messanlage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -389,7 +390,8 @@ const NAV = [
   ["Ablage",[["dateien","Archiv","files"]]],
   ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"],["aenderungsdoku","Änderungsdoku","changes"]]],
   ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"],["rechner","Rechner"]]],
-  ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]]
+  ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
+  ["Einstellungen",[["einstellungen","Optionen"]]]
 ];
 const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen"];
 const WHO = ["Janek","Baidinger","Graudejus","FSL"];
@@ -397,7 +399,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Aufgabe","area"],["who","Wer führt durch","select",WHO],["ask","Wen fragen","select",WHO],["due","Bis","date"],["status","Status","select",["offen","in Arbeit","erledigt"]],["prio","Priorität","select",["1","2","3"]],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
+    fields:[["title","Aufgabe","area"],["who","Wer führt durch","select",WHO,"r1"],["ask","Wen fragen","multi",WHO,"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt"],"r2"],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
@@ -412,13 +414,13 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"tasks",title:"Entscheidung",
-    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"]],["ask","Wen fragen","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Fällig bis","date"],["prio","Priorität","select",["1","2","3"]],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"]],["reason","Begründung (warum)","area"],["date","Datum","date"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
+    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
     fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
-    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"]],["ask","Wen fragen","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Bis","date"],["prio","Priorität","select",["1","2","3"]],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
+    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
@@ -533,40 +535,57 @@ function newBtn(key,label){return S.canWrite&&!S.offline?`<button class="btn pri
 
 const PERSON_KEYS=["who","ask","by"];
 const groupOf=k=>PERSON_KEYS.includes(k)?"person":k;
-function optsFor(group,base){const extra=(S.data.optionen||[]).filter(o=>o.feld===group).map(o=>o.wert);return [...new Set([...base,...extra])];}
+function optsFor(group,base){
+  if(group==="person"){return ["",...(S.data.optionen||[]).filter(o=>o.feld==="person").map(o=>o.wert)];}
+  const extra=(S.data.optionen||[]).filter(o=>o.feld===group).map(o=>o.wert);return [...new Set([...base,...extra])];}
 function openEditor(key,id,preset){
   const L=LISTS[key];const rec=id?(S.data[L.coll].find(x=>x.id===id)||{}):Object.assign({},L.def,preset||{});
   S.modalOpen=true;
-  let f="";
-  L.fields.forEach(([k,lab,type,opts])=>{
-    const v=rec[k]==null?"":rec[k];const fid="f_"+key+"_"+k;
-    if(type==="area")f+=`<label for="${fid}">${lab}<textarea id="${fid}" data-k="${k}">${esc(v)}</textarea></label>`;
-    else if(type==="select")f+=`<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(groupOf(k),opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>${S.canWrite&&!S.offline?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${groupOf(k)}" style="margin:4px 0 8px">+ neue Option</button>`:""}`;
-    else if(type==="bool")f+=`<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
-    else f+=`<label for="${fid}">${lab}<input id="${fid}" data-k="${k}" type="${type==="date"?"date":type==="num"?"number":"text"}" ${type==="num"?'step="any"':""} value="${esc(v)}"></label>`;
-  });
   const ro=!S.canWrite||S.offline;
+  const fieldHtml=(k,lab,type,opts)=>{
+    const v=rec[k]==null?"":rec[k];const fid="f_"+key+"_"+k;const grp=groupOf(k);const addBtn=!ro&&grp==="person";
+    if(type==="area")return `<label for="${fid}">${lab}<textarea id="${fid}" data-k="${k}">${esc(v)}</textarea></label>`;
+    if(type==="multi"){const sel=String(v).split(",").map(x=>x.trim()).filter(Boolean);
+      const all=[...new Set([...optsFor(grp,opts),...sel])].filter(Boolean);
+      return `<div class="mfield"><span class="mlab">${lab}</span><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
+        (!ro?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" data-multi="1" style="margin:4px 0 8px">+ neue Option</button>`:"");}
+    if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>`+
+        (addBtn?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" style="margin:4px 0 8px">+ neue Option</button>`:"");
+    if(type==="bool")return `<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
+    return `<label for="${fid}">${lab}<input id="${fid}" data-k="${k}" type="${type==="date"?"date":type==="num"?"number":"text"}" ${type==="num"?'step="any"':""} value="${esc(v)}"></label>`;
+  };
+  let f="";let buf="";let rowKey=null;
+  const flush=()=>{if(buf){f+=`<div class="frow">${buf}</div>`;buf="";}};
+  L.fields.forEach(([k,lab,type,opts,row])=>{
+    const h=fieldHtml(k,lab,type,opts);
+    if(row){if(rowKey!==row){flush();rowKey=row;}buf+=`<div>${h}</div>`;}
+    else{flush();rowKey=null;f+=h;}
+  });
+  flush();
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(L.title)}">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${id?"Bearbeiten":"Neu"}: ${esc(L.title)}</h2>${id&&!ro&&(key==="tasks"||key==="decisions")?`<button class="btn" id="pfbtn">Ins Postfach</button>`:""}${id&&!ro?`<button class="btn danger" id="delbtn">Löschen</button>`:""}</div><form class="form" id="edform">${f}</form>
     <div class="mact"><div></div>
     <div style="display:flex;gap:8px"><button class="btn" data-close="1">Abbrechen</button>${ro?"":`<button class="btn pri" id="savebtn">Speichern</button>`}</div></div></div></div>`;
-  document.querySelectorAll("[data-addopt]").forEach(b=>b.onclick=async()=>{const v=(prompt("Neue Option (Person oder Abteilung):")||"").trim();if(!v)return;const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
   const first=$("#edform [data-k]");if(first)first.focus();
+  const ef=$("#edform");
+  if(ef)ef.onchange=e=>{const c=e.target;if(c.classList&&c.classList.contains("mchk")){const h=document.querySelector(`#edform input[type=hidden][data-k="${c.dataset.mk}"]`);if(h)h.value=[...document.querySelectorAll(`#edform .mchk[data-mk="${c.dataset.mk}"]:checked`)].map(x=>x.value).join(", ");}};
+  document.querySelectorAll("[data-addopt]").forEach(b=>b.onclick=async()=>{
+    const v=(prompt("Neue Option (Person oder Abteilung):")||"").trim();if(!v)return;
+    if(b.dataset.multi){const h=document.getElementById(b.dataset.addopt);const box=h.parentElement.querySelector(".mchecks");const k=h.dataset.k;
+      const ex=Array.from(box.querySelectorAll(".mchk")).find(x=>x.value===v);
+      if(ex)ex.checked=true;else{const l=document.createElement("label");l.className="chk";const inp=document.createElement("input");inp.type="checkbox";inp.className="mchk";inp.dataset.mk=k;inp.value=v;inp.checked=true;l.appendChild(inp);l.appendChild(document.createTextNode(v));box.appendChild(l);}
+      h.value=Array.from(box.querySelectorAll(".mchk:checked")).map(x=>x.value).join(", ");}
+    else{const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;}
+    await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
     const obj=Object.assign({},rec);
     document.querySelectorAll("#edform [data-k]").forEach(el=>{const k=el.dataset.k;obj[k]=el.dataset.bool?el.checked:el.value;
       const fd_=L.fields.find(x=>x[0]===k);if(fd_&&fd_[2]==="num")obj[k]=el.value===""?"":Number(el.value);});
-    if(key==="decisions"&&obj.status==="erledigt"&&(!obj.by||!obj.reason)){alert2("Für „erledigt“ bitte „Entschieden von“ und „Begründung“ eintragen.");return;}
     if(key==="postfach"&&obj.status==="übernommen"&&rec.status!=="übernommen"){sb.disabled=true;await pfAccept(id,obj);closeModal();return;}
+    if(key==="decisions"&&obj.status==="erledigt"&&(!obj.by||!obj.reason)){alert2("Für „erledigt“ bitte „Entschieden von“ und „Begründung“ eintragen.");return;}
     sb.disabled=true;const ok=await save(L.coll,id,obj);if(ok)closeModal();else sb.disabled=false;};
   const pfb=$("#pfbtn");if(pfb)pfb.onclick=async()=>{if(!pfb.dataset.sure){pfb.dataset.sure=1;pfb.textContent="Wirklich ins Postfach?";return;}await toPostfach(L.coll,id,rec);};
   const db_=$("#delbtn");if(db_)db_.onclick=async()=>{if(db_.dataset.sure){await del(L.coll,id);closeModal();}else{db_.dataset.sure=1;db_.textContent="Wirklich löschen?";}};
-}
-async function toPostfach(coll,id,rec){
-  const ent=rec.typ==="entscheidung"||coll==="decisions";
-  const entry={kind:ent?"entscheidung":"aufgabe",title:rec.title||rec.text||"",detail:rec.note||"",vorschlag:rec.source||"",who:rec.who||"",ask:rec.ask||"",due:rec.due||"",prio:rec.prio||"2",stand:rec.status||"offen",date:rec.date||"",status:"neu",altColl:"tasks",alt:rec};
-  const ok=await save("postfach",nid(),entry);
-  if(ok){await del(coll,id);closeModal();}
 }
 function closeModal(){$("#modal").innerHTML="";S.modalOpen=false;S.terminId=null;S.taskId=null;render();}
 
@@ -748,6 +767,20 @@ VIEWS_after.aufgaben=()=>{
     col.addEventListener("dragover",e=>{e.preventDefault();col.classList.add("over");});
     col.addEventListener("dragleave",()=>col.classList.remove("over"));
     col.addEventListener("drop",async e=>{e.preventDefault();col.classList.remove("over");const id=e.dataTransfer.getData("text/plain");const t=S.data.tasks.find(x=>x.id===id);if(!t||(t.status||"offen")===col.dataset.col)return;await save("tasks",id,Object.assign({},t,{status:col.dataset.col}));});});
+};
+
+/* ---------- Einstellungen: Optionen ---------- */
+VIEWS.einstellungen=()=>{
+  const can=S.canWrite&&!S.offline;
+  const rows=(S.data.optionen||[]).filter(o=>o.feld==="person").sort((a,b)=>String(a.wert).localeCompare(String(b.wert),"de"));
+  return `<div class="head"><div><span class="tag">Einstellungen</span><h1>Optionen</h1><p>Personen und Abteilungen für „Wer führt durch“, „Wen fragen“ und „Entschieden von“. Umbenennen oder Löschen wirkt auf die Auswahl. Bereits eingetragene Einträge behalten ihren alten Text.</p></div></div>`+
+    (can?`<div class="toolbar"><input id="optnew" placeholder="Neue Person oder Abteilung" aria-label="Neue Option" style="min-width:260px"><button class="btn pri" id="optadd">Hinzufügen</button></div>`:"")+
+    `<div class="tbl"><table><thead><tr><th>Name</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr><td><input value="${esc(o.wert)}" data-optname="${esc(o.id)}" ${can?"":"disabled"} style="width:100%"></td><td>${can?`<button class="btn sm danger" data-optdel="${esc(o.id)}">Löschen</button>`:""}</td></tr>`).join("")||'<tr><td colspan="2" class="empty">Noch keine Optionen.</td></tr>'}</tbody></table></div>`;
+};
+VIEWS_after.einstellungen=()=>{
+  const add=$("#optadd");if(add)add.onclick=async()=>{const v=($("#optnew").value||"").trim();if(!v)return;await save("optionen",nid(),{feld:"person",wert:v});$("#optnew").value="";};
+  document.querySelectorAll("[data-optname]").forEach(i=>i.onchange=async()=>{const o=S.data.optionen.find(x=>x.id===i.dataset.optname);const v=i.value.trim();if(!o)return;if(!v){i.value=o.wert;return;}await save("optionen",o.id,Object.assign({},o,{wert:v}));});
+  document.querySelectorAll("[data-optdel]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Wirklich?";return;}await del("optionen",b.dataset.optdel);});
 };
 
 /* ---------- Postfach: Eingang ---------- */

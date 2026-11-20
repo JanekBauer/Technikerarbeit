@@ -1,2 +1,6 @@
 [
+{"id": "opt-janek", "feld": "person", "wert": "Janek"},
+{"id": "opt-baidinger", "feld": "person", "wert": "Baidinger"},
+{"id": "opt-graudejus", "feld": "person", "wert": "Graudejus"},
+{"id": "opt-fsl", "feld": "person", "wert": "FSL"}
 ]
