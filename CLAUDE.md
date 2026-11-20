@@ -11,6 +11,7 @@
 - Daten ändern: JSON-Datei bearbeiten (ein Eintrag pro Zeile, `id` beibehalten), danach
   `python cockpit/build.py` ausführen und `cockpit/daten` plus `docs/index.html` zusammen committen.
 - **Postfach:** Neue Aufgaben, Entscheidungen und Änderungen landen zuerst als Eintrag in `cockpit/daten/postfach.json` (`status` „neu“, `kind`: aufgabe/entscheidung/aenderung, `title`, `detail`, `vorschlag`, `stand`, `date`). Janek übernimmt oder verwirft sie im Postfach. Eine Entscheidung ist eine Aufgabe mit `typ: "entscheidung"` in `tasks.json`; sie erscheint unter Aufgaben und unter Entscheidungen und hat überall denselben Status. Fragen an den Betrieb und Widersprüche sind Entscheidungen. Nicht direkt in `tasks.json` oder `changes.json` schreiben; `decisions.json`, `questions.json` und `conflicts.json` sind nicht mehr in Gebrauch.
+- **Postfach-Vorschläge:** Neue Einträge im Postfach bekommen in `vorschlag` immer den Urheber, z. B. „KI (Claude Code)“, damit Janek sieht, woher der Vorschlag kommt.
 - **Änderungsdoku:** `cockpit/daten/changes.json` bleibt leer, bis Janek sagt, dass das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig ist. Erst dann Einträge anlegen.
 - **Zeitstempel:** `updated` nie erfinden. Immer `date -u +%Y-%m-%dT%H:%M:%SZ` verwenden. Die Übersicht zeigt den neuesten `updated`-Wert als Stand.
 - Nach jeder abgeschlossenen Aufgabe: geänderte Dateien committen (Nachricht auf Deutsch: was und warum) und pushen.
