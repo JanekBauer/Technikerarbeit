@@ -11,6 +11,8 @@
 - Daten ändern: JSON-Datei bearbeiten (ein Eintrag pro Zeile, `id` beibehalten), danach
   `python cockpit/build.py` ausführen und `cockpit/daten` plus `docs/index.html` zusammen committen.
 - **Postfach:** Neue Aufgaben, Entscheidungen, Änderungen und Vorschläge landen zuerst als Eintrag in `cockpit/daten/postfach.json` (`status` „neu“, `kind`: aufgabe/frage/entscheidung/widerspruch/aenderung, `title`, `detail`, `vorschlag`). Janek übernimmt oder verwirft sie im Postfach. Fragen an den Betrieb und Widersprüche sind jetzt Entscheidungen (`decisions.json`, Status offen/in Arbeit/wartet/erledigt/entfallen). Änderungsdoku liegt im KI-Logbuch-Reiter (`changes.json`). Nicht direkt in `tasks.json`, `decisions.json` oder `changes.json` schreiben; `questions.json` und `conflicts.json` sind archiviert und leer.
+- **Änderungsdoku:** `cockpit/daten/changes.json` bleibt leer, bis Janek sagt, dass das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig ist. Erst dann Einträge anlegen.
+- **Zeitstempel:** `updated` nie erfinden. Immer `date -u +%Y-%m-%dT%H:%M:%SZ` verwenden. Die Übersicht zeigt den neuesten `updated`-Wert als Stand.
 - Nach jeder abgeschlossenen Aufgabe: geänderte Dateien committen (Nachricht auf Deutsch: was und warum) und pushen.
 - **Projektabgleich:** Auf Zuruf „Projektabgleich“ gleicht Claude Code die Daten in `cockpit/daten/*.json` mit den Dokumenten im Repo ab; das Repo gewinnt bei Wertkonflikten. Das frühere Verfahren mit dem Claude-Artefakt und dem Skill ist archiviert (`cockpit/_Versionen/abgleich_2026-11-18/`, `cockpit/skill/_Versionen/`). Nicht automatisch starten.
 - Ältere Versionen nicht löschen, sondern in den Unterordner `_Versionen` verschieben. Nichts endgültig löschen.

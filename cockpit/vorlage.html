@@ -385,9 +385,9 @@ h3 a.small:hover{text-decoration:underline}
 "use strict";
 /* ---------- Konfiguration ---------- */
 const NAV = [
-  ["Steuerung",[["start","Übersicht"],["zeitleiste","Terminleiste","deadlines"],["postfach","Postfach","postfach"],["entscheidungen","Entscheidungen","decisions"]]],
+  ["Steuerung",[["start","Übersicht"],["zeitleiste","Terminleiste","deadlines"],["postfach","Postfach","postfach"],["offen","Offene Punkte","tasks"],["entscheidungen","Entscheidungen","decisions"]]],
   ["Ablage",[["dateien","Archiv","files"]]],
-  ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"]]],
+  ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"],["aenderungsdoku","Änderungsdoku","changes"]]],
   ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"],["rechner","Rechner"]]],
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]]
 ];
@@ -493,7 +493,7 @@ function getTool(id,def){return S.tmp["tool_"+id]||(tool(id)?JSON.parse(JSON.str
 
 /* ---------- Rendering ---------- */
 function navHtml(){
-  let h=`<div style="padding:0 0 14px"><button class="btn pri" id="pendgo" style="width:100%">Aktualisieren</button><button class="btn" id="srchbtn" style="width:100%;margin-top:8px;text-align:left">Suchen und Befehle <span class="muted small">Strg+K</span></button></div>`;
+  let h=`<div style="padding:0 0 14px"><button class="btn" id="srchbtn" style="width:100%;text-align:left">Suchen</button></div>`;
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
@@ -504,6 +504,7 @@ function navHtml(){
       if(c==="reqs")n=new Set(reqWarnings().map(w=>w[0])).size;
       cnt=`<span class="cnt">${n}</span>`;}
     h+=`<a href="#${k}" class="${S.view===k?"on":""}">${l}${cnt}</a>`;});});
+  h+=`<div style="padding:14px 0 0"><button class="btn pri" id="pendgo" style="width:100%">Aktualisieren</button></div>`;
   return h;
 }
 function render(){
@@ -684,7 +685,7 @@ VIEWS.start=()=>{
   <div class="hero">
     <a class="big" ${nxt?`href="#" data-termin="${esc(nxt.id)}"`:'href="#zeitleiste"'}><div class="l">Nächster Termin</div><div class="n">${nxt?(days(nxt.date)<0?"–":days(nxt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nxt?esc(nxt.title)+" · "+(nxt.approx?"ca. ":"")+fd(nxt.date):"Keine Termine angelegt"}</div></a>
     <a class="big" href="#zeitleiste"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></a>
-    <a class="big" href="#postfach" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
+    <a class="big" href="#offen" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Punkte</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px"><h3>Terminleiste <a class="small" href="#zeitleiste">alle Termine öffnen</a></h3>${timelineSvg()}</div>
   <div class="grid g2" style="align-items:start">
@@ -738,30 +739,32 @@ VIEWS_after.aufgaben=()=>{
     col.addEventListener("drop",async e=>{e.preventDefault();col.classList.remove("over");const id=e.dataTransfer.getData("text/plain");const t=S.data.tasks.find(x=>x.id===id);if(!t||(t.status||"offen")===col.dataset.col)return;await save("tasks",id,Object.assign({},t,{status:col.dataset.col}));});});
 };
 
-/* ---------- Postfach: Eingang und Offene Punkte ---------- */
+/* ---------- Postfach: Eingang ---------- */
 VIEWS.postfach=()=>{
-  const tab=lsGet("pfTab","eingang");
   const can=S.canWrite&&!S.offline;
-  const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>String(b.updated||"").localeCompare(String(a.updated||"")));
-  const tabs=[["eingang",`Eingang (${inbox.length})`],["board","Offene Punkte (Board)"]];
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Fragen und Widersprüche werden zu Entscheidungen.</p></div></div>`;
-  const bar=`<div class="toolbar">${tabs.map(([k,l])=>`<button class="btn ${tab===k?"pri":""}" data-pftab="${k}">${esc(l)}</button>`).join("")}<span style="flex:1"></span>${tab==="board"?newBtn("tasks","Neue Aufgabe"):newBtn("postfach","Neuer Eintrag")}</div>`;
-  if(tab==="eingang"){
-    return head+bar+`<p class="small muted">Vorschläge von KI, Programm oder Claude. Mit „Übernehmen“ landet der Eintrag in der Kategorie, die unter „Art“ steht. Antippen zum Ändern der Art oder des Textes. „Verwerfen“ behält den Eintrag als verworfen.</p>`+
-      listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."});
-  }
+  const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>
+  <div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span></div>`+
+  listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."});
+};
+VIEWS_after.postfach=()=>{
+  document.querySelectorAll("[data-pfaccept]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();pfAccept(b.dataset.pfaccept);});
+  document.querySelectorAll("[data-pfreject]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const p=S.data.postfach.find(x=>x.id===b.dataset.pfreject);if(p)await save("postfach",p.id,Object.assign({},p,{status:"verworfen"}));});
+};
+
+/* ---------- Offene Punkte: Board ---------- */
+VIEWS.offen=()=>{
+  const can=S.canWrite&&!S.offline;
   const cols=["offen","in Arbeit","wartet","erledigt"];
   const board=cols.map(c=>{
     const list=S.data.tasks.filter(t=>(t.status||"offen")===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>`<div class="bcard" ${can?'draggable="true"':""} data-task="${esc(t.id)}" data-tid="${esc(t.id)}"><div>${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return head+bar+`<div class="board">${board}</div>`;
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Was wer bis wann erledigen muss. Karten ziehen ändert den Status, Karte antippen zum Bearbeiten.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
-VIEWS_after.postfach=()=>{
-  document.querySelectorAll("[data-pftab]").forEach(b=>b.onclick=()=>{lsSet("pfTab",b.dataset.pftab);render();});
-  document.querySelectorAll("[data-pfaccept]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();pfAccept(b.dataset.pfaccept);});
-  document.querySelectorAll("[data-pfreject]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const p=S.data.postfach.find(x=>x.id===b.dataset.pfreject);if(p)await save("postfach",p.id,Object.assign({},p,{status:"verworfen"}));});
+VIEWS_after.offen=()=>{
+  if(!(S.canWrite&&!S.offline))return;
   document.querySelectorAll(".bcard[draggable]").forEach(c=>{
     c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.tid);e.dataTransfer.effectAllowed="move";c.classList.add("drag");});
     c.addEventListener("dragend",()=>c.classList.remove("drag"));});
@@ -772,25 +775,52 @@ VIEWS_after.postfach=()=>{
       const id=e.dataTransfer.getData("text/plain");const t=S.data.tasks.find(x=>x.id===id);
       if(!t||(t.status||"offen")===col.dataset.col)return;await save("tasks",id,Object.assign({},t,{status:col.dataset.col}));});});
 };
+
+/* Übernahme aus dem Eingang */
+const PF_KIND_COLL={aufgabe:"tasks",frage:"decisions",entscheidung:"decisions",widerspruch:"decisions",aenderung:"changes"};
+function pfAltRecord(p){
+  const a=p.alt||{};const c=p.altColl;
+  if(c==="questions")return {coll:"decisions",obj:{text:a.q||"",topic:a.topic||"",owner:a.entscheider||"",due:a.due||"",prio:a.prio||"1",status:"offen",by:"",reason:a.answer||"",date:a.date||"",source:"Frage an den Betrieb"+(a.source?" ("+a.source+")":""),docs:"",refs:a.refs||""}};
+  if(c==="conflicts")return {coll:"decisions",obj:{text:a.text||"",topic:"",owner:"",due:"",prio:"1",status:"offen",by:"",reason:a.note||"",date:"",source:"Widerspruch",docs:a.between||"",refs:a.refs||""}};
+  if(c==="decisions")return {coll:"decisions",obj:Object.assign({},a,{status:"offen"})};
+  if(c==="tasks")return {coll:"tasks",obj:Object.assign({},a,{status:"offen"})};
+  return null;
+}
 async function pfAccept(id){
   const p=S.data.postfach.find(x=>x.id===id);if(!p)return;
   const d=p.date||new Date().toISOString().slice(0,10);
   const both=[p.title,p.detail].filter(Boolean).join("\n");
   const src=p.vorschlag||"";
   const dec=(text,prio,date,source)=>({text,topic:"",owner:"",due:"",prio,status:"offen",by:"",reason:"",date,source,docs:"",refs:""});
-  const map={
-    aufgabe:["tasks",{title:p.title||"",who:"Janek",due:"",status:"offen",prio:"2",chat:"",note:p.detail||""}],
-    frage:["decisions",dec(both,"1","",src||"Frage an den Betrieb")],
-    entscheidung:["decisions",dec(both,"2",d,src)],
-    widerspruch:["decisions",dec(both,"1","",src||"Widerspruch")],
-    aenderung:["changes",{ver:"",date:d,chap:"",change:p.title||"",reason:p.detail||"",by:src}]
-  };
-  const m=map[p.kind];
-  if(!m){alert2("Diese Art ist unbekannt. Bitte im Eintrag die Art wählen.");return;}
+  let target=null,obj=null;
+  if(p.alt){const r=pfAltRecord(p);if(r&&PF_KIND_COLL[p.kind]===r.coll){target=r.coll;obj=r.obj;}}
+  if(!obj){
+    const map={
+      aufgabe:["tasks",{title:p.title||"",who:"Janek",due:"",status:"offen",prio:"2",chat:"",note:p.detail||""}],
+      frage:["decisions",dec(both,"1","",src||"Frage an den Betrieb")],
+      entscheidung:["decisions",dec(both,"2",d,src)],
+      widerspruch:["decisions",dec(both,"1","",src||"Widerspruch")],
+      aenderung:["changes",{ver:"",date:d,chap:"",change:p.title||"",reason:p.detail||"",by:src}]
+    };
+    const m=map[p.kind];
+    if(!m){alert2("Diese Art ist unbekannt. Bitte im Eintrag die Art wählen.");return;}
+    target=m[0];obj=m[1];
+  }
   const newId=nid();
-  const ok=await save(m[0],newId,m[1]);
-  if(ok)await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:m[0]+"/"+newId}));
+  const ok=await save(target,newId,obj);
+  if(ok)await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:target+"/"+newId}));
 }
+
+/* ---------- Änderungsdoku (Pflichtenheft) ---------- */
+VIEWS.aenderungsdoku=()=>{
+  const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
+  const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
+  return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Änderungsdoku</h1><p>Wird erst geführt, wenn das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig wird. Bis dahin bleibt sie leer. Als Tabelle in Word einfügbar.</p></div>${newBtn("changes","Neue Änderung")}</div>
+  <div class="toolbar"><span class="pill p-acc">${ch.length} Einträge</span><span style="flex:1"></span><button class="btn" id="chcopy">Für Word kopieren</button></div>`+
+  listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]],{empty:"Noch keine Änderungen. Einträge kommen erst nach der Unterschrift des Pflichtenhefts."})+
+  `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`;
+};
+VIEWS_after.aenderungsdoku=()=>{const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);};
 
 VIEWS.zeitleiste=()=>{
   const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
@@ -1172,25 +1202,11 @@ VIEWS.quellen=()=>{
 VIEWS_after.quellen=()=>{const b=$("#srccopy");if(b)b.onclick=()=>copyText($("#copybox").value,b);};
 
 VIEWS["ki-logbuch"]=()=>{
-  const tab=lsGet("kiTab","log");
   const rows=S.data.kilog.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   const f=rows.filter(r=>r.fach).length;
-  const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
-  const tabs=`<div class="toolbar"><button class="btn ${tab==="log"?"pri":""}" data-kitab="log">KI-Logbuch (${rows.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-kitab="ch">Änderungsdoku PH, Kap. 6 (${ch.length})</button></div>`;
-  if(tab==="ch"){
-    const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
-    return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>KI-Logbuch</h1><p>Änderungsdoku des Pflichtenhefts. Sie lässt sich als Tabelle in Word einfügen (Kapitel 6).</p></div>${newBtn("changes","Neue Änderung")}</div>`+tabs+
-      `<div class="toolbar"><button class="btn" id="chcopy">Für Word kopieren</button></div>`+
-      listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]])+
-      `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`;
-  }
-  return `<div class="head"><div><span class="tag">Schule · Selbstständigkeitserklärung</span><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>`+tabs+
-  `<div class="toolbar">${pill(rows.length+" Einträge","p-acc")} ${pill(f+" mit fachlichem Text durch KI",f?"p-bad":"p-ok")}</div>`+
+  return `<div class="head"><div><span class="tag">Schule · Selbstständigkeitserklärung</span><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
+  <div class="toolbar">${pill(rows.length+" Einträge","p-acc")} ${pill(f+" mit fachlichem Text durch KI",f?"p-bad":"p-ok")}</div>`+
   listTable("kilog",rows,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chat","Chat",r=>`<span class="small">${esc(r.chat)}</span>`],["purpose","Zweck"],["help","Art der Hilfe",r=>`<span class="small">${nl(r.help)}</span>`],["fach","",r=>r.fach?pill("fachlich","p-bad"):""]]);
-};
-VIEWS_after["ki-logbuch"]=()=>{
-  document.querySelectorAll("[data-kitab]").forEach(b=>b.onclick=()=>{lsSet("kiTab",b.dataset.kitab);render();});
-  const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);
 };
 
 /* ---------- Archiv ---------- */
@@ -1455,8 +1471,7 @@ $("#palq").addEventListener("keydown",e=>{
   else if(e.key==="Enter"){e.preventDefault();palGo(palSel);}
   else if(e.key==="Escape"){e.preventDefault();palClose();}});
 document.addEventListener("keydown",e=>{
-  if((e.ctrlKey||e.metaKey)&&String(e.key).toLowerCase()==="k"){e.preventDefault();pal.classList.contains("on")?palClose():palOpenUi();}
-  else if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||"")&&!S.modalOpen){e.preventDefault();palOpenUi();}});
+  if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||"")&&!S.modalOpen){e.preventDefault();palOpenUi();}});
 boot();
 })();
 </script>
