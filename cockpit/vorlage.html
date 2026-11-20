@@ -406,17 +406,17 @@ const LISTS = {
     fields:[["name","Arbeitspaket","text"],["ampel","Ampel","select",["gruen","gelb","rot","grau"]],["stand","Stand","area"],["chat","Chat","select",CHATS],["order","Reihenfolge","num"]],
     def:{ampel:"grau"}},
   questions:{coll:"questions",title:"Fragen an den Betrieb",
-    fields:[["q","Frage","area"],["prio","Priorität","select",["1","2"]],["topic","Bezug (z. B. Anf. 2.1)","text"],["due","Fällig bis","date"],["status","Status","select",["offen","beantwortet"]],["answer","Antwort","area"],["source","Quelle (wer)","text"],["date","Datum Antwort","date"]],
+    fields:[["q","Frage","area"],["prio","Priorität","select",["1","2"]],["topic","Bezug (z. B. Anf. 2.1)","text"],["due","Fällig bis","date"],["entscheider","Wer entscheidet","select",["","Baidinger","Graudejus","FSL","Janek"]],["refs","Verknüpft mit (IDs, z. B. e13, w02, 2.4)","text"],["status","Status","select",["offen","beantwortet","abgesagt"]],["answer","Antwort","area"],["source","Quelle (wer)","text"],["date","Datum Antwort","date"]],
     def:{prio:"1",status:"offen"}},
   reqs:{coll:"reqs",title:"Anforderungsliste",
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"decisions",title:"Entscheidungen",
-    fields:[["date","Datum","date"],["text","Entscheidung","area"],["source","Quelle","text"],["docs","Betroffene Dokumente","text"],["status","Status","select",["offen","bestätigt"]]],def:{status:"offen"}},
+    fields:[["date","Datum","date"],["text","Entscheidung","area"],["source","Quelle","text"],["docs","Betroffene Dokumente","text"],["status","Status","select",["offen","bestätigt","entfallen"]],["refs","Verknüpft mit (IDs)","text"]],def:{status:"offen"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
-    fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
+    fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
   sensors:{coll:"sensors",title:"Sensorvergleich",
@@ -446,7 +446,7 @@ const f2 = (v,d=2)=>isFinite(v)?v.toLocaleString("de-DE",{maximumFractionDigits:
 function lsGet(k,d){try{const v=localStorage.getItem("tac_"+k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem("tac_"+k,JSON.stringify(v));}catch(e){}}
 function pill(t,cls){return `<span class="pill ${cls||""}">${esc(t)}</span>`;}
-function stPill(s){const m={"erledigt":"p-ok","bestätigt":"p-ok","beantwortet":"p-ok","geklärt":"p-ok","fertig":"p-ok","offen":"p-warn","Notiz":"p-acc","in Arbeit":"p-acc","Entwurf":"p-acc","wartet":"p-acc","geplant":""};return pill(s||"–",m[s]||"");}
+function stPill(s){const m={"abgesagt":"p-bad","entfallen":"p-bad","erledigt":"p-ok","bestätigt":"p-ok","beantwortet":"p-ok","geklärt":"p-ok","fertig":"p-ok","offen":"p-warn","Notiz":"p-acc","in Arbeit":"p-acc","Entwurf":"p-acc","wartet":"p-acc","geplant":""};return pill(s||"–",m[s]||"");}
 function dueCell(s,done){if(!s)return '<span class="muted">–</span>';const n=days(s);let cls="";if(!done){if(n<0)cls="p-bad";else if(n<=3)cls="p-warn";}return `<span class="num">${fd(s)}</span>${done?"":` ${pill(n<0?`${-n} T überfällig`:n===0?"heute":`in ${n} T`,cls)}`}`;}
 async function copyText(t,btn){try{await navigator.clipboard.writeText(t);if(btn){const o=btn.textContent;btn.textContent="Kopiert";setTimeout(()=>btn.textContent=o,1500);}}catch(e){const ta=document.getElementById("copybox");if(ta){ta.focus();ta.select();}if(btn)btn.textContent="Text markiert – Strg+C";}}
 
@@ -494,7 +494,7 @@ function navHtml(){
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
-      if(c==="questions")n=arr.filter(x=>x.status!=="beantwortet").length;
+      if(c==="questions")n=arr.filter(x=>x.status==="offen").length;
       if(c==="decisions")n=arr.filter(x=>x.status==="offen").length;
       if(c==="conflicts")n=arr.filter(x=>x.status!=="geklärt").length;
       if(c==="reqs")n=new Set(reqWarnings().map(w=>w[0])).size;
@@ -756,13 +756,37 @@ function buildIcs(){
 }
 VIEWS_after.zeitleiste=()=>{const b=$("#icsbtn");if(b)b.onclick=async()=>{b.disabled=true;try{await saveBlob("Termine_Technikerarbeit.ics",new Blob([buildIcs()],{type:"text/calendar"}));}catch(e){alert2("Kalenderdatei konnte nicht erstellt werden.");}b.disabled=false;};};
 
+/* ---------- Verknüpfungen: Fragen, Entscheidungen, Widersprüche, Anforderungen ---------- */
+function refTokens(s){return String(s||"").split(/[,;]/).map(t=>t.trim().toLowerCase().replace(/^anf\.?\s*/,"")).filter(Boolean);}
+function linkedFor(q){
+  const toks=refTokens(q.refs);const out=[];
+  (S.data.decisions||[]).forEach(d=>{if(toks.includes(String(d.id).toLowerCase()))out.push({c:"decisions",id:d.id,kind:"Entscheidung",label:d.text,status:d.status,opts:[["entfallen","Entfällt"],["bestätigt","Bestätigt"]]});});
+  (S.data.conflicts||[]).forEach(c=>{if(toks.includes(String(c.id).toLowerCase()))out.push({c:"conflicts",id:c.id,kind:"Widerspruch",label:c.text,status:c.status,opts:[["geklärt","Geklärt"]]});});
+  (S.data.reqs||[]).forEach(r=>{if(toks.includes(String(r.nr||"").toLowerCase()))out.push({c:"reqs",id:r.id,kind:"Anforderung",label:(r.nr?r.nr+" ":"")+(r.text||""),status:r.status,opts:[["bestätigt","Bestätigt"]]});});
+  return out;
+}
+function openAbgleich(qid){
+  S.abglQ=qid;const q=S.data.questions.find(x=>x.id===qid);if(!q)return;
+  const items=linkedFor(q);
+  const body=items.length?items.map(it=>`<li style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="small muted">${esc(it.kind)} · ${stPill(it.status)}</div><div style="margin:4px 0">${nl(it.label)}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${it.opts.map(([s,l])=>`<button class="btn sm" data-abset="${esc(it.c)}|${esc(it.id)}|${esc(s)}">${esc(l)}</button>`).join("")}</div></li>`).join(""):'<p class="muted">Keine verknüpften Einträge. Trage unter „Verknüpft mit“ die IDs ein, z. B. e13 (Entscheidung), w02 (Widerspruch) oder 2.4 (Anforderung).</p>';
+  $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Abgleich">
+    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Frage ${stPill(q.status)}</span><h2 style="margin:6px 0">${esc(q.q)}</h2><p class="small muted" style="margin:0">${q.answer?"Antwort: "+esc(q.answer):"Keine Antwort eingetragen."}</p></div><button class="btn" data-close="1">Schließen</button></div>
+    <h3 style="margin-top:12px">Was dadurch wegfällt oder geklärt wird</h3><ul class="clean">${body}</ul></div></div>`;
+  S.modalOpen=true;
+}
+async function setLinked(c,id,status){
+  const r=(S.data[c]||[]).find(x=>x.id===id);if(!r)return;
+  const obj=Object.assign({},r,{status});
+  if(c==="conflicts"&&status==="geklärt")obj.resolved=new Date().toISOString().slice(0,10);
+  await save(c,id,obj);
+}
 VIEWS.fragen=()=>{
-  const f=lsGet("qFilter",{st:"alle"});
+  const f=lsGet("qFilter",{st:"offen"});
   const sorted=S.data.questions.slice().sort((x,y)=>(x.status===y.status?0:x.status==="offen"?-1:1)||(x.prio||"9").localeCompare(y.prio||"9"));
-  const rows=f.st==="alle"?sorted:sorted.filter(q=>f.st==="offen"?q.status!=="beantwortet":q.status==="beantwortet");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Erst dann gilt ein Wert als belegt.</p></div>${newBtn("questions","Neue Frage")}</div>
-  <div class="toolbar"><select id="qfst" aria-label="Status"><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="beantwortet" ${f.st==="beantwortet"?"selected":""}>Nur beantwortete</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
-  listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["topic","Bezug",r=>`<span class="small">${esc(r.topic)}</span>`],["due","Fällig",r=>dueCell(r.due,r.status==="beantwortet")],["status","Status",r=>stPill(r.status)],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
+  const rows=f.st==="alle"?sorted:sorted.filter(q=>q.status===f.st);
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Wer entscheidet, steht dabei. Unter „Verknüpft mit“ stehen die Entscheidungen, Widersprüche und Anforderungen, die von der Frage abhängen. Nach der Antwort oder Absage prüfst du sie mit „Prüfen“.</p></div>${newBtn("questions","Neue Frage")}</div>
+  <div class="toolbar"><select id="qfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="beantwortet" ${f.st==="beantwortet"?"selected":""}>Nur beantwortete</option><option value="abgesagt" ${f.st==="abgesagt"?"selected":""}>Nur abgesagte</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
+  listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["entscheider","Wer entscheidet",r=>`<span class="small">${esc(r.entscheider||"–")}</span>`],["refs","Verknüpft",r=>`<span class="small">${esc(r.refs||"")}</span>`],["status","Status",r=>stPill(r.status)],["ab","Abgleich",r=>{const n=r.status!=="offen"?linkedFor(r).length:0;return n?`<button class="btn sm" data-abgl="${esc(r.id)}">Prüfen (${n})</button>`:"";}],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
 };
 VIEWS_after.fragen=()=>{const s=$("#qfst");if(s)s.onchange=()=>{lsSet("qFilter",{st:s.value});render();};};
 
@@ -786,7 +810,7 @@ VIEWS.entscheidungen=()=>{
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
   return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Entscheidungen & Änderungen</h1><p>Wer hat wann was entschieden. Die Änderungsdoku lässt sich als Tabelle in Word einfügen (Kapitel 6 des Pflichtenhefts).</p></div></div>
   <div class="toolbar"><button class="btn ${tab==="dec"?"pri":""}" data-tab="dec">Entscheidungen (${dec.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-tab="ch">Änderungsdoku PH (${ch.length})</button><span style="flex:1"></span>${tab==="dec"?`<select id="decfst" aria-label="Status"><option value="offen" ${df.st==="offen"?"selected":""}>Nur offene</option><option value="bestätigt" ${df.st==="bestätigt"?"selected":""}>Nur bestätigte</option><option value="alle" ${df.st==="alle"?"selected":""}>Alle</option></select>`+newBtn("decisions","Neue Entscheidung"):`<button class="btn" id="chcopy">Für Word kopieren</button>`+newBtn("changes","Neue Änderung")}</div>`+
-  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["text","Entscheidung"],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["status","Status",r=>stPill(r.status)]])
+  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["id","ID",r=>`<span class="small muted">${esc(r.id)}</span>`],["text","Entscheidung"],["refs","Verknüpft",r=>`<span class="small">${esc(r.refs||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["status","Status",r=>stPill(r.status)]])
   :listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]])+`<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`);
 };
 VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);const ds=$("#decfst");if(ds)ds.onchange=()=>{lsSet("decFilter",{st:ds.value});render();};};
@@ -1286,6 +1310,8 @@ function renderTask(first){
 /* ---------- Events ---------- */
 document.addEventListener("click",ev=>{
   if(ev.target.closest("#srchbtn")){palOpenUi();return;}
+  const ab=ev.target.closest("[data-abgl]");if(ab){ev.preventDefault();openAbgleich(ab.dataset.abgl);return;}
+  const as=ev.target.closest("[data-abset]");if(as){ev.preventDefault();const [c,id,s]=as.dataset.abset.split("|");const qid=S.abglQ;setLinked(c,id,s).then(()=>{if(qid)openAbgleich(qid);});return;}
   const wi=ev.target.closest("[data-wpitem]");if(wi){ev.preventDefault();const [c,id,view]=wi.dataset.wpitem.split("|");closeModal();palOpen(c,view,id);return;}
   const dl=ev.target.closest("[data-dl]");if(dl){ev.preventDefault();ev.stopPropagation();const f=S.data.files.find(x=>x.id===dl.dataset.dl);if(f)dlFile(f,dl);return;}
   if(ev.target.closest("[data-noedit],.fchip a"))return;
