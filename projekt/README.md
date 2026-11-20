@@ -7,6 +7,7 @@ Alles, was bis zum 20.11.2026 nur im claude.ai-Projekt „Technikerarbeit“ und
 | `claude-projekt/` | die Projektdokumente (Projektstand, Chat-Menü/Prompts, AS-Textfassung V4, Ablage-Regel, PH-Änderungsdoku, Wochenstatus, Wochenrückblick, Vorbereitung Ersttermin) |
 | `gedaechtnis/` | Claudes Projekt-Gedächtnis (Fakten zur TA, Arbeitsweise) |
 | `Projekt-Anweisungen_claude-ai.md` | die Projekt-Anweisungen (Mentor-Rolle, Anrede „Janek“) |
+| `Geplante_Aufgabe_Wochenstatus_Freitag.md` | gelöschte geplante Aufgabe (Zeitplan, Ablauf, Prompt) zum Wiederherstellen |
 | `Chats_Uebersicht.md` | alle Chats 00–11 + TA-Allgemein mit Link, Inhalt und Verbleib der Ergebnisse |
 | `../cockpit/_Versionen/artefakt_export_2026-11-20/` | vollständiger Export der Artefakt-Datenbank (15 Sammlungen) |
 
