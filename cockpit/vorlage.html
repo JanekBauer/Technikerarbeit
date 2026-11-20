@@ -590,17 +590,48 @@ const SRC=[
  ["kilog","KI-Logbuch","ki-logbuch",r=>r.purpose||r.zweck,r=>[r.help,r.ergebnis,r.chat]],
 ];
 const NEWS=[["tasks","Neuer offener Punkt"],["deadlines","Neuer Termin"],["questions","Neue Frage an den Betrieb"],["reqs","Neue Anforderung"],["decisions","Neue Entscheidung"],["conflicts","Neuer Widerspruch"],["sources","Neue Quelle"],["doku","Neues Kapitel"],["sensors","Neuer Sensor"]];
-function weekChanges(){
-  const lim=Date.now()-7*864e5;const out=[];
-  SRC.forEach(([c,kind,view,lab])=>{if(c==="kilog"||c==="files")return;(S.data[c]||[]).forEach(r=>{const u=r.updated?Date.parse(r.updated):0;if(u>=lim)out.push({kind,label:String(lab(r)||"(ohne Titel)").slice(0,90),at:u,coll:c});});});
-  return out.sort((a,b)=>b.at-a.at);
+/* ---------- Wochenberichte: jeder Bericht läuft Freitag 07:30 bis nächsten Freitag 07:30 ---------- */
+function wpStart(ts){
+  const s=new Date(ts);s.setHours(7,30,0,0);
+  const diff=(s.getDay()-5+7)%7;s.setDate(s.getDate()-diff);
+  if(s.getTime()>ts)s.setDate(s.getDate()-7);
+  return s.getTime();
 }
-function weekReport(){
-  const wk=weekChanges();const T=new Date().toLocaleDateString("de-DE");const lim=Date.now()-7*864e5;
+function wpNext(start){const e=new Date(start);e.setDate(e.getDate()+7);return e.getTime();}
+function wpChanges(start,end){
+  const out=[];
+  SRC.forEach(([c,kind,view,lab])=>{if(c==="kilog")return;(S.data[c]||[]).forEach(r=>{const u=r.updated?Date.parse(r.updated):0;if(u>=start&&u<end)out.push({c,kind,view,id:r.id,label:String(lab(r)||"(ohne Titel)").slice(0,140),at:u});});});
+  return out.sort((x,y)=>y.at-x.at);
+}
+function wpRange(start){
+  const f=t=>new Date(t).toLocaleString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).replace(",","");
+  return f(start)+" – "+f(wpNext(start));
+}
+function wpList(start){
+  // alle Berichte von der aktuellen Woche bis zur ersten Änderung zurück
+  const all=[];S.data && Object.keys(S.data).forEach(c=>(S.data[c]||[]).forEach(r=>{if(r.updated)all.push(Date.parse(r.updated));}));
+  const now=wpStart(Date.now());
+  const first=all.length?wpStart(Math.min(...all)):now;
+  const out=[];for(let s=now;s>=first&&out.length<40;){out.push(s);const p=new Date(s);p.setDate(p.getDate()-7);s=p.getTime();}
+  return out;
+}
+function weekReport(start){
+  const ch=wpChanges(start,wpNext(start));
+  const done=ch.filter(x=>x.c==="tasks"&&(S.data.tasks.find(t=>t.id===x.id)||{}).status==="erledigt");
+  const groups={};ch.forEach(x=>{groups[x.kind]=(groups[x.kind]||0)+1;});
   const open=S.data.tasks.filter(t=>t.status!=="erledigt").sort(sortDue).slice(0,5);
   const nxt=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date&&days(d.date)>=0).sort((a,b)=>a.date<b.date?-1:1).slice(0,3);
-  const done=S.data.tasks.filter(t=>t.status==="erledigt"&&t.updated&&Date.parse(t.updated)>=lim);
-  return `Wochenbericht Technikerarbeit – Stand ${T}\n\nErledigt (letzte 7 Tage):\n${done.length?done.map(t=>"- "+t.title).join("\n"):"- –"}\n\nGeändert in den letzten 7 Tagen: ${wk.length} Einträge\n\nNächste Schritte:\n${open.map(t=>"- "+t.title+(t.due?" (bis "+fd(t.due)+")":"")).join("\n")}\n\nNächste Termine:\n${nxt.map(d=>"- "+fd(d.date)+": "+d.title).join("\n")}`;
+  return `Wochenbericht Technikerarbeit – ${wpRange(start)}\n\nErledigt in dieser Woche:\n${done.length?done.map(x=>"- "+x.label).join("\n"):"- –"}\n\nGeändert: ${ch.length} Einträge (${Object.entries(groups).map(([k,n])=>n+" "+k).join(", ")||"keine"})\n\nNächste Schritte:\n${open.map(t=>"- "+t.title+(t.due?" (bis "+fd(t.due)+")":"")).join("\n")}\n\nNächste Termine:\n${nxt.map(d=>"- "+fd(d.date)+": "+d.title).join("\n")}`;
+}
+function openWeek(start){
+  const end=wpNext(start);const ch=wpChanges(start,end);
+  const kinds=[...new Set(ch.map(x=>x.kind))];
+  const body=kinds.length?kinds.map(k=>`<h4 style="margin:14px 0 4px">${esc(k)} <span class="small muted">${ch.filter(x=>x.kind===k).length}</span></h4><ul class="clean">${ch.filter(x=>x.kind===k).map(x=>`<li style="padding:4px 0"><span class="small muted num">${new Date(x.at).toLocaleString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).replace(",","")}</span> · <a href="#" data-wpitem="${esc(x.c)}|${esc(x.id)}|${esc(x.view)}">${esc(x.label)}</a></li>`).join("")}</ul>`).join(""):'<p class="muted">In diesem Zeitraum wurde nichts geändert.</p>';
+  $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Wochenbericht">
+    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Wochenbericht · ${ch.length} Änderungen</span><h2>${esc(wpRange(start))}</h2></div><div style="display:flex;gap:8px"><button class="btn" id="wpcopy">Kopieren</button><button class="btn" data-close="1">Schließen</button></div></div>
+    ${body}</div></div>`;
+  S.modalOpen=true;
+  const cp=$("#wpcopy");if(cp)cp.onclick=()=>copyText(weekReport(start),cp);
 }
 const VIEWS={}, VIEWS_after={};
 
@@ -633,9 +664,15 @@ VIEWS.start=()=>{
   const dk=S.data.doku.slice();const pPlan=dk.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),pDone=dk.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
   const dkSt=["Idee","Notizen","Entwurf","fertig"].map(s=>[s,dk.filter(r=>r.status===s).length]);
   const wLeft=doku?Math.max(0,Math.ceil(days(doku.date)/7)):null;
-  const wk=weekChanges();
   const dokuPanel=`<a class="panel" href="#doku" style="display:block;color:inherit;text-decoration:none"><h3>Dokumentation</h3><div class="toolbar" style="justify-content:space-between"><span class="num">${f2(pDone,0)} von ${f2(pPlan,0)} Seiten</span><span class="small muted">${wLeft!=null?"noch "+wLeft+" Wochen bis zur Abgabe":""}</span></div><div class="bar" style="margin:6px 0 10px"><i style="width:${pPlan?Math.min(100,pDone/pPlan*100):0}%"></i></div><div class="small muted">${dkSt.map(([s,n])=>n+" "+s).join(" · ")}</div></a>`;
-  const weekPanel=`<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Diese Woche geändert</h3><button class="btn sm" id="wkcopy">Wochenbericht kopieren</button></div>${wk.length?`<div style="margin:6px 0 8px">${Object.entries(wk.reduce((m,x)=>(m[x.kind]=(m[x.kind]||0)+1,m),{})).map(([k,n])=>pill(n+" "+k,"p-acc")).join(" ")}</div><ul class="clean">${wk.slice(0,6).map(x=>`<li class="small" style="padding:3px 0"><span class="muted">${esc(x.kind)}</span> · ${esc(x.label)}</li>`).join("")}</ul>${wk.length>6?`<p class="note">… und ${wk.length-6} weitere</p>`:""}`:'<p class="muted small">Seit sieben Tagen nichts geändert.</p>'}</div>`;
+  const curStart=wpStart(Date.now());const curCh=wpChanges(curStart,wpNext(curStart));
+  const kindCount={};curCh.forEach(x=>{kindCount[x.kind]=(kindCount[x.kind]||0)+1;});
+  const weekPanel=`<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Wochenbericht · ${esc(wpRange(curStart))}</h3><span class="num small">${curCh.length} Änderungen</span></div>
+    <div style="margin:8px 0">${Object.entries(kindCount).map(([k,n])=>pill(n+" "+k,"p-acc")).join(" ")||'<span class="muted small">Noch nichts geändert.</span>'}</div>
+    ${curCh.length?`<ul class="clean">${curCh.slice(0,5).map(x=>`<li class="small" style="padding:3px 0"><span class="muted">${esc(x.kind)}</span> · ${esc(x.label)}</li>`).join("")}</ul>`:""}
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn pri sm" data-wp="${curStart}">Bericht öffnen</button><button class="btn sm" data-wpcopy="${curStart}">Kopieren</button></div></div>`;
+  const past=wpList(curStart).slice(1,20);
+  const pastPanel=`<div class="panel"><h3>Frühere Wochenberichte</h3>${past.length?`<ul class="clean">${past.map(s=>{const n=wpChanges(s,wpNext(s)).length;return `<li style="padding:6px 0;border-bottom:1px solid var(--line)"><a href="#" data-wp="${s}" style="display:flex;justify-content:space-between;gap:8px;color:inherit;text-decoration:none"><span>${esc(wpRange(s))}</span><span class="muted small">${n} Änderungen</span></a></li>`;}).join("")}</ul>`:'<p class="muted small">Noch keine früheren Berichte.</p>'}</div>`;
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
   return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer · FTM25</span><h1>Übersicht</h1>
     <p>Konzeption und Konstruktion einer automatisierten Messanlage zur Prüfung von Rohren im Wareneingang · BD Gamer Lasertechnik, Bruchsal</p></div>
@@ -647,10 +684,12 @@ VIEWS.start=()=>{
   </div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px"><h3>Terminleiste <a class="small" href="#zeitleiste">alle Termine öffnen</a></h3>${timelineSvg()}</div>
   <div class="grid g2" style="margin-bottom:14px;align-items:start">${dokuPanel}${weekPanel}</div>
+  <div style="margin-bottom:14px">${pastPanel}</div>
   <div class="panel"><h3>Termine <a class="small" href="#zeitleiste">in der Terminleiste</a></h3><div class="dl">${dl.slice(0,7).map(d=>{const n=days(d.date);return `<div class="cd click" data-termin="${esc(d.id)}" role="button" tabindex="0"><div>${esc(d.title)}<div class="small muted">${d.kind==="betrieb"?"Betrieb":"Schule"} · ${d.approx?"ca. ":""}${fd(d.date)}</div></div><div class="d" style="color:${n<0?"var(--bad)":n<=7?"var(--warn)":"var(--ink)"}">${n<0?-n:n}<small> ${n<0?"T über":"T"}</small></div></div>`;}).join("")||'<div class="empty">Noch keine Termine.</div>'}</div></div>`;
 };
 VIEWS_after.start=()=>{
-  const wb=$("#wkcopy");if(wb)wb.onclick=()=>copyText(weekReport(),wb);
+  document.querySelectorAll("[data-wp]").forEach(x=>x.addEventListener("click",ev=>{ev.preventDefault();openWeek(+x.dataset.wp);}));
+  document.querySelectorAll("[data-wpcopy]").forEach(x=>x.onclick=()=>copyText(weekReport(+x.dataset.wpcopy),x));
 document.querySelectorAll("[data-pkmv]").forEach(b=>b.onclick=async()=>{const [i,dd]=b.dataset.pkmv.split("|").map(Number);const pk=S.data.packages.slice().sort((a,b)=>(a.order||99)-(b.order||99));const j=i+dd;if(j<0||j>=pk.length)return;const t=pk[i];pk[i]=pk[j];pk[j]=t;b.disabled=true;for(let k=0;k<pk.length;k++){if(pk[k].order!==k+1)await save("packages",pk[k].id,Object.assign({},pk[k],{order:k+1}));}});};
 
 VIEWS.aufgaben=()=>{
@@ -1245,6 +1284,7 @@ function renderTask(first){
 /* ---------- Events ---------- */
 document.addEventListener("click",ev=>{
   if(ev.target.closest("#srchbtn")){palOpenUi();return;}
+  const wi=ev.target.closest("[data-wpitem]");if(wi){ev.preventDefault();const [c,id,view]=wi.dataset.wpitem.split("|");closeModal();palOpen(c,view,id);return;}
   const dl=ev.target.closest("[data-dl]");if(dl){ev.preventDefault();ev.stopPropagation();const f=S.data.files.find(x=>x.id===dl.dataset.dl);if(f)dlFile(f,dl);return;}
   if(ev.target.closest("[data-noedit],.fchip a"))return;
   const tt=ev.target.closest("[data-termin]");if(tt&&!S.modalOpen){ev.preventDefault();openTermin(tt.dataset.termin);return;}
