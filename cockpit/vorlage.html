@@ -412,7 +412,7 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"decisions",title:"Entscheidungen",
-    fields:[["date","Datum","date"],["text","Entscheidung","area"],["source","Quelle","text"],["docs","Betroffene Dokumente","text"],["check","Noch prüfen/bestätigen","bool"]],def:{}},
+    fields:[["date","Datum","date"],["text","Entscheidung","area"],["source","Quelle","text"],["docs","Betroffene Dokumente","text"],["status","Status","select",["offen","bestätigt"]]],def:{status:"offen"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
@@ -495,6 +495,7 @@ function navHtml(){
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
       if(c==="questions")n=arr.filter(x=>x.status!=="beantwortet").length;
+      if(c==="decisions")n=arr.filter(x=>x.status==="offen").length;
       if(c==="conflicts")n=arr.filter(x=>x.status!=="geklärt").length;
       if(c==="reqs")n=new Set(reqWarnings().map(w=>w[0])).size;
       cnt=`<span class="cnt">${n}</span>`;}
@@ -778,16 +779,17 @@ VIEWS_after.anforderungen=()=>{const b=$("#reqcopy");if(b)b.onclick=()=>copyText
 
 VIEWS.entscheidungen=()=>{
   const tab=lsGet("decTab","dec");
-  const dsort=lsGet("decSort","date");
-  const dec=S.data.decisions.slice().sort((a,b)=>(dsort==="date"?0:((!!b.check)-(!!a.check))*(dsort==="open"?1:-1))||(b.date||"").localeCompare(a.date||""));
+  const df=lsGet("decFilter",{st:"offen"});
+  const decAll=S.data.decisions.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const dec=decAll.filter(x=>df.st==="alle"||x.status===(df.st==="offen"?"offen":"bestätigt"));
   const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
   return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Entscheidungen & Änderungen</h1><p>Wer hat wann was entschieden. Die Änderungsdoku lässt sich als Tabelle in Word einfügen (Kapitel 6 des Pflichtenhefts).</p></div></div>
-  <div class="toolbar"><button class="btn ${tab==="dec"?"pri":""}" data-tab="dec">Entscheidungen (${dec.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-tab="ch">Änderungsdoku PH (${ch.length})</button><span style="flex:1"></span>${tab==="dec"?`<select id="decsort" aria-label="Sortierung"><option value="date" ${dsort==="date"?"selected":""}>Nach Datum</option><option value="open" ${dsort==="open"?"selected":""}>Offene zuerst</option><option value="done" ${dsort==="done"?"selected":""}>Bestätigte zuerst</option></select>`+newBtn("decisions","Neue Entscheidung"):`<button class="btn" id="chcopy">Für Word kopieren</button>`+newBtn("changes","Neue Änderung")}</div>`+
-  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["text","Entscheidung"],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["check","Status",r=>r.check?pill("offen","p-warn"):pill("bestätigt","p-ok")]])
+  <div class="toolbar"><button class="btn ${tab==="dec"?"pri":""}" data-tab="dec">Entscheidungen (${dec.length})</button><button class="btn ${tab==="ch"?"pri":""}" data-tab="ch">Änderungsdoku PH (${ch.length})</button><span style="flex:1"></span>${tab==="dec"?`<select id="decfst" aria-label="Status"><option value="offen" ${df.st==="offen"?"selected":""}>Nur offene</option><option value="bestätigt" ${df.st==="bestätigt"?"selected":""}>Nur bestätigte</option><option value="alle" ${df.st==="alle"?"selected":""}>Alle</option></select>`+newBtn("decisions","Neue Entscheidung"):`<button class="btn" id="chcopy">Für Word kopieren</button>`+newBtn("changes","Neue Änderung")}</div>`+
+  (tab==="dec"?listTable("decisions",dec,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["text","Entscheidung"],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["docs","Dokumente",r=>`<span class="small">${esc(r.docs)}</span>`],["status","Status",r=>stPill(r.status)]])
   :listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]])+`<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`);
 };
-VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);const ds=$("#decsort");if(ds)ds.onchange=()=>{lsSet("decSort",ds.value);render();};};
+VIEWS_after.entscheidungen=()=>{document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{lsSet("decTab",b.dataset.tab);render();});const c=$("#chcopy");if(c)c.onclick=()=>copyText($("#copybox").value,c);const ds=$("#decfst");if(ds)ds.onchange=()=>{lsSet("decFilter",{st:ds.value});render();};};
 
 VIEWS.widersprueche=()=>{
   const f=lsGet("cfFilter",{st:"offen"});
