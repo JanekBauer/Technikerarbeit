@@ -1,0 +1,101 @@
+[
+ {
+  "id": "k01",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Problem, Ziel, Bearbeitungsschritte; Firmenvorstellung nur so weit nötig",
+  "nr": "1.",
+  "pagesDone": 0,
+  "pagesPlan": 2,
+  "refs": "",
+  "status": "Idee",
+  "title": "Einleitung"
+ },
+ {
+  "id": "k02",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Rundgang 23.10.: 100-%-Sichtprüfung im WE, Rundheit/Maßhaltigkeit nur über Lieferantendokumente, Fehler fallen beim Laserschneiden auf",
+  "nr": "2.",
+  "pagesDone": 0,
+  "pagesPlan": 5,
+  "refs": "",
+  "status": "Idee",
+  "title": "Ist-Zustand und Problemanalyse"
+ },
+ {
+  "id": "k03",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Anforderungsliste (F/M/W), Abgrenzung",
+  "nr": "3.",
+  "pagesDone": 0,
+  "pagesPlan": 4,
+  "refs": "",
+  "status": "Idee",
+  "title": "Anforderungen"
+ },
+ {
+  "id": "k04",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Normbegriffe ISO 1101/12181/14405; Sensorvergleich",
+  "nr": "4.",
+  "pagesDone": 0,
+  "pagesPlan": 6,
+  "refs": "",
+  "status": "Idee",
+  "title": "Messtechnische Grundlagen und Messprinzipien"
+ },
+ {
+  "id": "k05",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Funktionsstruktur, Morphologischer Kasten, Varianten",
+  "nr": "5.",
+  "pagesDone": 0,
+  "pagesPlan": 8,
+  "refs": "",
+  "status": "Idee",
+  "title": "Lösungsfindung"
+ },
+ {
+  "id": "k06",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Paarweiser Vergleich, Nutzwertanalyse/VDI 2225, Entscheidung Betrieb",
+  "nr": "6.",
+  "pagesDone": 0,
+  "pagesPlan": 4,
+  "refs": "",
+  "status": "Idee",
+  "title": "Bewertung und Auswahl"
+ },
+ {
+  "id": "k07",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. SolidWorks-Baugruppen, Berechnungen (Durchbiegung, Spannkräfte)",
+  "nr": "7.",
+  "pagesDone": 0,
+  "pagesPlan": 10,
+  "refs": "",
+  "status": "Idee",
+  "title": "Konstruktion der Messanlage"
+ },
+ {
+  "id": "k08",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Ablauf vom Einlegen bis zum Prüfergebnis, Taktzeit",
+  "nr": "8.",
+  "pagesDone": 0,
+  "pagesPlan": 5,
+  "refs": "",
+  "status": "Idee",
+  "title": "Messprozess und Sensorintegration"
+ },
+ {
+  "id": "k09",
+  "figures": "",
+  "notes": "Vorschlag Gliederung – anpassen. Soll-Ist-Vergleich gegen PH, Urteil Betrieb, Ausblick (Fließtext)",
+  "nr": "9.",
+  "pagesDone": 0,
+  "pagesPlan": 2,
+  "refs": "",
+  "status": "Idee",
+  "title": "Schlussbetrachtung und Ausblick"
+ }
+]

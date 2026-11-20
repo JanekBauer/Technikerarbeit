@@ -1,0 +1,101 @@
+[
+ {
+  "id": "c01",
+  "by": "Janek (KI-unterstützt)",
+  "change": "Gerüst aus Schulvorlage, Inhalte aus AS V2, offene Punkte markiert",
+  "chap": "alle",
+  "date": "2026-10-16",
+  "reason": "Start PH",
+  "ver": "V1"
+ },
+ {
+  "id": "c02",
+  "by": "offen – klären",
+  "change": "Werkstoff „Nitinol / Edelstahl“; Rohrlänge 1000–3000 mm",
+  "chap": "Anf. 1.1, 1.2",
+  "date": "2026-10-23",
+  "reason": "Quelle offen",
+  "ver": "V1.x"
+ },
+ {
+  "id": "c03",
+  "by": "Information Betrieb (QM)",
+  "change": "Ist-Zustand: 100-%-Prüfung im WE durch QM, nur Sichtprüfung; Rundheit/Maßhaltigkeit nur über Lieferantendokumente",
+  "chap": "2 Problemstellung",
+  "date": "2026-10-24",
+  "reason": "Rundgang im Betrieb 23.10.2026",
+  "ver": "V2"
+ },
+ {
+  "id": "c04",
+  "by": "Janek – vom Betrieb bestätigen",
+  "change": "Rohrfehler fallen meist erst beim Laserschneiden auf",
+  "chap": "2 Defizite",
+  "date": "2026-10-24",
+  "reason": "Aussage Janek (Kenntnis aus Betrieb)",
+  "ver": "V2"
+ },
+ {
+  "id": "c05",
+  "by": "Janek",
+  "change": "Bezüge zur Automatisierung entfernt; Anf. 4.2 gestrichen",
+  "chap": "Titel, 3, Anf. 4",
+  "date": "2026-10-30",
+  "reason": "nicht dokumentiert",
+  "ver": "V3"
+ },
+ {
+  "id": "c06",
+  "by": "Betrieb – bestätigen",
+  "change": "Nitinol + Edelstahl bis 3 m; D 1–6,5 mm; Rundheit „10 %“; Pneumatik-/Elektronikplan; Abgrenzungen; SolidWorks; Freitag; 230 V + Druckluft; berührungslos",
+  "chap": "mehrere",
+  "date": "2026-10-30",
+  "reason": "Gespräch im Betrieb 30.10.2026",
+  "ver": "V3"
+ },
+ {
+  "id": "c07",
+  "by": "Betrieb – bestätigen",
+  "change": "Automatisierung wieder aufgenommen; Anf. 4.2 manuell einlegen, Messen/Auswerten automatisch; Abgrenzung automatisches Zuführen",
+  "chap": "Titel, 3, Anf. 4.2, 4",
+  "date": "2026-10-30",
+  "reason": "Notiz Gespräch 30.10.",
+  "ver": "V4"
+ },
+ {
+  "id": "c08",
+  "by": "Betrieb",
+  "change": "Tantal ergänzt; Abgrenzung andere Halbzeuge; Rohre bis 3 m",
+  "chap": "3, Anf. 1.1, 4, 5.3, 5.4",
+  "date": "2026-10-30",
+  "reason": "Notiz 30.10.; Konsistenz",
+  "ver": "V4"
+ },
+ {
+  "id": "c09",
+  "by": "Janek / Betrieb",
+  "change": "Edelstahl/Tantal in Problemstellung; Auslegungsberechnungen gestrichen; Termine angepasst; betriebl. MS Variantenauswahl/Konstruktionsfreigabe entfernt",
+  "chap": "2, 3, 2.4, 5.1, 5.2",
+  "date": "2026-10-30",
+  "reason": "Überarbeitung Janek",
+  "ver": "V5"
+ },
+ {
+  "id": "c10",
+  "by": "Janek – Quelle Betrieb nennen",
+  "change": "Neue Anf. 2.3 (M): Messpunktabstand max. 2 mm; Rechtschreibung; Logo BD",
+  "chap": "Anf. 2.3, 2, Kopfzeile",
+  "date": "2026-10-30",
+  "reason": "Notiz Janek",
+  "ver": "V5"
+ },
+ {
+  "id": "c11",
+  "by": "Janek (Bestätigung Baidinger offen)",
+  "change": "Titel an AS V3; Angebote Kaufteile als Ergebnis; Abgrenzung Bestellung/Beschaffung",
+  "chap": "Titel, 3, 4",
+  "date": "2026-10-30",
+  "reason": "Abgleich AS V3 / Cockpit",
+  "ver": "V6"
+ }
+]

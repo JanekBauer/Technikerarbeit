@@ -1,0 +1,105 @@
+[
+ {
+  "id": "p01",
+  "ampel": "gelb",
+  "chat": "01 AS/Klärung",
+  "name": "Aufgabenstellung",
+  "order": 1,
+  "stand": "AS V3 (MS 1 final, 13.11., Versionszählung neu) = gültige AS; „Ovalität“ angeglichen. Offen: KI-Formulierung (W8), FSL-Prüfung (W5) beim MS 1 am 20.11., Unterschriften",
+  "updated": "2026-11-17T20:45:00Z"
+ },
+ {
+  "id": "p02",
+  "ampel": "gelb",
+  "chat": "02 Pflichtenheft",
+  "name": "Pflichtenheft",
+  "order": 2,
+  "stand": "PH V1 (MS 1 final, 13.11., Versionszählung neu, Kap. 6 Stand 0). Offen: Freigabe + Unterschrift 27.11., Rest-Formfehler, Inhaltsverzeichnis, W10–W16",
+  "updated": "2026-11-17T20:45:00Z"
+ },
+ {
+  "id": "p03",
+  "ampel": "gelb",
+  "chat": "03 Projektplan",
+  "name": "Projektplan (Rillsoft)",
+  "order": 3,
+  "stand": "13.11. aktualisiert (Rillsoft-PDF, M1 20.11.). Weicht vom PH V1 ab (Variantenauswahl 25.12. statt 04.12., Konstruktionsfreigabe 29.01. statt 22.01., Übergabe 26.03. statt 26.02.) → anpassen bis 19.11. (Entscheidung e19)",
+  "updated": "2026-11-17T20:45:00Z"
+ },
+ {
+  "id": "p04",
+  "ampel": "gelb",
+  "chat": "05 Messtechnik",
+  "name": "Lösungsansätze (PDF für MS 1)",
+  "order": 4,
+  "stand": "19.11.: Shortlist mit 8 Messprinzipien A–H aus Chat 05 als Grundlage (Bewertung erst in Chat 07); PDF für MS 1 am 20.11. nicht belegt",
+  "updated": "2026-11-19T08:45:00Z"
+ },
+ {
+  "id": "p05",
+  "ampel": "gruen",
+  "chat": "04 Meilensteine",
+  "name": "MS-1-Termin + Vor-Ort-Termin",
+  "order": 5,
+  "stand": "MS 1 fest: Fr. 20.11.2026, 9:30–10:30 Uhr mit Hr. Graudejus de Olio (14.11.)",
+  "updated": "2026-11-17T20:45:00Z"
+ },
+ {
+  "id": "p06",
+  "ampel": "gelb",
+  "chat": "05 Messtechnik",
+  "name": "Messtechnik-Recherche",
+  "order": 6,
+  "stand": "19.11. Übergabe Chat 05: Recherche weitgehend erledigt, Shortlist Messprinzipien A–H; vorläufiger Abgleich nach Annahme ≤ 1/10 Toleranz (nicht vom Betrieb). Maßgeblich ist der Sensorvergleich im Cockpit (26 Sensoren, Entscheidung e23). Offen: Mittelung 2.5 (q16), Ovalitätsdefinition (q17), %GRR (q03), Datenblätter gegenprüfen, Zumbach, Angebote, %GRR-Abschätzung",
+  "updated": "2026-11-19T09:00:00Z"
+ },
+ {
+  "id": "p07",
+  "ampel": "gelb",
+  "chat": "06 Spann/Handhabung",
+  "name": "Spann- und Handhabungskonzept",
+  "order": 7,
+  "stand": "Morphologischer Kasten in Chat 06 begonnen (04.11.), V2 am 12.11.: 13 Teilfunktionen + 3 Querschnittsfunktionen, Ideen überwiegend KI-Vorschläge; eigene Ideen nur bei TF1/TF3/TF4; noch keine Gesamtvarianten (Quelle: Cockpit tools/morph, Archiv 20261112_Chat06_Morpho-Kasten_V2)",
+  "updated": "2026-11-12T20:00:00Z"
+ },
+ {
+  "id": "p08",
+  "ampel": "grau",
+  "chat": "07 Bewertung",
+  "name": "Variantenbewertung",
+  "order": 8,
+  "stand": "noch nicht begonnen"
+ },
+ {
+  "id": "p09",
+  "ampel": "grau",
+  "chat": "08 CAD",
+  "name": "CAD-Konstruktion (SolidWorks)",
+  "order": 9,
+  "stand": "noch nicht begonnen"
+ },
+ {
+  "id": "p10",
+  "ampel": "grau",
+  "chat": "09 Messprozess/Unterlagen",
+  "name": "Messprozess, Sensorintegration, Unterlagen",
+  "order": 10,
+  "stand": "gehört zum Umfang (30.10.); Ablauf nach Variantenwahl"
+ },
+ {
+  "id": "p11",
+  "ampel": "grau",
+  "chat": "10 Doku",
+  "name": "Dokumentation",
+  "order": 11,
+  "stand": "Gliederungsentwurf 19.10.; Doku-Speicher nicht belegt"
+ },
+ {
+  "id": "p12",
+  "ampel": "grau",
+  "chat": "11 Präsentation",
+  "name": "Präsentation",
+  "order": 12,
+  "stand": "ab Mai 2027"
+ }
+]

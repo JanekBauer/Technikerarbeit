@@ -1,0 +1,373 @@
+[
+ {
+  "id": "cfbundle",
+  "items": [],
+  "updated": "2026-11-05T21:25:45.648Z"
+ },
+ {
+  "id": "eval",
+  "criteria": [],
+  "hzul": "",
+  "pair": {},
+  "variants": []
+ },
+ {
+  "id": "morph",
+  "rows": [
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Rohr einlegen ",
+    "id": "tf1",
+    "ideas": [
+     "Manuell per Hand",
+     "KI: Von oben in offene Auflagen legen",
+     "KI: Von vorn in seitlich offene Auflagen schieben",
+     "KI: Auf Ladeleiste legen, die das Rohr in die Messlage absenkt",
+     "KI: Axial durch Trichter einschieben [F? 2.7 Reibung, Platz]",
+     "KI: Vertikal einhängen [F? 4.2 Bauhöhe über 3 m]"
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf3",
+     "tf4"
+    ],
+    "fn": "Durchbiegung begrenzen (KI-Vorschlag)",
+    "id": "tf2",
+    "ideas": [
+     "KI: Viele feste Stützstellen im berechneten Abstand",
+     "KI: Durchgehende Rinne mit Messfenstern oder Längsschlitz",
+     "KI: Stütze fährt mit dem Sensor mit, stützt direkt neben der Messstelle",
+     "KI: Rohr hängt vertikal, keine Durchbiegung [F? 4.2 Bauhöhe]",
+     "KI: Leichte Zugvorspannung zwischen zwei Enden [F? 3.1 Spannung, 2.2 Ø wird kleiner]",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf3",
+     "tf5"
+    ],
+    "fn": "Rohr auflagern und zur Messachse ausrichten (KI-Vorschlag)",
+    "id": "tf7",
+    "ideas": [
+     "KI: Festes V-Prisma aus Kunststoff",
+     "KI: Rollenpaar aus Kunststoff oder Keramik",
+     "KI: Luftlager-Prisma, Rohr schwebt auf ölfreier Druckluft [F? 3.2, ruhige Lage bei Ø 1 mm unsicher]",
+     "KI: Zentrisch schließende Dreipunkt-Auflage (Lünette)",
+     "KI: Wechseleinsätze oder höhenverstellbare Auflage je Ø-Bereich",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf3"
+    ],
+    "fn": "Rohr gegen ungewollte Bewegung sichern (KI-Vorschlag)",
+    "id": "tf8",
+    "ideas": [
+     "KI: Nur Eigengewicht und Endanschlag",
+     "KI: Spannzange/Futter mit Kunststoffeinsatz an einem Ende [F? 3.1 Spannkraft ovalisiert]",
+     "KI: Beide Enden gefasst, Antriebsseite und mitlaufende Gegenseite [F? 3.1 Verspannung]",
+     "KI: Federnde Niederhalterrollen aus Kunststoff",
+     "KI: Vakuum-Prisma (Saugnut hält das Rohr)",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Rohrtyp und Sollwerte vorgeben (KI-Vorschlag)",
+    "id": "tf9",
+    "ideas": [
+     "KI: Auswahl am Bedienpanel (Rezept je Rohrtyp)",
+     "KI: Barcode/DataMatrix vom Begleitpapier scannen",
+     "KI: Nenn-Ø aus erster Messung erkennen, Werkstoff manuell wählen",
+     "KI: Kodierte Wechseleinsätze melden den Ø-Bereich",
+     "",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Rohranfang und Rohrende erkennen (KI-Vorschlag)",
+    "id": "tf10",
+    "ideas": [
+     "KI: Fester Endanschlag ist der Nullpunkt",
+     "KI: Messsensor erkennt die Rohrkante am Signalsprung",
+     "KI: Eigene Gabellichtschranke am Schlitten",
+     "KI: Länge aus dem Rezept, nur Anfang wird erkannt",
+     "",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf3",
+     "tf7"
+    ],
+    "fn": "Durchmesser berührungslos erfassen (KI-Vorschlag)",
+    "id": "tf5",
+    "ideas": [
+     "KI: Schattenmikrometer LED + Zeilenkamera, einachsig (z. B. Keyence LS, Micro-Epsilon optoCONTROL) [F? W10 Streuung, W7 Messbereich]",
+     "KI: Laser-Scan-Mikrometer mit rotierendem Spiegel [F? W10]",
+     "KI: Mehrachs-Messkopf mit 2 oder 3 Achsen (z. B. Zumbach, Sikora, LaserLinc, Aeroel – ungeprüft) [F? W10]",
+     "KI: Zwei gegenüberliegende Abstandssensoren (konfokal oder Triangulation), Ø aus Differenz [F? W10]",
+     "KI: Telezentrische Kamera mit Bildauswertung [F? W10]",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf2",
+     "tf5",
+     "tf8",
+     "tf7",
+     "tf4"
+    ],
+    "fn": "Querschnitt in mehreren Winkellagen erfassen (KI-Vorschlag)",
+    "id": "tf3",
+    "ideas": [
+     "Rohr dreht an jedem Messpunkt 360°",
+     "Rohr dreht durchgehend ohne zu stoppen während dem gesamtem Messvorgangs",
+     "KI: Messkopf schwenkt um das stehende Rohr (180° reichen)",
+     "KI: Mehrere feste Messachsen, nichts dreht sich [F? 2.1 Ø max/min zwischen den Achsen]",
+     "KI: Mehrachs-Kopf plus kleiner Schwenk (z. B. 3 Achsen, je 60°)",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf2",
+     "tf11",
+     "tf3"
+    ],
+    "fn": "Messposition entlang der Länge ändern (KI-Vorschlag)",
+    "id": "tf4",
+    "ideas": [
+     "Sensor fährt Rohrlänge ab, Rohr gehalten ",
+     "Sensor ist stationär und das Rohr wird durch den Messbereich geführt",
+     "KI: Sensor steht, Treibrollen schieben das Rohr durch [F? 3.2 Kontakt, Schlupf, doppelte Länge]",
+     "KI: Sensor steht, Rohr liegt auf fahrendem Träger",
+     "KI: Zwei Sensoren teilen sich die Strecke",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [
+     "tf4"
+    ],
+    "fn": "Position erfassen und dem Messwert zuordnen (KI-Vorschlag)",
+    "id": "tf11",
+    "ideas": [
+     "KI: Geber im Antriebsmotor (Servo oder Schrittmotor)",
+     "KI: Direktes Längenmesssystem am Schlitten (Magnetband oder Glasmaßstab)",
+     "KI: Messung positionsgesteuert alle 2 mm auslösen",
+     "KI: Messung zeitgesteuert bei konstanter Geschwindigkeit",
+     "KI: Drehgeber an der Drehachse für den Winkel",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Messwerte auswerten und i.O./n.i.O. anzeigen (KI-Vorschlag)",
+    "id": "tf6",
+    "ideas": [
+     "KI: Sensor-Controller mit Grenzwerten und Signalleuchte",
+     "KI: Industrie-PC mit Messprotokoll je Rohr",
+     "KI: SPS mit Bedienpanel",
+     "KI: Verlauf von Ø und Ovalität über die Länge mit markierter Fehlstelle",
+     "",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Rohr entnehmen und zuordnen (KI-Vorschlag)",
+    "id": "tf12",
+    "ideas": [
+     "KI: Manuell in zwei gekennzeichnete Ablagen (i.O./n.i.O.)",
+     "KI: Entnahme erst nach Quittierung, bei n.i.O. gibt nur die Sperrablage frei",
+     "KI: Pneumatischer Auswerfer kippt in i.O.- oder n.i.O.-Rinne",
+     "KI: n.i.O.-Rohr bekommt Anhänger/Etikett an der Schutzhülle",
+     "",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Messsystem prüfen und einstellen (KI-Vorschlag)",
+    "id": "tf13",
+    "ideas": [
+     "KI: Kalibrierter Prüfstift fest am Anfang des Fahrwegs, wird bei jedem Rohr mitgemessen",
+     "KI: Einstellmeister wird täglich manuell eingelegt",
+     "KI: Stufendorn mit mehreren Ø zwischen 1,0 und 6,5 mm",
+     "KI: Referenzrohr als Meisterteil",
+     "",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Querschnitt: sauber und ölfrei halten (KI-Vorschlag)",
+    "id": "q1",
+    "ideas": [
+     "KI: Kontaktflächen nur Kunststoff (z. B. PEEK, POM, PE-UHMW) oder Keramik",
+     "KI: Antriebe und Führungen unterhalb des Rohrs oder gekapselt",
+     "KI: Schmierfreie Führungen",
+     "KI: Druckluft über Öl- und Partikelfilter",
+     "KI: Glatte, abwischbare Wechselauflagen",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Querschnitt: Störeinflüsse fernhalten (KI-Vorschlag)",
+    "id": "q2",
+    "ideas": [
+     "KI: Steifes Maschinenbett (Aluprofil, Stahl-Schweißkonstruktion oder Hartgestein)",
+     "KI: Schwingungsdämpfende Maschinenfüße",
+     "KI: Haube gegen Staub, Zugluft und Fremdlicht",
+     "KI: Sperrluft vor der Sensoroptik",
+     "KI: Wartezeit zum Temperaturausgleich oder Temperatur miterfassen",
+     ""
+    ]
+   },
+   {
+    "dep": "",
+    "deps": [],
+    "fn": "Querschnitt: Bediener schützen (KI-Vorschlag)",
+    "id": "q3",
+    "ideas": [
+     "KI: Haube mit Sicherheitsschalter",
+     "KI: Lichtgitter vor dem Einlegebereich",
+     "KI: Langsame, kraftbegrenzte Achsen",
+     "KI: Start nur über Taster außerhalb des Fahrbereichs",
+     "",
+     ""
+    ]
+   }
+  ],
+  "updated": "2026-11-12T09:25:00.000Z",
+  "variants": []
+ },
+ {
+  "id": "pcsync",
+  "at": "2026-11-17T20:45:00Z",
+  "files": {
+   "a00": "2026-11-04T15:37:40.609508Z",
+   "a01": "2026-11-04T16:23:32.963Z",
+   "a02": "2026-11-04T16:23:16.514Z",
+   "a03": "2026-11-04T15:37:40.609508Z",
+   "a04": "2026-11-04T15:37:40.609508Z",
+   "a05": "2026-11-04T16:20:48.133Z",
+   "a06": "2026-11-04T16:21:01.556Z",
+   "a07": "2026-11-04T16:21:10.528Z",
+   "a08": "2026-11-04T16:21:19.585Z",
+   "a09": "2026-11-04T16:21:27.707Z",
+   "a10": "2026-11-04T15:37:40.609508Z",
+   "a13": "2026-11-04T15:37:40.609508Z",
+   "a14": "2026-11-04T15:37:40.609508Z",
+   "a15": "2026-11-04T15:37:40.609508Z",
+   "a16": "2026-11-04T15:37:40.609508Z",
+   "a17": "2026-11-04T15:37:40.609508Z",
+   "a20": "2026-11-04T15:37:40.609508Z",
+   "a21": "2026-11-04T15:37:40.609508Z",
+   "a22": "2026-11-04T15:37:40.609508Z",
+   "a23": "2026-11-04T15:37:40.609508Z",
+   "a24": "2026-11-04T15:37:40.609508Z",
+   "a25": "2026-11-04T15:37:40.609508Z",
+   "a26": "2026-11-04T15:37:40.609508Z",
+   "a27": "2026-11-04T15:37:40.609508Z",
+   "a28": "2026-11-04T15:37:40.609508Z",
+   "a29": "2026-11-04T15:37:40.609508Z",
+   "a30": "2026-11-04T15:37:40.609508Z",
+   "a31": "2026-11-04T15:37:40.609508Z",
+   "a32": "2026-11-04T15:37:40.609508Z",
+   "a33": "2026-11-04T15:37:40.609508Z",
+   "a34": "2026-11-04T15:37:40.609508Z",
+   "a35": "2026-11-04T15:37:40.609508Z",
+   "a36": "2026-11-04T15:37:40.609508Z",
+   "a37": "2026-11-04T15:37:40.609508Z",
+   "a38": "2026-11-04T15:37:40.609508Z",
+   "a39": "2026-11-04T15:37:40.609508Z",
+   "a40": "2026-11-04T15:37:40.609508Z",
+   "a41": "2026-11-04T15:37:40.609508Z",
+   "a42": "2026-11-04T15:37:40.609508Z",
+   "a43": "2026-11-04T15:37:40.609508Z",
+   "a44": "2026-11-04T15:37:40.609508Z",
+   "a45": "2026-11-04T15:37:40.609508Z",
+   "as-v3-1": "2026-11-05T21:10:00Z",
+   "as-v3-ms1": "2026-11-13T08:15:00Z",
+   "as-v4": "2026-11-06T13:37:24Z",
+   "as-v4-1": "2026-11-06T13:39:57Z",
+   "as-v4-2": "2026-11-06T13:45:00Z",
+   "ds-2d-optical-micrometers-eng": "2026-11-13T14:30:00Z",
+   "ds-cat-optocontrol-odc-de": "2026-11-13T14:30:00Z",
+   "ds-ls-9006-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9006d-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9006m-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9030-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9030d-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9030m-datasheet": "2026-11-13T14:30:00Z",
+   "ds-ls-9120m-datasheet": "2026-11-13T14:30:00Z",
+   "ds-tm-x5006-datasheet": "2026-11-13T14:30:00Z",
+   "ip-021500507": "2026-11-06T17:55:00Z",
+   "kx-angebot-mail": "2026-11-06T17:55:00Z",
+   "kx-angebot-pdf": "2026-11-06T17:55:00Z",
+   "kx-broschuere": "2026-11-06T17:55:00Z",
+   "kx-mail-ls9": "2026-11-06T17:55:00Z",
+   "kx-vorstellung": "2026-11-06T17:55:00Z",
+   "morpho-kasten-v2-docx": "2026-11-13T07:30:00Z",
+   "morpho-kasten-v2-pdf": "2026-11-13T07:35:00Z",
+   "morpho-tf-v1": "2026-11-07T11:40:00Z",
+   "morpho-tf-v2": "2026-11-12T09:10:00Z",
+   "morpho-tf-v2-janek": "2026-11-13T09:25:00Z",
+   "mw2bl3p8j6f1k": "2026-11-04T16:29:40.016Z",
+   "ph-v1-ms1": "2026-11-13T08:20:00Z",
+   "ph-v7": "2026-11-05T21:17:00Z",
+   "ph-v8": "2026-11-06T07:58:00Z",
+   "ph-v8-1": "2026-11-06T09:10:00Z",
+   "ph-v8-2": "2026-11-06T09:15:00Z",
+   "ph-v8-2-janek": "2026-11-06T10:15:00Z",
+   "ph-v8-3": "2026-11-06T10:16:00Z",
+   "ph-v8-3-janek": "2026-11-06T10:35:00Z",
+   "ph-v8-4": "2026-11-06T10:36:00Z",
+   "ph-v8-5": "2026-11-06T11:10:00Z",
+   "ph-v8-6": "2026-11-06T13:20:00Z",
+   "ph-v8-7": "2026-11-06T13:15:00Z",
+   "ph-v8-7-final": "2026-11-06T13:30:00Z",
+   "pp-20261113": "2026-11-13T14:30:00Z",
+   "sensorvergleich-ds-v1": "2026-11-13T14:30:00Z",
+   "spec-RM021500502": "2026-11-06T11:01:00Z",
+   "spec-RM021500502-word": "2026-11-06T17:55:00Z",
+   "spec-RM021500507": "2026-11-06T10:56:00Z",
+   "spec-RM021500507-word": "2026-11-06T17:55:00Z",
+   "spec-RM021800003": "2026-11-06T17:55:00Z",
+   "spec-RM2021500605": "2026-11-06T10:58:00Z",
+   "spec-RM2021500605-word": "2026-11-06T17:55:00Z",
+   "spec-niti-3x05-s4": "2026-11-06T07:45:00Z",
+   "spec-rm021500502-s3": "2026-11-06T10:55:00Z",
+   "spec-rm021500502-s4": "2026-11-06T10:55:00Z",
+   "spec-rm021500502-s5": "2026-11-06T07:45:00Z",
+   "spec-ss-635-s2": "2026-11-06T07:45:00Z",
+   "spec-ss-635-s3": "2026-11-06T07:45:00Z"
+  },
+  "root": "C:\\_Janek_Bauer\\Cloude\\Technikerarbeit\\Archiv",
+  "updated": "2026-11-17T20:45:00Z"
+ }
+]

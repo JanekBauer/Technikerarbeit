@@ -1,0 +1,197 @@
+[
+ {
+  "id": "e01",
+  "check": true,
+  "date": "2026-10-29",
+  "docs": "Projektplan, PH",
+  "source": "Hr. Graudejus (mündl./Teams)",
+  "text": "MS 1 → ca. Mitte Nov., MS 2 → ca. Mitte Feb. (MS finden statt, vorher absprechen)"
+ },
+ {
+  "id": "e02",
+  "check": false,
+  "date": "2026-10-30",
+  "docs": "PH 5.2",
+  "source": "Gespräch Hr. Baidinger",
+  "text": "Projekttag Freitag; CAD SolidWorks"
+ },
+ {
+  "id": "e03",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "PH Anf. 4.2, Abgrenzung",
+  "source": "Gespräch Hr. Baidinger",
+  "text": "Automatisierungsgrad: manuell einlegen, Messen + Auswerten automatisch; Zuführung nicht Bestandteil"
+ },
+ {
+  "id": "e04",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "PH Anforderungsliste, AS V3",
+  "source": "Gespräch Hr. Baidinger",
+  "text": "Werkstoffe Nitinol/Edelstahl/Tantal; Länge 1–3 m; Ø 1,0–6,5 mm; berührungslos; Messpunkte max. 2 mm"
+ },
+ {
+  "id": "e05",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "PH 4",
+  "source": "Gespräch Hr. Baidinger",
+  "text": "Abgrenzung bestätigt (Software/Steuerung, Messmittelfähigkeit, IT/QM, Bau, Inbetriebnahme)"
+ },
+ {
+  "id": "e06",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "AS V3, PH V6",
+  "source": "Janek (Cockpit)",
+  "text": "Titel AS V3 gilt, auch im PH"
+ },
+ {
+  "id": "e07",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "AS V3, PH V6",
+  "source": "Janek (Cockpit), deckt sich mit Ausschreibung",
+  "text": "Angebote für Kaufteile = Ergebnis; Bestellung/Beschaffung = Abgrenzung"
+ },
+ {
+  "id": "e08",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "AS V3, PH",
+  "source": "Janek (Cockpit)",
+  "text": "Messprozessentwicklung inkl. Sensorintegration gehört zum Umfang"
+ },
+ {
+  "id": "e09",
+  "check": false,
+  "date": "2026-10-30",
+  "docs": "AS, PH",
+  "source": "AS V2/V3",
+  "text": "Kein physischer Bau"
+ },
+ {
+  "id": "e10",
+  "check": false,
+  "date": "2026-10-30",
+  "docs": "PH 5.2",
+  "source": "Chat 02 (UP0)",
+  "text": "Schulische MS aus dem PH entfernt (stehen im Projektplan); betriebliche MS bleiben im PH"
+ },
+ {
+  "id": "e11",
+  "check": false,
+  "date": "2026-10-30",
+  "docs": "PH 6",
+  "source": "Chat 02",
+  "text": "Änderungsdokumentation als Kap. 6 im PH"
+ },
+ {
+  "id": "e12",
+  "check": true,
+  "date": "2026-10-30",
+  "docs": "PH 3, 5.2",
+  "source": "Janek, PH V5",
+  "text": "Auslegungsberechnungen als Ergebnis gestrichen; Variantenauswahl + Konstruktionsfreigabe als betriebl. MS entfernt"
+ },
+ {
+  "id": "e13",
+  "check": true,
+  "date": "2026-11-06",
+  "docs": "PH V8.7, Projektplan",
+  "source": "Janek (Chat 02 / Cockpit)",
+  "text": "Betriebliche MS: Kick-off 23.10. · Variantenauswahl 04.12. · Konstruktionsfreigabe 22.01. · Übergabe 26.02.; PH-Freigabe + Unterschrift am 20.11. (nach MS 1)",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e14",
+  "check": false,
+  "date": "2026-11-06",
+  "docs": "PH V8.7",
+  "source": "Chat 02 / Rohrspezifikationen / Janek",
+  "text": "Anforderungen aus Rohrspezifikationen: Ovalität statt Rundheit, Ø ± 13 µm, keine Mittelwerte, Tantal nur W, Rückverfolgbarkeit gestrichen; Wandstärke/Konzentrizität/Geradheit abgegrenzt",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e15",
+  "check": true,
+  "date": "2026-11-06",
+  "docs": "PH V8.7 Anf. 2.4",
+  "source": "Janek (Chat 02), Wert aus KI-Websuche",
+  "text": "Reproduzierbarkeit als %GRR ≤ 10 % (AIAG MSA)",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e16",
+  "check": true,
+  "date": "2026-11-06",
+  "docs": "Doku, Präsentation, PH 5.4",
+  "source": "Janek / Betrieb",
+  "text": "Kein Sperrvermerk; Spezifikationen/interne Dokumente nicht beifügen/zeigen, nur paraphrasieren",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e17",
+  "check": false,
+  "date": "2026-11-06",
+  "docs": "AS V4.2",
+  "source": "Janek (Chat 01)",
+  "text": "AS V4: an PH V8.7 angeglichen; 2 mm und %GRR nur im PH; Tantal als Wunsch",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e18",
+  "check": false,
+  "date": "2026-11-06",
+  "docs": "PH, AS",
+  "source": "Janek (Cockpit)",
+  "text": "Elektronikplan = Schaltplan Pneumatik + E-Plan, keine Programmierung",
+  "updated": "2026-11-06T14:25:00Z"
+ },
+ {
+  "id": "e19",
+  "check": false,
+  "date": "2026-11-14",
+  "docs": "PH V1, Projektplan",
+  "source": "Janek",
+  "text": "Bei Terminabweichungen gelten die Daten aus dem PH V1; der Projektplan wird daran angepasst",
+  "updated": "2026-11-14T10:00:00Z"
+ },
+ {
+  "id": "e20",
+  "check": false,
+  "date": "2026-11-14",
+  "docs": "AS",
+  "source": "Janek",
+  "text": "Bauer_TA_AS_V3.docx vom 13.11. ist die Originalfassung der AS; die alte AS V3 vom 30.10. wird verworfen (aus dem Archiv gelöscht)",
+  "updated": "2026-11-14T10:00:00Z"
+ },
+ {
+  "id": "e21",
+  "check": false,
+  "date": "2026-11-14",
+  "docs": "Projektplan, Termine",
+  "source": "Janek / Hr. Graudejus de Olio",
+  "text": "MS 1 am Fr. 20.11.2026, 9:30–10:30 Uhr",
+  "updated": "2026-11-14T10:00:00Z"
+ },
+ {
+  "id": "e22",
+  "check": true,
+  "date": "2026-11-12",
+  "docs": "Sensorvergleich, PH 2.4",
+  "source": "Janek/Claude (Chat 05) – Annahme, nicht vom Betrieb",
+  "text": "Abgleich-Maßstab für Messgeräte (Annahme): Messunsicherheit ≤ 1/10 der Toleranz → Ø ≤ 2,6 µm, Ovalität NiTi ≤ 1 µm",
+  "updated": "2026-11-19T08:45:00Z"
+ },
+ {
+  "id": "e23",
+  "check": false,
+  "date": "2026-11-19",
+  "docs": "Cockpit, Übergabe Chat 05",
+  "source": "Janek (Chat 00, 19.11.)",
+  "text": "Bei Abweichungen zwischen Chat-Übergaben und Cockpit gelten die Daten aus dem Cockpit (z. B. Sensorvergleich mit 26 Sensoren vor Chat-05-Liste s01–s19; Termine laut PH V1 vor Projektplan). Keine neuen Widersprüche W17 ff. angelegt.",
+  "updated": "2026-11-19T09:00:00Z"
+ }
+]

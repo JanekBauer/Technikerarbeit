@@ -1,0 +1,22 @@
+---
+name: technikerarbeit
+description: Janeks Technikerarbeit bei BD Gamer mit Baidinger und Graudejus de Olio
+---
+- Arbeitet an seiner Technikerarbeit (TA) mit eigener Aufgabenstellung, eigenem Pflichtenheft und Projektplan; will getrennte Chats je TA-Abschnitt, die per Übergabe aneinander übergeben.
+- TA-Fristen: MS 1 bis Ende Okt. 2026, MS 2 bis Mitte Jan. 2027, MS 3 bis Mitte März 2027, Doku-Abgabe 05.04.2027 10:00, Präsentation 17./18.06.2027; „Chat 00 Cockpit“ als Projektgedächtnis, gespeist aus Übergabeblöcken der Chats 01–11.
+- 23.10.2026 erster Tag im Betrieb (BD Gamer): nur Rundgang und Leute kennengelernt, kaum über die TA gesprochen; Ziel, Anforderungen, Abgrenzung und Rahmenbedingungen noch nicht vom Betrieb erhalten.
+- Ist-Zustand Wareneingang: QM macht eine 100-%-Prüfung der Rohre, die nur aus optischem Anschauen besteht; ansonsten verlässt man sich auf die Lieferantendokumente, daher fallen Fehler selten auf.
+- Anforderungen kommen später vom Betrieb als Excel-Liste (Stand 24.10.2026 noch nicht erhalten).
+- MS 1 wird wahrscheinlich auf ca. Mitte Nov. 2026 verlegt, damit MS 2 ca. Mitte Feb. 2027 stattfinden kann; Graudejus hat zugestimmt (Verschiebung ok, wenn vorher abgesprochen und die MS stattfinden; Grund: Start im Betrieb erst jetzt).
+- Fehler an Rohren fallen meist erst beim Laserschneiden auf; Fehler, die durch das Lasern selbst entstehen, erst danach.
+- Klärungsgespräch zur TA mit Baidinger für 30.10.2026 geplant; danach Pflichtenheft umschreiben und Aufgabenstellung verfeinern.
+- Baidinger lehnt Gesprächsprotokolle ab (Stand 03.11.2026); MS 1 geplant für 16.11.2026, Termin mit Graudejus erst nach fertigem Pflichtenheft.
+- Kein Sperrvermerk für die TA-Dokumentation; Rohrspezifikationen und interne Dokumente des Betriebs sind vertraulich – dürfen nicht gezeigt oder beigefügt, nur einzelne Daten paraphrasiert verwendet werden (Stand 06.11.2026).
+- MS 1 mit Graudejus de Olio fest vereinbart: Fr. 20.11.2026, 9:30–10:30 Uhr (Stand 14.11.2026).
+- Bei Terminabweichungen gelten die Daten aus dem Pflichtenheft; den Projektplan passt Janek daran an (14.11.2026).
+- PH-Freigabe und Unterschrift durch Baidinger auf Fr. 27.11.2026 verschoben, also nach MS 1 (Entscheidung Janek, 13.11.2026; vorher 20.11.).
+- Schulischer Betreuer Björn Graudejus heißt nach seiner Heirat jetzt Graudejus de Olio (Stand 06.11.2026).
+- Auf den Rechnern und im WLAN des Betriebs ist jede KI außer Copilot gesperrt; Janek nutzt Claude für die TA.
+- Muss TA-Dateien in OneNote ablegen, um sie am PC im Betrieb laden zu können.
+- Finale Fassungen für MS 1: Bauer_TA_AS_V3.docx und Bauer_TA_PH_V1.docx (Versionszählung neu, Dateinamen bleiben); PH-Kap. 6 auf Stand 0, neue Einträge nur auf Janeks Anweisung (Stand 13.11.2026).
+- Bei Abweichungen zwischen Chat-Übergaben und dem TA-Cockpit gelten die Daten aus dem Cockpit (Stand 19.11.2026).

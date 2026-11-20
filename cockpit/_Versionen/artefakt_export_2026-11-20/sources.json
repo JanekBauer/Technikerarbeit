@@ -1,0 +1,18 @@
+[
+ {
+  "id": "q1",
+  "accessed": "",
+  "kind": "Buch",
+  "nr": 1,
+  "text": "Feldhusen, Jörg; Grote, Karl-Heinrich (Hrsg.): Pahl/Beitz Konstruktionslehre. Methoden und Anwendung erfolgreicher Produktentwicklung. 8. Auflage. Berlin, Heidelberg: Springer Vieweg, 2013.",
+  "used": "Anforderungsliste, Bewertung (Kap. 6.2, 6.4)"
+ },
+ {
+  "id": "q2",
+  "accessed": "2026-10-30",
+  "kind": "Datenblatt",
+  "nr": 2,
+  "text": "KEYENCE Deutschland GmbH: Optische Inline Messtechnik – Präzise messen direkt in der Fertigung (Produktflyer).",
+  "used": "Sensorvergleich"
+ }
+]
