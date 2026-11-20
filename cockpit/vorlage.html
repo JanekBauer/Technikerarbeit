@@ -397,7 +397,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Aufgabe","area"],["who","Wer","select",WHO],["due","Bis","date"],["status","Status","select",["offen","in Arbeit","wartet","erledigt"]],["prio","Priorität","select",["1","2","3"]],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
+    fields:[["title","Aufgabe","area"],["who","Wer","select",WHO],["due","Bis","date"],["status","Status","select",["offen","in Arbeit","erledigt"]],["prio","Priorität","select",["1","2","3"]],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
@@ -412,13 +412,13 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"tasks",title:"Entscheidung",
-    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer entscheidet","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Fällig bis","date"],["prio","Priorität","select",["1","2","3"]],["status","Status","select",["offen","in Arbeit","wartet","erledigt","entfallen"]],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"]],["reason","Begründung (warum)","area"],["date","Datum","date"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
+    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer entscheidet","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Fällig bis","date"],["prio","Priorität","select",["1","2","3"]],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"]],["reason","Begründung (warum)","area"],["date","Datum","date"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
     fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
-    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Bis","date"],["prio","Priorität","select",["1","2","3"]],["stand","Status","select",["offen","in Arbeit","wartet","erledigt","entfallen"]],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
+    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer","select",["","Janek","Baidinger","Graudejus","FSL"]],["due","Bis","date"],["prio","Priorität","select",["1","2","3"]],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"]],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
@@ -553,6 +553,7 @@ function openEditor(key,id,preset){
     document.querySelectorAll("#edform [data-k]").forEach(el=>{const k=el.dataset.k;obj[k]=el.dataset.bool?el.checked:el.value;
       const fd_=L.fields.find(x=>x[0]===k);if(fd_&&fd_[2]==="num")obj[k]=el.value===""?"":Number(el.value);});
     if(key==="decisions"&&obj.status==="erledigt"&&(!obj.by||!obj.reason)){alert2("Für „erledigt“ bitte „Entschieden von“ und „Begründung“ eintragen.");return;}
+    if(key==="postfach"&&obj.status==="übernommen"&&rec.status!=="übernommen"){sb.disabled=true;await pfAccept(id,obj);closeModal();return;}
     sb.disabled=true;const ok=await save(L.coll,id,obj);if(ok)closeModal();else sb.disabled=false;};
   const pfb=$("#pfbtn");if(pfb)pfb.onclick=async()=>{if(!pfb.dataset.sure){pfb.dataset.sure=1;pfb.textContent="Wirklich ins Postfach?";return;}await toPostfach(L.coll,id,rec);};
   const db_=$("#delbtn");if(db_)db_.onclick=async()=>{if(db_.dataset.sure){await del(L.coll,id);closeModal();}else{db_.dataset.sure=1;db_.textContent="Wirklich löschen?";}};
@@ -719,7 +720,7 @@ VIEWS.aufgaben=()=>{
   const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
   if(view==="board"){
     const all=S.data.tasks.filter(t=>!f.who||t.who===f.who);
-    const cols=["offen","in Arbeit","wartet","erledigt"];
+    const cols=["offen","in Arbeit","erledigt"];
     const board=cols.map(c=>{
       let items=all.filter(t=>(t.status||"offen")===c);
       if(c==="erledigt")items=items.sort((x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")));else items=items.sort(sortDue);
@@ -748,12 +749,17 @@ VIEWS_after.aufgaben=()=>{
 /* ---------- Postfach: Eingang ---------- */
 VIEWS.postfach=()=>{
   const can=S.canWrite&&!S.offline;
+  const show=lsGet("pfDrop",false);
   const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>
-  <div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span></div>`+
-  listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."});
+  const dropped=S.data.postfach.filter(p=>p.status==="verworfen");
+  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
+  return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
+    listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Quelle / Vorschlag von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."})+
+    (show?`<h3 style="margin-top:18px">Verworfen (${dropped.length})</h3><p class="small muted">Zum Wiederherstellen Eintrag antippen und den Eingang auf „neu“ setzen.</p>`+
+      listTable("postfach",dropped,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Titel"],["dublette","Dublette von",r=>`<span class="small">${esc(r.dublette||"")}</span>`]],{empty:"Keine verworfenen Einträge."}):"");
 };
 VIEWS_after.postfach=()=>{
+  const pd=$("#pfdrop");if(pd)pd.onchange=()=>{lsSet("pfDrop",pd.checked);render();};
   document.querySelectorAll("[data-pfaccept]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();pfAccept(b.dataset.pfaccept);});
   document.querySelectorAll("[data-pfreject]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const p=S.data.postfach.find(x=>x.id===b.dataset.pfreject);if(p)await save("postfach",p.id,Object.assign({},p,{status:"verworfen"}));});
 };
@@ -761,7 +767,7 @@ VIEWS_after.postfach=()=>{
 /* ---------- Aufgaben: Board (Aufgaben und Entscheidungen, dieselbe Karte) ---------- */
 VIEWS.offen=()=>{
   const can=S.canWrite&&!S.offline;
-  const cols=["offen","in Arbeit","wartet","erledigt"];
+  const cols=["offen","in Arbeit","erledigt"];
   const board=cols.map(c=>{
     const list=S.data.tasks.filter(t=>(t.status||"offen")===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
@@ -786,7 +792,7 @@ VIEWS_after.offen=()=>{
 
 /* Übernahme aus dem Eingang: Status, Datum, Inhalt und Vorschlag bleiben erhalten */
 const PF_KIND_COLL={aufgabe:"tasks",entscheidung:"tasks",aenderung:"changes"};
-const PF_STAT={"offen":"offen","in Arbeit":"in Arbeit","wartet":"wartet","erledigt":"erledigt","entfallen":"entfallen","bestätigt":"erledigt","beantwortet":"erledigt","abgesagt":"entfallen","geklärt":"erledigt"};
+const PF_STAT={"offen":"offen","in Arbeit":"in Arbeit","erledigt":"erledigt","entfallen":"entfallen","bestätigt":"erledigt","beantwortet":"erledigt","abgesagt":"entfallen","geklärt":"erledigt"};
 function pfAltRecord(p){
   const a=p.alt||{};const c=p.altColl;const st=PF_STAT[p.stand]||PF_STAT[a.status]||"offen";const dt=p.date||a.date||a.resolved||"";
   if(c==="tasks")return {coll:"tasks",obj:Object.assign({},a,{status:st,date:dt})};
@@ -795,8 +801,8 @@ function pfAltRecord(p){
   if(c==="conflicts")return {coll:"tasks",obj:{typ:"entscheidung",title:a.text||"",note:a.note||"",who:"",due:"",prio:"1",status:st,by:"",reason:"",date:dt,source:"Widerspruch",docs:a.between||"",refs:a.refs||"",topic:""}};
   return null;
 }
-async function pfAccept(id){
-  const p=S.data.postfach.find(x=>x.id===id);if(!p)return;
+async function pfAccept(id,pre){
+  const p=pre||S.data.postfach.find(x=>x.id===id);if(!p)return;
   let target=null,obj=null;
   if(p.alt){const r=pfAltRecord(p);if(r&&PF_KIND_COLL[p.kind]===r.coll){target=r.coll;obj=r.obj;}}
   if(!obj){
@@ -897,10 +903,9 @@ VIEWS_after.anforderungen=()=>{const b=$("#reqcopy");if(b)b.onclick=()=>copyText
 /* ---------- Entscheidungen: Board (dieselben Einträge wie unter Aufgaben) ---------- */
 VIEWS.entscheidungen=()=>{
   const can=S.canWrite&&!S.offline;
-  const showAll=lsGet("decAll",false);
-  const all=S.data.tasks.filter(t=>t.typ==="entscheidung"&&(showAll||t.status!=="entfallen"));
-  const openN=S.data.tasks.filter(t=>t.typ==="entscheidung"&&["offen","in Arbeit","wartet"].includes(t.status||"offen")).length;
-  const cols=showAll?["offen","in Arbeit","wartet","erledigt","entfallen"]:["offen","in Arbeit","wartet","erledigt"];
+  const all=S.data.tasks.filter(t=>t.typ==="entscheidung");
+  const openN=all.filter(t=>(t.status||"offen")==="offen"||t.status==="in Arbeit").length;
+  const cols=["offen","in Arbeit","erledigt","entfallen"];
   const sortIt=(x,y)=>(x.due||"9999").localeCompare(y.due||"9999");
   const card=d=>`<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(d.title||"(ohne Text)")}</div><div class="small muted">${d.who?"Wer: "+esc(d.who):"ohne Zuständige/r"}${d.by?" · entschieden von "+esc(d.by):""}${d.due?" · bis "+fd(d.due):""}${d.topic?" · "+esc(d.topic):""}</div>${d.source?`<div class="small muted">${esc(d.source)}</div>`:""}</div>`;
   const board=cols.map(c=>{
@@ -909,11 +914,10 @@ VIEWS.entscheidungen=()=>{
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
   return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss, inklusive Fragen an den Betrieb und Widersprüche. Dieselben Karten wie unter Aufgaben. Für „erledigt“ braucht es „Entschieden von“ und „Begründung“ (Karte antippen).</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
-  <div class="toolbar"><span class="pill p-warn">${openN} offen</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="decall" ${showAll?"checked":""}> „entfallen“ anzeigen</label></div>
+  <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board">${board}</div>`;
 };
 VIEWS_after.entscheidungen=()=>{
-  const ca=$("#decall");if(ca)ca.onchange=()=>{lsSet("decAll",ca.checked);render();};
   if(!(S.canWrite&&!S.offline))return;
   document.querySelectorAll(".bcard[draggable]").forEach(c=>{
     c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.dec);e.dataTransfer.effectAllowed="move";c.classList.add("drag");});
@@ -1411,7 +1415,7 @@ function renderTask(first){
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Offener Punkt${t.prio?" · Prio "+esc(t.prio):""}</span><h2>${esc(t.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn sm" id="kedit">Bearbeiten</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
    <p class="small muted" style="margin:4px 0">${esc(t.who||"")}${t.chat?" · Chat "+esc(t.chat):""} · ${dueCell(t.due,false)} · ${stPill(t.status)}${dl?" · vor Termin „"+esc(dl.title)+"“":""}</p>
    ${t.note?`<p>${nl(t.note)}</p>`:""}
-   ${ro?"":`<div class="tsec"><h3>Status</h3><div class="toolbar" style="margin:0">${["offen","in Arbeit","wartet","erledigt"].filter(s=>s!==t.status).map(s=>`<button class="btn sm" data-kstat="${s}">auf „${s}“</button>`).join("")}</div></div>`}
+   ${ro?"":`<div class="tsec"><h3>Status</h3><div class="toolbar" style="margin:0">${["offen","in Arbeit","erledigt"].filter(s=>s!==t.status).map(s=>`<button class="btn sm" data-kstat="${s}">auf „${s}“</button>`).join("")}</div></div>`}
   </div></div>`;
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const ke=$("#kedit");if(ke)ke.onclick=()=>{S.taskId=null;openEditor("tasks",t.id);};
