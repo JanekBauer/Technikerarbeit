@@ -82,3 +82,20 @@ Der Initialisierungs-Prompt für neue Chats steht in `projekt/Master-Prompt_Tech
 - Morpho-Testdateien (.doc/.rtf): nicht archivieren.
 
 Im Cockpit stehen diese Entscheidungen unter `decisions.json` (Einträge `e-20261120-…`).
+
+---
+
+## Stand nach Abarbeitung (20.11.2026)
+
+| Punkt | Entscheidung |
+|---|---|
+| Variantenauswahl | 11.12.2026 (Cockpit gilt; 04.12. aus den Übergaben überholt) |
+| Finale AS an FSL | 30.11.2026 (t14); Rillsoft 1.1.4 angleichen |
+| Repo-Sichtbarkeit | bleibt öffentlich; vertrauliche Betriebsunterlagen bleiben trotzdem im Repo |
+| Branch-Regel | CLAUDE.md gilt für neue Branches; diese Sitzung bleibt auf `claude/migrate-technikerarbeit-github-wbqsgp` |
+| Commit-Attribution | wie bisher (mit Modellname). **Konflikt:** Systeminstruktion verbietet Modellnamen in Commits. Bleibt offen markiert. |
+| Ausgabeformat Doku | noch offen (Frage `q-doku-format`) |
+
+Die übrigen Lücken (Zieltermine Gliederung und Abgabe, Präsentationsrahmen, Vorschlagsfristen) bleiben bestehen.
+
+Entscheidungen im Cockpit: `e-20261120-variantenauswahl`, `e-20261120-as-abgabe`, `e-20261120-repo-oeffentlich`, `e-20261120-branch-regel`, `e-20261120-attribution`.
