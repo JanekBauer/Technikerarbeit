@@ -1,2 +1,8 @@
 [
+{"id":"e03","date":"2026-10-30","text":"Automatisierungsgrad: manuell einlegen, Messen + Auswerten automatisch; Zuführung nicht Bestandteil","source":"Gespräch Hr. Baidinger","docs":"PH Anf. 4.2, Abgrenzung","status":"bestätigt","updated":"2026-11-20T11:27:43.756Z"},
+{"id":"e04","date":"2026-10-30","text":"Werkstoffe Nitinol/Edelstahl/Tantal; Länge 1–3 m; Ø 1,0–6,5 mm; berührungslos; Messpunkte max. 2 mm","source":"Gespräch Hr. Baidinger","docs":"PH Anforderungsliste, AS V3","status":"bestätigt","updated":"2026-11-20T11:27:48.588Z"},
+{"id":"e05","date":"2026-10-30","text":"Abgrenzung bestätigt (Software/Steuerung, Messmittelfähigkeit, IT/QM, Bau, Inbetriebnahme)","source":"Gespräch Hr. Baidinger","docs":"PH 4","status":"bestätigt","updated":"2026-11-20T11:27:54.092Z"},
+{"id":"e07","date":"2026-10-30","text":"Angebote für Kaufteile = Ergebnis; Bestellung/Beschaffung = Abgrenzung","source":"Janek (Cockpit), deckt sich mit Ausschreibung","docs":"AS V3, PH V6","status":"bestätigt","updated":"2026-11-20T11:28:05.508Z"},
+{"id":"e08","date":"2026-10-30","text":"Messprozessentwicklung inkl. Sensorintegration gehört zum Umfang","source":"Janek (Cockpit)","docs":"AS V3, PH","status":"bestätigt","updated":"2026-11-20T11:28:11.173Z"},
+{"id":"e12","date":"2026-10-30","text":"Auslegungsberechnungen als Ergebnis gestrichen; Variantenauswahl + Konstruktionsfreigabe als betriebl. MS entfernt","source":"Janek, PH V5","docs":"PH 3, 5.2","status":"bestätigt","updated":"2026-11-20T11:28:26.325Z"}
 ]
