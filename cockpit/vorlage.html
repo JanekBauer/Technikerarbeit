@@ -792,12 +792,16 @@ VIEWS.postfach=()=>{
   const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
   const dropped=S.data.postfach.filter(p=>p.status==="verworfen");
   const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
-  return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
+  return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span>${can?'<button class="btn" id="pruefbtn">Dokumente prüfen</button>':""}<label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
     listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Quelle / Vorschlag von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."})+
     (show?`<h3 style="margin-top:18px">Verworfen (${dropped.length})</h3><p class="small muted">Zum Wiederherstellen Eintrag antippen und den Eingang auf „neu“ setzen.</p>`+
       listTable("postfach",dropped,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Titel"],["dublette","Dublette von",r=>`<span class="small">${esc(r.dublette||"")}</span>`]],{empty:"Keine verworfenen Einträge."}):"");
 };
 VIEWS_after.postfach=()=>{
+  const pb=$("#pruefbtn");if(pb)pb.onclick=async()=>{
+    if(S.data.postfach.some(x=>x.status==="neu"&&/^Dokumente prüfen/.test(x.title||""))){alert2("Der Prüfauftrag steht schon im Eingang.");return;}
+    const day=new Date().toISOString().slice(0,10);
+    await save("postfach",nid(),{kind:"aufgabe",title:"Dokumente prüfen (Prüfauftrag)",detail:"Neue Dokumente im Archiv gegen offene Punkte abgleichen. Ergebnisse kommen als Einträge in den Eingang. Ausgelöst am "+day+".",vorschlag:"Cockpit (Knopf Dokumente prüfen)",who:"Janek Bauer",ask:"",due:"",prio:"1",stand:"offen",date:day,status:"neu"});};
   const pd=$("#pfdrop");if(pd)pd.onchange=()=>{lsSet("pfDrop",pd.checked);render();};
   document.querySelectorAll("[data-pfaccept]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();pfAccept(b.dataset.pfaccept);});
   document.querySelectorAll("[data-pfreject]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const p=S.data.postfach.find(x=>x.id===b.dataset.pfreject);if(p)await save("postfach",p.id,Object.assign({},p,{status:"verworfen"}));});
