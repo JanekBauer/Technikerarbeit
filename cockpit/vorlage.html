@@ -402,7 +402,7 @@ const LISTS = {
     fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
-    fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
+    fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","erledigt"]],["unterlagen","Vorgeschlagene Unterlagen (Dokumentnamen, mit Komma, z. B. Pflichtenheft)","text"],["note","Notiz","area"]],
     def:{kind:"schule",status:"geplant"}},
   packages:{coll:"packages",title:"Arbeitspakete",
     fields:[["name","Arbeitspaket","text"],["ampel","Ampel","select",["gruen","gelb","rot","grau"]],["stand","Stand","area"],["chat","Chat","select",CHATS],["order","Reihenfolge","num"]],
@@ -1412,10 +1412,21 @@ function checkFor(d){
   const id=CHK_FOR_TERMIN[d.id];
   return (S.data.checks||[]).find(c=>c.id===id)||(S.data.checks||[]).find(c=>c.title===d.title)||null;
 }
+function latestFor(d){
+  const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);
+  if(!fams.length)return "";
+  const rows=archRows().filter(f=>!f.missing&&fams.includes(f.family));
+  const pick={};rows.forEach(f=>{const cur=pick[f.family];const better=!cur||(!!f.gilt>!!cur.gilt)||((!!f.gilt===!!cur.gilt)&&f.seq>cur.seq);if(better)pick[f.family]=f;});
+  const list=fams.map(k=>pick[k]).filter(Boolean);
+  const missing=fams.filter(k=>!pick[k]);
+  return `<h4 style="margin:12px 0 4px">Vorgeschlagene Unterlagen (gültige Version)</h4>`+
+    (list.length?`<div class="tbl"><table><tbody>${list.map(f=>`<tr><td>${esc(f.family)} <span class="small muted">${esc(f.ver||"")}</span></td><td class="small">${esc(f.name)}</td><td>${fileBtns(f,true)}</td></tr>`).join("")}</tbody></table></div>`:"")+
+    (missing.length?`<p class="small muted">Noch nicht im Archiv: ${esc(missing.join(", "))}</p>`:"");
+}
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
   const ck=checkFor(d);
-  if(!ck)return `<div class="tsec"><h3>Was du dafür brauchst</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste. Unter „Checklisten“ kannst du eine anlegen.</p>${latestDocsHtml()}</div>`;
+  if(!ck)return `<div class="tsec"><h3>Was du dafür brauchst</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste. Unter „Checklisten“ kannst du eine anlegen.</p>${latestFor(d)||'<p class="muted small">Keine Unterlagen festgelegt. Unter „Termin bearbeiten“ im Feld „Vorgeschlagene Unterlagen“ eintragen.</p>'}</div>`;
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
   return `<div class="tsec"><h3>Was du dafür brauchst <span class="small muted">${n} von ${items.length} erledigt</span></h3>
     <p class="note" style="margin:0 0 6px">Checkliste „${esc(ck.title)}“. Abhaken geht direkt hier.</p>
@@ -1440,14 +1451,15 @@ function renderTermin(first){
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${d.kind==="betrieb"?"Betrieb":"Schule"} · Termin</span><h2>${esc(d.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn danger" id="tdel">${S.tDelSure===d.id?"Wirklich löschen?":"Termin löschen"}</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
    <div class="hero" style="margin:10px 0 0">
     <div class="big"><div class="l">Datum</div><div class="n" style="font-size:30px">${d.approx?"ca. ":""}${fd(d.date)}</div><div class="l">${n==null?"":n<0?-n+" Tage vorbei":n===0?"heute":"in "+n+" Tagen"}</div></div>
-    <div class="big"><div class="l">Status</div><div style="margin:8px 0">${stPill(d.status)}</div>${ro?"":`<div class="toolbar" style="margin:0">${["geplant","offen","erledigt"].filter(s=>s!==d.status).map(s=>`<button class="btn sm" data-tstat="${s}">auf „${s}“</button>`).join("")}</div>`}</div>
+    <div class="big"><div class="l">Status</div><div style="margin:8px 0">${stPill(d.status)}</div>${ro?"":`<div class="toolbar" style="margin:0">${["geplant","erledigt"].filter(s=>s!==d.status).map(s=>`<button class="btn sm" data-tstat="${s}">auf „${s}“</button>`).join("")}</div>`}</div>
    </div>
    ${d.note?`<p>${nl(d.note)}</p>`:""}
    ${ro?"":`<button class="btn sm" id="tedit">Termin bearbeiten</button>`}
    ${prepHtml(d)}
    <div class="tsec"><h3>Vorzubereiten: offene Punkte bis zu diesem Termin (${tasks.length})</h3>${tasks.length?`<ul class="clean">${tasks.map(t=>`<li class="step"><b class="k">${esc(t.prio||"")}</b><div>${esc(t.title)}<div class="small muted">${esc(t.who||"")} · ${dueCell(t.due,false)}</div></div></li>`).join("")}</ul>`:'<p class="muted small">Keine offenen Punkte mit Frist bis zu diesem Termin.</p>'}</div>
    <div class="tsec"><h3>Was du schon hast: Dateien zu diesem Termin</h3>
-    ${files.length?`<div class="tbl"><table><tbody>${files.map((f,i)=>`<tr><td>${esc(f.name)} ${i===0?pill("neueste","p-ok"):""}</td><td>${fileBtns(f,true)}</td><td class="small">${nl(f.note)}</td><td class="num">${f.updated?new Date(f.updated).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</td></tr>`).join("")}</tbody></table></div>`:'<p class="muted small">Noch keine Dateien.</p>'}
+    ${files.length?`<div class="tbl"><table><tbody>${files.map((f,i)=>`<tr><td>${esc(f.name)} ${i===0?pill("neueste","p-ok"):""}</td><td>${fileBtns(f,true)}</td><td class="small">${nl(f.note)}</td><td class="num">${f.updated?new Date(f.updated).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</td><td>${ro?"":`<button class="btn sm" data-tfdel="${esc(f.id)}">Entfernen</button>`}</td></tr>`).join("")}</tbody></table></div>`:'<p class="muted small">Noch keine Dateien.</p>'}
+    ${ro?"":`<div class="toolbar" style="margin-top:8px"><select id="tfadd" aria-label="Datei aus dem Archiv"><option value="">Datei aus dem Archiv wählen …</option>${S.data.files.filter(f=>!f.missing&&f.deadline!==d.id).sort((a,b)=>String(a.family||a.name).localeCompare(String(b.family||b.name),"de")||(+b.seq||0)-(+a.seq||0)).map(f=>`<option value="${esc(f.id)}">${esc((f.family||f.name)+" "+(f.ver||""))} – ${esc(f.name)}</option>`).join("")}</select><button class="btn sm" id="tfaddbtn">Zum Termin legen</button></div>`}
     ${!ro&&S.assets?`<div class="form" style="margin-top:8px"><label for="tfnote">Notiz zur Datei (z. B. „PH V7 – Stand für Freigabe“)<input id="tfnote" type="text"></label><div><label class="btn pri" for="tupl" style="display:inline-block">Datei hochladen</label><input id="tupl" type="file" hidden> <span id="tuplmsg" class="small muted"></span></div></div>`:(!S.assets&&!S.offline?'<p class="note">Hochladen ist in dieser Ansicht nicht möglich.</p>':"")}
    </div>
    <div class="tsec"><h3>Notizen</h3>
@@ -1458,6 +1470,8 @@ function renderTermin(first){
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const upd=async ch=>{const cur=S.data.deadlines.find(x=>x.id===d.id)||d;await save("deadlines",d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
+  const tfa=$("#tfaddbtn");if(tfa)tfa.onclick=async()=>{const sel=$("#tfadd");if(!sel||!sel.value)return;const f=S.data.files.find(x=>x.id===sel.value);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));};
+  document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
   document.querySelectorAll("[data-chk]").forEach(b=>b.onchange=async()=>{const [cid,i]=b.dataset.chk.split("|");const c=S.data.checks.find(x=>x.id===cid);if(!c)return;const items=(c.items||[]).map((x,j)=>j===+i?Object.assign({},x,{done:b.checked}):x);await save("checks",cid,Object.assign({},c,{items}));});
   const tdl=$("#tdel");if(tdl)tdl.onclick=async()=>{if(S.tDelSure===d.id){tdl.disabled=true;S.tDelSure=null;await del("deadlines",d.id);closeModal();}else{S.tDelSure=d.id;tdl.textContent="Wirklich löschen?";setTimeout(()=>{if(S.tDelSure===d.id){S.tDelSure=null;const b=$("#tdel");if(b)b.textContent="Termin löschen";}},5000);}};
