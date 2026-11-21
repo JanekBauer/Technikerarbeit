@@ -423,7 +423,7 @@ const LISTS = {
     fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung","abschluss"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["beleg","Beleg (Dokument, nur bei Abschluss)","text"],["ziel","Betrifft Eintrag (ID, nur bei Abschluss)","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
-    fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
+    fields:[["date","Datum","date"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
   sensors:{coll:"sensors",title:"Sensorvergleich",
     fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["variant","Variante/Größe","text"],["range","1 Messbereich (Text)","text"],["fittxt","Deckt Ø 1,0–6,5 mm? (ja/nein/knapp …)","text"],["rep","2 Wiederholgenauigkeit (mit Einheit)","text"],["repcond","2 Bedingungen dazu","area"],["lin","3 Messgenauigkeit / Linearität","text"],["pos","4 Zulässige Lage im Messfeld","area"],["axes","6 Messachsen","text"],["build","7 Bauform / freier Durchgang","area"],["trig","8 Trigger / Encoder","text"],["light","9 Lichtquelle / Laserklasse","text"],["acc","Genauigkeit (µm, Zahl, alt)","num"],["rate","5 Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
   sources:{coll:"sources",title:"Quellenverzeichnis",
@@ -1268,7 +1268,7 @@ VIEWS["ki-logbuch"]=()=>{
   const f=rows.filter(r=>r.fach).length;
   return `<div class="head"><div><span class="tag">Schule · Selbstständigkeitserklärung</span><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
   <div class="toolbar">${pill(rows.length+" Einträge","p-acc")} ${pill(f+" mit fachlichem Text durch KI",f?"p-bad":"p-ok")}</div>`+
-  listTable("kilog",rows,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chat","Chat",r=>`<span class="small">${esc(r.chat)}</span>`],["purpose","Zweck"],["help","Art der Hilfe",r=>`<span class="small">${nl(r.help)}</span>`],["fach","",r=>r.fach?pill("fachlich","p-bad"):""]]);
+  listTable("kilog",rows,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["help","Art der Hilfe",r=>`<span class="small">${nl(r.help||r.purpose||r.zweck||"")}</span>`],["fach","",r=>r.fach?pill("fachlich","p-bad"):""]]);
 };
 
 /* ---------- Archiv ---------- */
