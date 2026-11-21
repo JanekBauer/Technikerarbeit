@@ -452,7 +452,8 @@ const f2 = (v,d=2)=>isFinite(v)?v.toLocaleString("de-DE",{maximumFractionDigits:
 function lsGet(k,d){try{const v=localStorage.getItem("tac_"+k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem("tac_"+k,JSON.stringify(v));}catch(e){}}
 function pill(t,cls){return `<span class="pill ${cls||""}">${esc(t)}</span>`;}
-function stPill(s){const m={"abgesagt":"p-bad","entfallen":"p-bad","erledigt":"p-ok","bestätigt":"p-ok","beantwortet":"p-ok","geklärt":"p-ok","fertig":"p-ok","offen":"p-warn","Notiz":"p-acc","in Arbeit":"p-acc","Entwurf":"p-acc","wartet":"p-acc","geplant":""};return pill(s||"–",m[s]||"");}
+const CAP=v=>{v=String(v==null?"":v);return v?v.charAt(0).toUpperCase()+v.slice(1):v;};
+function stPill(s){const m={"abgesagt":"p-bad","entfallen":"p-bad","erledigt":"p-ok","bestätigt":"p-ok","beantwortet":"p-ok","geklärt":"p-ok","fertig":"p-ok","offen":"p-warn","Notiz":"p-acc","in Arbeit":"p-acc","Entwurf":"p-acc","wartet":"p-acc","geplant":""};return pill(CAP(s)||"–",m[s]||"");}
 function dueCell(s,done){if(!s)return '<span class="muted">–</span>';const n=days(s);let cls="";if(!done){if(n<0)cls="p-bad";else if(n<=3)cls="p-warn";}return `<span class="num">${fd(s)}</span>${done?"":` ${pill(n<0?`${-n} T überfällig`:n===0?"heute":`in ${n} T`,cls)}`}`;}
 async function copyText(t,btn){try{await navigator.clipboard.writeText(t);if(btn){const o=btn.textContent;btn.textContent="Kopiert";setTimeout(()=>btn.textContent=o,1500);}}catch(e){const ta=document.getElementById("copybox");if(ta){ta.focus();ta.select();}if(btn)btn.textContent="Text markiert – Strg+C";}}
 
@@ -551,7 +552,7 @@ function openEditor(key,id,preset){
       const all=[...new Set([...optsFor(grp,opts),...sel])].filter(Boolean);
       return `<div class="mfield"><span class="mlab">${lab}</span><details class="mdrop"><summary>${sel.length?esc(sel.join(", ")):"– auswählen –"}</summary><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div></details><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
         (!ro?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" data-multi="1" style="margin:4px 0 8px">+ neue Option</button>`:"");}
-    if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>`+
+    if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(CAP(o)||"–")}</option>`).join("")}</select></label>`+
         (addBtn?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" style="margin:4px 0 8px">+ neue Option</button>`:"");
     if(type==="bool")return `<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
     return `<label for="${fid}">${lab}<input id="${fid}" data-k="${k}" type="${type==="date"?"date":type==="num"?"number":"text"}" ${type==="num"?'step="any"':""} value="${esc(v)}"></label>`;
@@ -699,6 +700,8 @@ VIEWS.start=()=>{
   const dl=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date).sort((a,b)=>a.date<b.date?-1:1);
   const doku=S.data.deadlines.find(d=>/Abgabe Dokumentation/i.test(d.title||""));
   const nxt=dl.find(d=>days(d.date)>=0)||dl[0];
+  const fri=(()=>{const d=new Date();d.setDate(d.getDate()+(5-d.getDay()+7)%7);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");})();
+  const nt=(!nxt||!nxt.date||nxt.date>fri)?{id:null,title:"Freitag (Platzhalter)",date:fri,fri:true}:nxt;
   const open=S.data.tasks.filter(t=>t.status!=="erledigt");
   const over=open.filter(t=>t.due&&days(t.due)<0);
   const dk=S.data.doku.slice();const pPlan=dk.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),pDone=dk.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
@@ -716,7 +719,7 @@ VIEWS.start=()=>{
   return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer</span><h1>Übersicht</h1>
     <p class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</p></div></div>
   <div class="hero">
-    <a class="big" ${nxt?`href="#" data-termin="${esc(nxt.id)}"`:'href="#zeitleiste"'}><div class="l">Nächster Termin</div><div class="n">${nxt?(days(nxt.date)<0?"–":days(nxt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nxt?esc(nxt.title)+" · "+(nxt.approx?"ca. ":"")+fd(nxt.date):"Keine Termine angelegt"}</div></a>
+    <a class="big" ${nt.id?`href="#" data-termin="${esc(nt.id)}"`:'href="#zeitleiste"'}><div class="l">Nächster Termin</div><div class="n">${nt.date?(days(nt.date)<0?"–":days(nt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nt.date?esc(nt.title)+" · "+(nt.approx?"ca. ":"")+fd(nt.date):"Keine Termine angelegt"}</div></a>
     <a class="big" href="#zeitleiste"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></a>
     <a class="big" href="#offen" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Aufgaben</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
