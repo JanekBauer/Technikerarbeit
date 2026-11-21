@@ -1241,6 +1241,7 @@ async function moveCheckItem(srcId,i,dlId){
   if(!(await save("checks",srcId,srcC)))return;
   if(tgt){const tc=JSON.parse(JSON.stringify(tgt));tc.items=[Object.assign({},item)].concat(tc.items||[]);await save("checks",tgt.id,tc);}
   else{await save("checks",nid(),{title:dl.title,hint:dl.date?fd(dl.date):"",items:[Object.assign({},item)]});}
+alert2("Verschoben nach „"+dl.title+"“.");
 }
 VIEWS.meilensteine=()=>{
   const order=["m1","m2","m3","formalia","abgabe","praesi"];
