@@ -1280,13 +1280,14 @@ const XMIME={pdf:"application/pdf",docx:"application/vnd.openxmlformats-officedo
 const NATIVE=/^(application\/pdf|image\/(png|jpeg|gif|webp)|text\/(plain|csv|markdown)|application\/json)$/;
 const VIEWABLE=/^(application\/pdf|image\/)/;
 const fext=n=>{const m=/\.([a-z0-9]+)$/i.exec(n||"");return m?m[1].toLowerCase():"";};
+const verSort=f=>{const m=/(\d+(?:[.,]\d+)?)/.exec(f.ver||"");return m?parseFloat(m[1].replace(",",".")):(+f.seq||0);};
 const verNum=v=>{const m=/(\d+(?:[.,]\d+)?)/.exec(v||"");return m?parseFloat(m[1].replace(",",".")):0;};
 const fsize=b=>!b?"":b>=1048576?f2(b/1048576,1)+" MB":Math.max(1,Math.round(b/1024))+" KB";
 const fileMime=f=>f.mime||XMIME[fext(f.name)]||"";
 const PAGES="https://janekbauer02-cell.github.io/Technikerarbeit/",RAWB="https://raw.githubusercontent.com/janekbauer02-cell/Technikerarbeit/main/docs/";
 const encPath=p=>p.split("/").map(encodeURIComponent).join("/");
 function fileUrl(f){if(f.url)return f.url;if(f.path)return (location.protocol==="file:"?PAGES:"")+encPath(f.path);return "";}
-function archRows(){return S.data.files.map(f=>Object.assign({},f,{folder:f.folder||(f.deadline?"9 Uploads zu Terminen":"9 Sonstiges"),family:f.family||f.name||"Datei",seq:(f.seq!==""&&f.seq!=null&&isFinite(+f.seq))?+f.seq:verNum(f.ver)}));}
+function archRows(){return S.data.files.map(f=>Object.assign({},f,{folder:f.folder||(f.deadline?"9 Uploads zu Terminen":"9 Sonstiges"),family:f.family||f.name||"Datei",seq:verSort(f)}));}
 function archTree(){const t={};archRows().forEach(r=>{const fo=t[r.folder]=t[r.folder]||{};(fo[r.family]=fo[r.family]||[]).push(r);});
   Object.values(t).forEach(fams=>Object.values(fams).forEach(v=>v.sort((a,b)=>(b.seq-a.seq)||(b.date||"").localeCompare(a.date||"")||(b.updated||"").localeCompare(a.updated||""))));return t;}
 const newest=vers=>vers.find(v=>!v.missing&&v.gilt)||vers.find(v=>!v.missing)||null;
@@ -1416,7 +1417,7 @@ function checkFor(d){
 function pickHtml(files){
   const by={};files.forEach(f=>{const fo=f.folder||"9 Sonstiges";const fam=f.family||f.name||"Datei";((by[fo]=by[fo]||{})[fam]=by[fo][fam]||[]).push(f);});
   if(!files.length)return '<p class="muted small">Keine Dateien im Archiv.</p>';
-  return Object.keys(by).sort((a,b)=>a.localeCompare(b,"de")).map(fo=>`<details style="margin:4px 0"><summary style="cursor:pointer">${esc(fo)} <span class="small muted">(${Object.keys(by[fo]).length})</span></summary>${Object.keys(by[fo]).sort((a,b)=>a.localeCompare(b,"de")).map(fam=>`<details style="margin:4px 0 4px 12px"><summary style="cursor:pointer">${esc(fam)} <span class="small muted">(${by[fo][fam].length})</span></summary>${by[fo][fam].sort((a,b)=>(+b.seq||0)-(+a.seq||0)).map(f=>`<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:4px 0 4px 24px;flex-wrap:wrap"><span class="small" style="min-width:0;overflow-wrap:anywhere">${esc(f.ver||"")} · ${esc(f.name)}</span><button class="btn sm" data-tfadd="${esc(f.id)}">Zum Termin legen</button></div>`).join("")}</details>`).join("")}</details>`).join("");
+  return Object.keys(by).sort((a,b)=>a.localeCompare(b,"de")).map(fo=>`<details style="margin:4px 0"><summary style="cursor:pointer">${esc(fo)} <span class="small muted">(${Object.keys(by[fo]).length})</span></summary>${Object.keys(by[fo]).sort((a,b)=>a.localeCompare(b,"de")).map(fam=>`<details style="margin:4px 0 4px 12px"><summary style="cursor:pointer">${esc(fam)} <span class="small muted">(${by[fo][fam].length})</span></summary>${by[fo][fam].sort((a,b)=>verSort(b)-verSort(a)).map(f=>`<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:4px 0 4px 24px;flex-wrap:wrap"><span class="small" style="min-width:0;overflow-wrap:anywhere">${esc(f.ver||"")} · ${esc(f.name)}</span><button class="btn sm" data-tfadd="${esc(f.id)}">Zum Termin legen</button></div>`).join("")}</details>`).join("")}</details>`).join("");
 }
 function latestFor(d){
   const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);
