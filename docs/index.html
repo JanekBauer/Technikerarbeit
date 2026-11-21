@@ -1412,6 +1412,11 @@ function checkFor(d){
   const id=CHK_FOR_TERMIN[d.id];
   return (S.data.checks||[]).find(c=>c.id===id)||(S.data.checks||[]).find(c=>c.title===d.title)||null;
 }
+function pickHtml(files){
+  const by={};files.forEach(f=>{const fo=f.folder||"9 Sonstiges";const fam=f.family||f.name||"Datei";((by[fo]=by[fo]||{})[fam]=by[fo][fam]||[]).push(f);});
+  if(!files.length)return '<p class="muted small">Keine Dateien im Archiv.</p>';
+  return Object.keys(by).sort((a,b)=>a.localeCompare(b,"de")).map(fo=>`<details style="margin:4px 0"><summary style="cursor:pointer">${esc(fo)} <span class="small muted">(${Object.keys(by[fo]).length})</span></summary>${Object.keys(by[fo]).sort((a,b)=>a.localeCompare(b,"de")).map(fam=>`<details style="margin:4px 0 4px 12px"><summary style="cursor:pointer">${esc(fam)} <span class="small muted">(${by[fo][fam].length})</span></summary>${by[fo][fam].sort((a,b)=>(+b.seq||0)-(+a.seq||0)).map(f=>`<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:4px 0 4px 24px;flex-wrap:wrap"><span class="small" style="min-width:0;overflow-wrap:anywhere">${esc(f.ver||"")} · ${esc(f.name)}</span><button class="btn sm" data-tfadd="${esc(f.id)}">Zum Termin legen</button></div>`).join("")}</details>`).join("")}</details>`).join("");
+}
 function latestFor(d){
   const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);
   if(!fams.length)return "";
@@ -1459,7 +1464,7 @@ function renderTermin(first){
    <div class="tsec"><h3>Vorzubereiten: offene Punkte bis zu diesem Termin (${tasks.length})</h3>${tasks.length?`<ul class="clean">${tasks.map(t=>`<li class="step"><b class="k">${esc(t.prio||"")}</b><div>${esc(t.title)}<div class="small muted">${esc(t.who||"")} · ${dueCell(t.due,false)}</div></div></li>`).join("")}</ul>`:'<p class="muted small">Keine offenen Punkte mit Frist bis zu diesem Termin.</p>'}</div>
    <div class="tsec"><h3>Was du schon hast: Dateien zu diesem Termin</h3>
     ${files.length?`<div class="tbl"><table><tbody>${files.map((f,i)=>`<tr><td>${esc(f.name)} ${i===0?pill("neueste","p-ok"):""}</td><td>${fileBtns(f,true)}</td><td class="small">${nl(f.note)}</td><td class="num">${f.updated?new Date(f.updated).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</td><td>${ro?"":`<button class="btn sm" data-tfdel="${esc(f.id)}">Entfernen</button>`}</td></tr>`).join("")}</tbody></table></div>`:'<p class="muted small">Noch keine Dateien.</p>'}
-    ${ro?"":`<div class="toolbar" style="margin-top:8px"><select id="tfadd" aria-label="Datei aus dem Archiv"><option value="">Datei aus dem Archiv wählen …</option>${S.data.files.filter(f=>!f.missing&&f.deadline!==d.id).sort((a,b)=>String(a.family||a.name).localeCompare(String(b.family||b.name),"de")||(+b.seq||0)-(+a.seq||0)).map(f=>`<option value="${esc(f.id)}">${esc((f.family||f.name)+" "+(f.ver||""))} – ${esc(f.name)}</option>`).join("")}</select><button class="btn sm" id="tfaddbtn">Zum Termin legen</button></div>`}
+    ${ro?"":`<div class="tsec-pick"><h4 style="margin:10px 0 4px">Aus dem Archiv hinzufügen</h4>${pickHtml(S.data.files.filter(f=>!f.missing&&f.deadline!==d.id))}</div>`}
     ${!ro&&S.assets?`<div class="form" style="margin-top:8px"><label for="tfnote">Notiz zur Datei (z. B. „PH V7 – Stand für Freigabe“)<input id="tfnote" type="text"></label><div><label class="btn pri" for="tupl" style="display:inline-block">Datei hochladen</label><input id="tupl" type="file" hidden> <span id="tuplmsg" class="small muted"></span></div></div>`:(!S.assets&&!S.offline?'<p class="note">Hochladen ist in dieser Ansicht nicht möglich.</p>':"")}
    </div>
    <div class="tsec"><h3>Notizen</h3>
@@ -1471,7 +1476,7 @@ function renderTermin(first){
   const upd=async ch=>{const cur=S.data.deadlines.find(x=>x.id===d.id)||d;await save("deadlines",d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
   document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:fams.map(f=>({done:false,t:"Unterlagen prüfen: "+f}))});});
-  const tfa=$("#tfaddbtn");if(tfa)tfa.onclick=async()=>{const sel=$("#tfadd");if(!sel||!sel.value)return;const f=S.data.files.find(x=>x.id===sel.value);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));};
+  document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
   document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
   document.querySelectorAll("[data-chk]").forEach(b=>b.onchange=async()=>{const [cid,i]=b.dataset.chk.split("|");const c=S.data.checks.find(x=>x.id===cid);if(!c)return;const items=(c.items||[]).map((x,j)=>j===+i?Object.assign({},x,{done:b.checked}):x);await save("checks",cid,Object.assign({},c,{items}));});
