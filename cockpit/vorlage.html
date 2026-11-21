@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}.frow>div{min-width:0}.mfield{margin:8px 0}.mlab{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}.mchecks{display:flex;flex-wrap:wrap;gap:6px 14px}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}.frow>div{min-width:0}.mfield{margin:8px 0}.mlab{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}.mchecks{display:flex;flex-wrap:wrap;gap:6px 14px}.mdrop summary{cursor:pointer;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);list-style:none;min-height:20px}.mdrop[open] summary{margin-bottom:6px}.mdrop .mchecks{padding:6px 2px}
 </style></head><body>
 <title>TA-Cockpit Messanlage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -399,7 +399,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Aufgabe","area"],["who","Wer führt durch","select",WHO,"r1"],["ask","Wen fragen","multi",WHO,"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt"],"r2"],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
+    fields:[["title","Titel","text"],["who","Wer führt durch","select",WHO,"r1"],["ask","Wen fragen","multi",WHO,"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt"],"r2"],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
@@ -414,7 +414,7 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"tasks",title:"Entscheidung",
-    fields:[["title","Entscheidung / Frage","area"],["note","Inhalt","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
+    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   conflicts:{coll:"conflicts",title:"Widersprüche",
@@ -548,7 +548,7 @@ function openEditor(key,id,preset){
     if(type==="area")return `<label for="${fid}">${lab}<textarea id="${fid}" data-k="${k}">${esc(v)}</textarea></label>`;
     if(type==="multi"){const sel=String(v).split(",").map(x=>x.trim()).filter(Boolean);
       const all=[...new Set([...optsFor(grp,opts),...sel])].filter(Boolean);
-      return `<div class="mfield"><span class="mlab">${lab}</span><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
+      return `<div class="mfield"><span class="mlab">${lab}</span><details class="mdrop"><summary>${sel.length?esc(sel.join(", ")):"– auswählen –"}</summary><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div></details><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
         (!ro?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" data-multi="1" style="margin:4px 0 8px">+ neue Option</button>`:"");}
     if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(o||"–")}</option>`).join("")}</select></label>`+
         (addBtn?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" style="margin:4px 0 8px">+ neue Option</button>`:"");
@@ -569,13 +569,14 @@ function openEditor(key,id,preset){
     <div style="display:flex;gap:8px"><button class="btn" data-close="1">Abbrechen</button>${ro?"":`<button class="btn pri" id="savebtn">Speichern</button>`}</div></div></div></div>`;
   const first=$("#edform [data-k]");if(first)first.focus();
   const ef=$("#edform");
-  if(ef)ef.onchange=e=>{const c=e.target;if(c.classList&&c.classList.contains("mchk")){const h=document.querySelector(`#edform input[type=hidden][data-k="${c.dataset.mk}"]`);if(h)h.value=[...document.querySelectorAll(`#edform .mchk[data-mk="${c.dataset.mk}"]:checked`)].map(x=>x.value).join(", ");}};
+  const mSync=h=>{const vals=Array.from(h.parentElement.querySelectorAll(".mchk:checked")).map(x=>x.value);h.value=vals.join(", ");const sm=h.parentElement.querySelector("summary");if(sm)sm.textContent=vals.join(", ")||"– auswählen –";};
+  if(ef)ef.onchange=e=>{const c=e.target;if(c.classList&&c.classList.contains("mchk")){const h=c.closest(".mfield").querySelector("input[type=hidden]");if(h)mSync(h);}};
   document.querySelectorAll("[data-addopt]").forEach(b=>b.onclick=async()=>{
     const v=(prompt("Neue Option (Person oder Abteilung):")||"").trim();if(!v)return;
     if(b.dataset.multi){const h=document.getElementById(b.dataset.addopt);const box=h.parentElement.querySelector(".mchecks");const k=h.dataset.k;
       const ex=Array.from(box.querySelectorAll(".mchk")).find(x=>x.value===v);
       if(ex)ex.checked=true;else{const l=document.createElement("label");l.className="chk";const inp=document.createElement("input");inp.type="checkbox";inp.className="mchk";inp.dataset.mk=k;inp.value=v;inp.checked=true;l.appendChild(inp);l.appendChild(document.createTextNode(v));box.appendChild(l);}
-      h.value=Array.from(box.querySelectorAll(".mchk:checked")).map(x=>x.value).join(", ");}
+      mSync(h);}
     else{const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;}
     await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
