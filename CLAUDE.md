@@ -21,9 +21,7 @@
 - **Projektabgleich:** Auf Zuruf „Projektabgleich“ gleicht Claude Code die Daten in `cockpit/daten/*.json` mit den Dokumenten im Repo ab; das Repo gewinnt bei Wertkonflikten. Das frühere Verfahren mit dem Claude-Artefakt und dem Skill ist archiviert (`cockpit/_Versionen/abgleich_2026-11-18/`, `cockpit/skill/_Versionen/`). Nicht automatisch starten.
 - Ältere Versionen nicht löschen, sondern in den Unterordner `_Versionen` verschieben. Nichts endgültig löschen.
 - KI-Logbuch: Jede KI-Hilfe für die Technikerarbeit zuerst als Postfach-Eintrag `kind: "kilog"` mit `date`, `detail` (Art der Hilfe: was KI gemacht hat) und `fach` (`true`, wenn KI fachlichen Text erzeugt hat) anlegen. Janek prüft sie im Postfach und übernimmt sie; erst dann landen sie in `cockpit/daten/kilog.json`. Kein Chat-Feld. Änderungen am Cockpit selbst (Umbau, Umkodierung, Layout) kommen nicht ins KI-Logbuch.
-- **Branch-Namen:** Neue Branches heißen `Main_JJJJ-MM-TT_HH-MM`, mit dem Datum und der Uhrzeit (deutsche Zeit,
-  Europe/Berlin) des Erstellungszeitpunkts, z. B. `Main_2026-11-18_16-30`. Die Uhrzeit ermittelt man mit
-  `TZ=Europe/Berlin date +%Y-%m-%d_%H-%M`. Bindestrich statt Doppelpunkt, weil Git Doppelpunkte in Branch-Namen nicht erlaubt.
+- **Branch-Namen:** Es wird direkt auf `main` gearbeitet. Ein neuer Branch wird nur erstellt, wenn Janek ausdrücklich darum bittet. Dann heißt er `Main_JJJJ-MM-TT_HH-MM` (deutsche Zeit, Europe/Berlin), z. B. `Main_2026-11-18_16-30`; die Uhrzeit ermittelt man mit `TZ=Europe/Berlin date +%Y-%m-%d_%H-%M`.
 
 - **Vertrauliche Betriebsunterlagen im Repo:** Janek hat am 20.11.2026 entschieden, dass die vorhandenen Rohrspezifikationen und die Prüfanweisung im Repo bleiben. Dazu nicht mehr nachfragen.
 - **Geplante Aufgabe Wochenstatus (Freitag):** am 20.11.2026 gelöscht; Aufbau, Zeitplan und Prompt stehen in `projekt/Geplante_Aufgabe_Wochenstatus_Freitag.md`.
