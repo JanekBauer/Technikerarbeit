@@ -1,0 +1,57 @@
+name: Cockpit-Seiten (alt + neu)
+
+# Veröffentlicht zwei Cockpit-Stände auf GitHub Pages:
+#   /alt/  = Branch main (Stand vor dem Umbau)
+#   /neu/  = Branch main-upgrade (Umbau; hier wird geändert)
+# Voraussetzung: Settings > Pages > Build and deployment > Source = „GitHub Actions“.
+
+on:
+  push:
+    branches: [main-upgrade]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  seiten:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: alt
+      - uses: actions/checkout@v4
+        with:
+          ref: main-upgrade
+          path: neu
+      - name: Beide Stände bauen
+        run: |
+          (cd alt && python3 cockpit/build.py)
+          (cd neu && python3 cockpit/build.py)
+      - name: Seite zusammenstellen
+        run: |
+          mkdir -p site/alt site/neu
+          cp -r alt/docs/. site/alt/
+          cp -r neu/docs/. site/neu/
+          cat > site/index.html <<'HTML'
+          <!doctype html><html lang="de"><meta charset="utf-8"><title>TA-Cockpit</title>
+          <body style="font-family:Arial,sans-serif;max-width:600px;margin:40px auto">
+          <h1>TA-Cockpit</h1>
+          <p><a href="alt/">Alt: Stand main</a></p>
+          <p><a href="neu/">Neu: Umbau (main-upgrade)</a></p>
+          </body></html>
+          HTML
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

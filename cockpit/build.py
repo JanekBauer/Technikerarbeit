@@ -13,7 +13,11 @@ for datei in sorted((basis / "daten").glob("*.json")):
 
 # </ im JSON entschärfen, damit das <script>-Element nicht vorzeitig endet
 roh = json.dumps(daten, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-html = (basis / "vorlage.html").read_text(encoding="utf-8").replace("<!--DATEN-->", roh)
+import os, subprocess
+# Bearbeiten im Cockpit schreibt in den Branch, auf dem diese Seite gebaut wird (nie fest auf main)
+branch = os.environ.get("GITHUB_REF_NAME") or subprocess.run(["git","rev-parse","--abbrev-ref","HEAD"],cwd=basis,capture_output=True,text=True).stdout.strip() or "main"
+repo = os.environ.get("GITHUB_REPOSITORY") or "JanekBauer/Technikerarbeit"
+html = (basis / "vorlage.html").read_text(encoding="utf-8").replace("<!--DATEN-->", roh).replace("__REPO__", repo).replace("__BRANCH__", branch)
 
 ziel = basis.parent / "docs"
 ziel.mkdir(exist_ok=True)
