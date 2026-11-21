@@ -533,6 +533,7 @@ function listTable(key,rows,cols,opt){
 }
 function newBtn(key,label){return S.canWrite&&!S.offline?`<button class="btn pri" data-new="${key}">${label||"Neu"}</button>`:"";}
 
+function shortT(x){x=String(x||"").replace(/\s+/g," ").trim();return x.length>72?x.slice(0,70).replace(/\s+\S*$/,"")+" …":x;}
 const PERSON_KEYS=["who","ask","by"];
 const groupOf=k=>PERSON_KEYS.includes(k)?"person":k;
 function optsFor(group,base){
@@ -808,7 +809,7 @@ VIEWS.offen=()=>{
   const board=cols.map(c=>{
     const list=S.data.tasks.filter(t=>(t.status||"offen")===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
-    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.ask?" · fragen: "+esc(t.ask):""}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
+    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
   return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Alles, was zu tun ist. Entscheidungen stehen hier auch: dieselbe Karte wie unter Entscheidungen, der Status gilt überall. Karten ziehen ändert den Status.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
@@ -944,7 +945,7 @@ VIEWS.entscheidungen=()=>{
   const openN=all.filter(t=>(t.status||"offen")==="offen"||t.status==="in Arbeit").length;
   const cols=["offen","in Arbeit","erledigt","entfallen"];
   const sortIt=(x,y)=>(x.due||"9999").localeCompare(y.due||"9999");
-  const card=d=>`<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(d.title||"(ohne Text)")}</div><div class="small muted">${d.who?"Wer: "+esc(d.who):"ohne Zuständige/r"}${d.by?" · entschieden von "+esc(d.by):""}${d.due?" · bis "+fd(d.due):""}${d.topic?" · "+esc(d.topic):""}</div>${d.source?`<div class="small muted">${esc(d.source)}</div>`:""}</div>`;
+  const card=d=>`<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(shortT(d.title||"(ohne Titel)"))}</div></div>`;
   const board=cols.map(c=>{
     const list=all.filter(d=>(d.status||"offen")===c).sort(c==="erledigt"?(x,y)=>String(y.date||"").localeCompare(String(x.date||"")):sortIt);
     const shown=c==="erledigt"?list.slice(0,10):list;
