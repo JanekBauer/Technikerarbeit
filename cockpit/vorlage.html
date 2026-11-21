@@ -1,4 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}.frow>div{min-width:0}.mfield{margin:8px 0}.mlab{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}.mchecks{display:flex;flex-wrap:wrap;gap:6px 14px}.mdrop summary{cursor:pointer;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);list-style:none;min-height:20px}.mdrop[open] summary{margin-bottom:6px}.mdrop .mchecks{padding:6px 2px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}@media(max-width:700px){.tgrid{grid-template-columns:1fr}}.tfrow{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.tfrow>span:first-child{min-width:0;overflow-wrap:anywhere}
 </style></head><body>
 <title>TA-Cockpit Messanlage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -402,7 +403,7 @@ const LISTS = {
     fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
-    fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","erledigt"]],["unterlagen","Vorgeschlagene Unterlagen (Dokumentnamen, mit Komma, z. B. Pflichtenheft)","text"],["note","Notiz","area"]],
+    fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","erledigt"]],["note","Notiz","area"]],
     def:{kind:"schule",status:"geplant"}},
   packages:{coll:"packages",title:"Arbeitspakete",
     fields:[["name","Arbeitspaket","text"],["ampel","Ampel","select",["gruen","gelb","rot","grau"]],["stand","Stand","area"],["chat","Chat","select",CHATS],["order","Reihenfolge","num"]],
@@ -1431,11 +1432,11 @@ function latestFor(d){
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
   const ck=checkFor(d);
-  if(!ck)return `<div class="tsec"><h3>Was du dafür brauchst</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste.</p>${ro?"":'<button class="btn sm" data-mkck="1">Checkliste anlegen</button>'} ${latestFor(d)||'<p class="muted small">Keine Unterlagen festgelegt. Unter „Termin bearbeiten“ im Feld „Vorgeschlagene Unterlagen“ eintragen.</p>'}</div>`;
+  if(!ck)return `<div class="tsec"><h3>Was du dafür brauchst</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste.</p>${ro?"":'<button class="btn sm" data-mkck="1">Checkliste anlegen</button>'}</div>`;
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
   return `<div class="tsec"><h3>Was du dafür brauchst <span class="small muted">${n} von ${items.length} erledigt</span></h3>
     <p class="note" style="margin:0 0 6px">Checkliste „${esc(ck.title)}“. Abhaken geht direkt hier.</p>
-    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul>${latestDocsHtml()}</div>`;
+    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul></div>`;
 }
 /* neueste Version der Kerndokumente (Aufgabenstellung, Pflichtenheft, Projektplan) */
 function latestDocsHtml(){
@@ -1460,22 +1461,19 @@ function renderTermin(first){
    </div>
    ${d.note?`<p>${nl(d.note)}</p>`:""}
    ${ro?"":`<button class="btn sm" id="tedit">Termin bearbeiten</button>`}
-   ${prepHtml(d)}
+   <div class="tgrid">${prepHtml(d)}<div><div class="tsec" style="margin-top:0"><h3>Dateien zu diesem Termin</h3>${files.length?files.map(f=>`<div class="tfrow"><span title="${esc(f.name)}">${esc(String(f.name||"").replace(/\.[^.]+$/,""))}</span><span style="display:flex;gap:6px;flex-wrap:wrap">${fileBtns(f,true)}${ro?"":`<button class="btn sm" data-tfdel="${esc(f.id)}">Entfernen</button>`}</span></div>`).join(""):'<p class="muted small">Noch keine Dateien.</p>'}${ro?"":`<div style="margin-top:10px"><h4 style="margin:6px 0 4px">Aus dem Archiv hinzufügen</h4>${pickHtml(S.data.files.filter(f=>!f.missing&&f.deadline!==d.id))}</div>`}    ${!ro&&S.assets?`<div class="form" style="margin-top:8px"><label for="tfnote">Notiz zur Datei (z. B. „PH V7 – Stand für Freigabe“)<input id="tfnote" type="text"></label><div><label class="btn pri" for="tupl" style="display:inline-block">Datei hochladen</label><input id="tupl" type="file" hidden> <span id="tuplmsg" class="small muted"></span></div></div>`:(!S.assets&&!S.offline?'<p class="note">Hochladen ist in dieser Ansicht nicht möglich.</p>':"")}</div></div></div>
    <div class="tsec"><h3>Vorzubereiten: offene Punkte bis zu diesem Termin (${tasks.length})</h3>${tasks.length?`<ul class="clean">${tasks.map(t=>`<li class="step"><b class="k">${esc(t.prio||"")}</b><div>${esc(t.title)}<div class="small muted">${esc(t.who||"")} · ${dueCell(t.due,false)}</div></div></li>`).join("")}</ul>`:'<p class="muted small">Keine offenen Punkte mit Frist bis zu diesem Termin.</p>'}</div>
-   <div class="tsec"><h3>Was du schon hast: Dateien zu diesem Termin</h3>
-    ${files.length?`<div class="tbl"><table><tbody>${files.map((f,i)=>`<tr><td>${esc(f.name)} ${i===0?pill("neueste","p-ok"):""}</td><td>${fileBtns(f,true)}</td><td class="small">${nl(f.note)}</td><td class="num">${f.updated?new Date(f.updated).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</td><td>${ro?"":`<button class="btn sm" data-tfdel="${esc(f.id)}">Entfernen</button>`}</td></tr>`).join("")}</tbody></table></div>`:'<p class="muted small">Noch keine Dateien.</p>'}
-    ${ro?"":`<div class="tsec-pick"><h4 style="margin:10px 0 4px">Aus dem Archiv hinzufügen</h4>${pickHtml(S.data.files.filter(f=>!f.missing&&f.deadline!==d.id))}</div>`}
-    ${!ro&&S.assets?`<div class="form" style="margin-top:8px"><label for="tfnote">Notiz zur Datei (z. B. „PH V7 – Stand für Freigabe“)<input id="tfnote" type="text"></label><div><label class="btn pri" for="tupl" style="display:inline-block">Datei hochladen</label><input id="tupl" type="file" hidden> <span id="tuplmsg" class="small muted"></span></div></div>`:(!S.assets&&!S.offline?'<p class="note">Hochladen ist in dieser Ansicht nicht möglich.</p>':"")}
-   </div>
    <div class="tsec"><h3>Notizen</h3>
     ${ro?"":`<div class="form" style="margin-top:4px"><label for="tlog">Neue Notiz<textarea id="tlog" placeholder="z. B. Antwort von Hr. Baidinger, Ergebnis des Termins">${esc(draft)}</textarea></label><div><button class="btn pri" id="tlogsave">Notiz speichern</button></div></div>`}
     ${log.length?log.map(l=>`<div class="logi"><div class="small muted num">${new Date(l.at).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}${l.by?" · "+esc(l.by):""}</div>${nl(l.t)}</div>`).join(""):'<p class="muted small">Noch keine Notizen.</p>'}
+
+   <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn pri" id="tsave">Speichern</button></div>
   </div></div>`;
   const tmb=document.querySelector("#modal .modal-bg");if(tmb){tmb.style.position="absolute";tmb.style.top="0";tmb.style.left="0";tmb.style.right="0";tmb.style.minHeight="100vh";tmb.style.overflow="visible";if(first)window.scrollTo(0,0);}
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const upd=async ch=>{const cur=S.data.deadlines.find(x=>x.id===d.id)||d;await save("deadlines",d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
-  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:fams.map(f=>({done:false,t:"Unterlagen prüfen: "+f}))});});
+  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
   document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
   document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
@@ -1483,6 +1481,7 @@ function renderTermin(first){
   const tdl=$("#tdel");if(tdl)tdl.onclick=async()=>{if(S.tDelSure===d.id){tdl.disabled=true;S.tDelSure=null;await del("deadlines",d.id);closeModal();}else{S.tDelSure=d.id;tdl.textContent="Wirklich löschen?";setTimeout(()=>{if(S.tDelSure===d.id){S.tDelSure=null;const b=$("#tdel");if(b)b.textContent="Termin löschen";}},5000);}};
   const addNote=async()=>{const t=$("#tlog").value.trim();if(!t)return null;const cur=S.data.deadlines.find(x=>x.id===d.id)||d;const e={t,at:new Date().toISOString(),by:"Janek"};const lg=(cur.log||[]).concat([e]);$("#tlog").value="";await upd({log:lg});return e;};
   const ls=$("#tlogsave");if(ls)ls.onclick=async()=>{ls.disabled=true;await addNote();ls.disabled=false;};
+  const tsv=$("#tsave");if(tsv)tsv.onclick=async()=>{const tx=($("#tlog")||{}).value||"";if(tx.trim())await addNote();closeModal();};
   const u=$("#tupl");if(u)u.onchange=async()=>{const f=u.files[0];if(!f)return;const m=$("#tuplmsg");m.textContent="Lädt hoch …";
     try{const st=await storeFile(f);await save("files",null,Object.assign(st,{name:f.name,folder:"9 Uploads zu Terminen",family:d.title||f.name,ver:fd(new Date().toISOString().slice(0,10)),seq:Date.now()/1e10,date:new Date().toISOString().slice(0,10),kind:/image/.test(f.type)?"Foto":"Sonstiges",note:($("#tfnote")||{}).value||"",deadline:d.id}));m.textContent="Hochgeladen: "+f.name+" (auch im Archiv)";}
     catch(e){m.textContent="Hochladen hat nicht geklappt: "+(e&&(e.code==="unsupported_type"?"Dateityp wird nicht unterstützt":e.message)||"unbekannter Fehler");}};
