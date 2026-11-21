@@ -41,7 +41,7 @@ Maßgeblich bei Widersprüchen ist CLAUDE.md im Repo, danach die Cockpit-Daten (
 
 **Spezifische Befehle & Trigger**
 - „Projektabgleich“: Abgleich der Daten mit den Dokumenten im Repo, Repo gewinnt. Nur auf Zuruf.
-- Jede KI-Hilfe in `cockpit/daten/kilog.json` eintragen (Datum, Chat, Art, `fach` true/false).
+- Jede KI-Hilfe in `cockpit/daten/kilog.json` eintragen (Datum, Art der Hilfe, `fach` true/false), als Postfach-Eintrag der Art kilog.
 - Neue Branches: `Main_JJJJ-MM-TT_HH-MM` (Europe/Berlin). In dieser Sitzung gilt der vorgegebene Branch `claude/migrate-technikerarbeit-github-wbqsgp` (siehe Teil 2).
 
 ## Teil 2: Analyse
@@ -71,7 +71,7 @@ Vor jeder Aufgabe im Repo: `git pull`. Maßgeblich für den Projektstand sind di
 
 Daten ändern: JSON-Datei bearbeiten (eine Zeile pro Eintrag, `id` erhalten), danach `python cockpit/build.py`, dann `cockpit/daten` und `docs/index.html` zusammen committen und pushen. Commit-Nachrichten auf Deutsch (was und warum). Nichts löschen; ältere Stände nach `_Versionen` verschieben.
 
-Jede KI-Hilfe in `cockpit/daten/kilog.json` eintragen (Datum, Chat, Art, fach true/false).
+Jede KI-Hilfe in `cockpit/daten/kilog.json` eintragen (Datum, Art der Hilfe, fach true/false), als Postfach-Eintrag der Art kilog.
 
 Projektabgleich nur auf ausdrücklichen Zuruf von Janek. Dann gleichen wir die Daten mit den Dokumenten im Repo ab; das Repo gewinnt bei Wertkonflikten.
 
