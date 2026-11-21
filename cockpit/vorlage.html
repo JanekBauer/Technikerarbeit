@@ -1454,6 +1454,7 @@ function renderTermin(first){
     ${ro?"":`<div class="form" style="margin-top:4px"><label for="tlog">Neue Notiz<textarea id="tlog" placeholder="z. B. Antwort von Hr. Baidinger, Ergebnis des Termins">${esc(draft)}</textarea></label><div><button class="btn pri" id="tlogsave">Notiz speichern</button></div></div>`}
     ${log.length?log.map(l=>`<div class="logi"><div class="small muted num">${new Date(l.at).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}${l.by?" · "+esc(l.by):""}</div>${nl(l.t)}</div>`).join(""):'<p class="muted small">Noch keine Notizen.</p>'}
   </div></div>`;
+  const tmb=document.querySelector("#modal .modal-bg");if(tmb){tmb.style.position="absolute";tmb.style.top="0";tmb.style.left="0";tmb.style.right="0";tmb.style.minHeight="100vh";tmb.style.overflow="visible";if(first)window.scrollTo(0,0);}
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const upd=async ch=>{const cur=S.data.deadlines.find(x=>x.id===d.id)||d;await save("deadlines",d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
