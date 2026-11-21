@@ -394,7 +394,7 @@ const NAV = [
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
   ["Einstellungen",[["einstellungen","Optionen"]]]
 ];
-const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen"];
+const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen","freitage"];
 const WHO = ["Janek","Baidinger","Graudejus","FSL"];
 const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektplan","04 Meilensteine","05 Messtechnik","06 Spann/Handhabung","07 Bewertung","08 CAD","09 Messprozess/Unterlagen","10 Doku","11 Präsentation"];
 
@@ -719,7 +719,7 @@ VIEWS.start=()=>{
   return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer</span><h1>Übersicht</h1>
     <p class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</p></div></div>
   <div class="hero">
-    <a class="big" ${nt.id?`href="#" data-termin="${esc(nt.id)}"`:'href="#zeitleiste"'}><div class="l">Nächster Termin</div><div class="n">${nt.date?(days(nt.date)<0?"–":days(nt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nt.date?esc(nt.title)+" · "+(nt.approx?"ca. ":"")+fd(nt.date):"Keine Termine angelegt"}</div></a>
+    <a class="big" ${nt.id?`href="#" data-termin="${esc(nt.id)}"`:`href="#" data-termin="fr-${esc(nt.date)}"`}><div class="l">Nächster Termin</div><div class="n">${nt.date?(days(nt.date)<0?"–":days(nt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nt.date?esc(nt.title)+" · "+(nt.approx?"ca. ":"")+fd(nt.date):"Keine Termine angelegt"}</div></a>
     <a class="big" href="#zeitleiste"><div class="l">Abgabe Dokumentation</div><div class="n">${doku?days(doku.date):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${doku?fd(doku.date)+", 10:00 Uhr":"Termin fehlt"}</div></a>
     <a class="big" href="#offen" style="border-left-color:${over.length?"var(--bad)":"var(--ok)"}"><div class="l">Offene Aufgaben</div><div class="n">${open.length}</div><div class="l">${over.length?over.length+" davon überfällig":"nichts überfällig"}</div></a>
   </div>
@@ -1435,6 +1435,7 @@ function latestFor(d){
 }
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
+  if(String(d.id).startsWith("fr-"))return '<div class="tsec"><h3>Checkliste</h3><p class="muted small">Für Freitage gibt es keine Checkliste.</p></div>';
   const ck=checkFor(d);
   if(!ck)return `<div class="tsec"><h3>Checkliste</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste.</p>${ro?"":'<button class="btn sm" data-mkck="1">Checkliste anlegen</button>'}</div>`;
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
@@ -1450,21 +1451,24 @@ function latestDocsHtml(){
   if(!list.length)return "";
   return `<h4 style="margin:12px 0 4px">Aktuelle Unterlagen (neueste Version)</h4><div class="tbl"><table><tbody>${list.map(f=>`<tr><td>${esc(f.family||f.name)} <span class="small muted">${esc(f.ver||"")}</span></td><td class="small">${esc(f.name)}</td><td>${fileBtns(f,true)}</td></tr>`).join("")}</tbody></table></div>`;
 }
+function frDeadline(id){const rec=(S.data.freitage||[]).find(x=>x.id===id)||{};return Object.assign({id,title:"Freitag (Platzhalter)",date:String(id).slice(3),kind:"betrieb",status:"geplant",note:"",approx:false,log:[]},rec,{id});}
 function renderTermin(first){
-  const d=S.data.deadlines.find(x=>x.id===S.terminId);if(!d){closeModal();return;}
+  const isFr=String(S.terminId||"").startsWith("fr-");
+  const d=isFr?frDeadline(S.terminId):S.data.deadlines.find(x=>x.id===S.terminId);if(!d){closeModal();return;}
+  const coll=isFr?"freitage":"deadlines";
   const ro=!S.canWrite||S.offline;const n=d.date?days(d.date):null;
   const files=S.data.files.filter(f=>f.deadline===d.id).sort((a,b)=>(b.updated||"").localeCompare(a.updated||""));
   const log=(d.log||[]).slice().reverse();
   const tasks=S.data.tasks.filter(t=>t.status!=="erledigt"&&t.due&&d.date&&t.due<=d.date).sort(sortDue);
   const draft=($("#tlog")||{}).value||"";
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="${esc(d.title)}">
-   <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${d.kind==="betrieb"?"Betrieb":"Schule"} · Termin</span><h2>${esc(d.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn danger" id="tdel">${S.tDelSure===d.id?"Wirklich löschen?":"Termin löschen"}</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
+   <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${d.kind==="betrieb"?"Betrieb":"Schule"} · Termin</span><h2>${esc(d.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro||isFr?"":`<button class="btn danger" id="tdel">${S.tDelSure===d.id?"Wirklich löschen?":"Termin löschen"}</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
    <div class="hero" style="margin:10px 0 0">
     <div class="big"><div class="l">Datum</div><div class="n" style="font-size:30px">${d.approx?"ca. ":""}${fd(d.date)}</div><div class="l">${n==null?"":n<0?-n+" Tage vorbei":n===0?"heute":"in "+n+" Tagen"}</div></div>
-    <div class="big"><div class="l">Status</div><div style="margin:8px 0">${stPill(d.status)}</div>${ro?"":`<div class="toolbar" style="margin:0">${["geplant","erledigt"].filter(s=>s!==d.status).map(s=>`<button class="btn sm" data-tstat="${s}">auf „${s}“</button>`).join("")}</div>`}</div>
+    <div class="big"><div class="l">Status</div><div style="margin:8px 0">${stPill(d.status)}</div>${ro||isFr?"":`<div class="toolbar" style="margin:0">${["geplant","erledigt"].filter(s=>s!==d.status).map(s=>`<button class="btn sm" data-tstat="${s}">auf „${s}“</button>`).join("")}</div>`}</div>
    </div>
    ${d.note?`<p>${nl(d.note)}</p>`:""}
-   ${ro?"":`<button class="btn sm" id="tedit">Termin bearbeiten</button>`}
+   ${ro||isFr?"":`<button class="btn sm" id="tedit">Termin bearbeiten</button>`}
    <div class="tgrid">${prepHtml(d)}<div><div class="tsec" style="margin-top:0"><h3>Dateien zu diesem Termin</h3>${files.length?files.map(f=>`<div class="tfrow"><span title="${esc(f.name)}">${esc(String(f.name||"").replace(/\.[^.]+$/,""))}</span><span style="display:flex;gap:6px;flex-wrap:wrap">${fileBtns(f,true)}${ro?"":`<button class="btn sm" data-tfdel="${esc(f.id)}">Entfernen</button>`}</span></div>`).join(""):'<p class="muted small">Noch keine Dateien.</p>'}${ro?"":`<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Aus dem Archiv hinzufügen</summary><div style="margin-top:6px">${pickHtml(S.data.files.filter(f=>!f.missing&&f.deadline!==d.id))}</div></details>`}    ${!ro&&S.assets?`<div class="form" style="margin-top:8px"><div><label class="btn pri" for="tupl" style="display:inline-block">Datei hochladen</label><input id="tupl" type="file" hidden> <span id="tuplmsg" class="small muted"></span></div></div>`:(!S.assets&&!S.offline?'<p class="note">Hochladen ist in dieser Ansicht nicht möglich.</p>':"")}</div></div></div>
    <div class="tsec"><h3>Vorzubereiten: offene Punkte bis zu diesem Termin (${tasks.length})</h3>${tasks.length?`<ul class="clean">${tasks.map(t=>`<li class="step"><b class="k">${esc(t.prio||"")}</b><div>${esc(t.title)}<div class="small muted">${esc(t.who||"")} · ${dueCell(t.due,false)}</div></div></li>`).join("")}</ul>`:'<p class="muted small">Keine offenen Punkte mit Frist bis zu diesem Termin.</p>'}</div>
    <div class="tsec"><h3>Notizen</h3>
@@ -1475,7 +1479,7 @@ function renderTermin(first){
   </div></div>`;
   const tmb=document.querySelector("#modal .modal-bg");if(tmb){tmb.style.position="absolute";tmb.style.top="0";tmb.style.left="0";tmb.style.right="0";tmb.style.minHeight="100vh";tmb.style.overflow="visible";if(first)window.scrollTo(0,0);}
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
-  const upd=async ch=>{const cur=S.data.deadlines.find(x=>x.id===d.id)||d;await save("deadlines",d.id,Object.assign({},cur,ch));};
+  const upd=async ch=>{const cur=S.data[coll].find(x=>x.id===d.id)||d;await save(coll,d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
   document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
   document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
@@ -1483,7 +1487,7 @@ function renderTermin(first){
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
   document.querySelectorAll("[data-chk]").forEach(b=>b.onchange=async()=>{const [cid,i]=b.dataset.chk.split("|");const c=S.data.checks.find(x=>x.id===cid);if(!c)return;const items=(c.items||[]).map((x,j)=>j===+i?Object.assign({},x,{done:b.checked}):x);await save("checks",cid,Object.assign({},c,{items}));});
   const tdl=$("#tdel");if(tdl)tdl.onclick=async()=>{if(S.tDelSure===d.id){tdl.disabled=true;S.tDelSure=null;await del("deadlines",d.id);closeModal();}else{S.tDelSure=d.id;tdl.textContent="Wirklich löschen?";setTimeout(()=>{if(S.tDelSure===d.id){S.tDelSure=null;const b=$("#tdel");if(b)b.textContent="Termin löschen";}},5000);}};
-  const addNote=async()=>{const t=$("#tlog").value.trim();if(!t)return null;const cur=S.data.deadlines.find(x=>x.id===d.id)||d;const e={t,at:new Date().toISOString(),by:"Janek"};const lg=(cur.log||[]).concat([e]);$("#tlog").value="";await upd({log:lg});return e;};
+  const addNote=async()=>{const t=$("#tlog").value.trim();if(!t)return null;const cur=S.data[coll].find(x=>x.id===d.id)||d;const e={t,at:new Date().toISOString(),by:"Janek"};const lg=(cur.log||[]).concat([e]);$("#tlog").value="";await upd({log:lg});return e;};
   const ls=$("#tlogsave");if(ls)ls.onclick=async()=>{ls.disabled=true;await addNote();ls.disabled=false;};
   const tsv=$("#tsave");if(tsv)tsv.onclick=async()=>{const tx=($("#tlog")||{}).value||"";if(tx.trim())await addNote();closeModal();};
   const u=$("#tupl");if(u)u.onchange=async()=>{const f=u.files[0];if(!f)return;const m=$("#tuplmsg");m.textContent="Lädt hoch …";
