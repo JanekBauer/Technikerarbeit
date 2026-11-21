@@ -226,7 +226,7 @@ h3 a.small:hover{text-decoration:underline}
    Schreiben (Bearbeiten/Löschen) als Commit in cockpit/daten/*.json über die GitHub-API,
    sobald in diesem Browser ein Zugriffstoken gespeichert ist. */
 (function(){
-  var REPO="JanekBauer/Technikerarbeit",BRANCH="main",DIR="cockpit/daten/";
+  var REPO="JanekBauer/Technikerarbeit",BRANCH="main-upgrade",DIR="cockpit/daten/";
   var DATA=JSON.parse(document.getElementById("cockpit-data").textContent);
   var listeners={};
   function tok(){try{return localStorage.getItem("ta_gh_token")||"";}catch(e){return "";}}
