@@ -420,7 +420,7 @@ const LISTS = {
   conflicts:{coll:"conflicts",title:"Widersprüche",
     fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
-    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
+    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung","abschluss"]],["title","Titel","text"],["detail","Inhalt","area"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["beleg","Beleg (Dokument, nur bei Abschluss)","text"],["ziel","Betrifft Eintrag (ID, nur bei Abschluss)","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["chat","Chat","select",CHATS.concat(["Routine"])],["purpose","Zweck","text"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
@@ -830,7 +830,7 @@ VIEWS_after.offen=()=>{
 };
 
 /* Übernahme aus dem Eingang: Status, Datum, Inhalt und Vorschlag bleiben erhalten */
-const PF_KIND_COLL={aufgabe:"tasks",entscheidung:"tasks",aenderung:"changes"};
+const PF_KIND_COLL={aufgabe:"tasks",entscheidung:"tasks",aenderung:"changes",abschluss:"tasks"};
 const PF_STAT={"offen":"offen","in Arbeit":"in Arbeit","erledigt":"erledigt","entfallen":"entfallen","bestätigt":"erledigt","beantwortet":"erledigt","abgesagt":"entfallen","geklärt":"erledigt"};
 function pfAltRecord(p){
   const a=p.alt||{};const c=p.altColl;const st=PF_STAT[p.stand]||PF_STAT[a.status]||"offen";const dt=p.date||a.date||a.resolved||"";
@@ -840,8 +840,18 @@ function pfAltRecord(p){
   if(c==="conflicts")return {coll:"tasks",obj:{typ:"entscheidung",title:a.text||"",note:a.note||"",who:"",due:"",prio:"1",status:st,by:"",reason:"",date:dt,source:"Widerspruch",docs:a.between||"",refs:a.refs||"",topic:""}};
   return null;
 }
+async function pfClose(p){
+  const t=S.data.tasks.find(x=>x.id===p.ziel);
+  if(!t){alert2("Der betroffene Eintrag wurde nicht gefunden. Bitte das Feld „Betrifft Eintrag“ prüfen.");return;}
+  const obj=Object.assign({},t,{status:"erledigt"});
+  if(t.typ==="entscheidung"){obj.by=t.by||p.who||"";obj.reason=t.reason||p.detail||"";
+    if(!obj.by||!obj.reason){alert2("Für eine Entscheidung braucht „erledigt“ „Entschieden von“ und „Begründung“.");return;}}
+  if(!(await save("tasks",t.id,obj)))return;
+  await save("postfach",p.id,Object.assign({},p,{status:"übernommen",ziel:"tasks/"+t.id}));
+}
 async function pfAccept(id,pre){
   const p=pre||S.data.postfach.find(x=>x.id===id);if(!p)return;
+  if(p.kind==="abschluss"){await pfClose(p);return;}
   let target=null,obj=null;
   if(p.alt){const r=pfAltRecord(p);if(r&&PF_KIND_COLL[p.kind]===r.coll){target=r.coll;obj=r.obj;}}
   if(!obj){
