@@ -399,7 +399,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Titel","text"],["who","Wer führt durch","select",WHO,"r1"],["ask","Wen fragen","multi",WHO,"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt"],"r2"],["source","Quelle / Vorschlag von","text"],["date","Datum","date"],["note","Notiz","area"]],
+    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["docs","Betroffene Dokumente","text"],["refs","Verknüpft mit (IDs)","text"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","offen","erledigt"]],["note","Notiz","area"]],
