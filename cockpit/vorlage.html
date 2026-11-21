@@ -1276,7 +1276,7 @@ const XMIME={pdf:"application/pdf",docx:"application/vnd.openxmlformats-officedo
 const NATIVE=/^(application\/pdf|image\/(png|jpeg|gif|webp)|text\/(plain|csv|markdown)|application\/json)$/;
 const VIEWABLE=/^(application\/pdf|image\/)/;
 const fext=n=>{const m=/\.([a-z0-9]+)$/i.exec(n||"");return m?m[1].toLowerCase():"";};
-const verNum=v=>{const m=/(\d+)/.exec(v||"");return m?+m[1]:0;};
+const verNum=v=>{const m=/(\d+(?:[.,]\d+)?)/.exec(v||"");return m?parseFloat(m[1].replace(",",".")):0;};
 const fsize=b=>!b?"":b>=1048576?f2(b/1048576,1)+" MB":Math.max(1,Math.round(b/1024))+" KB";
 const fileMime=f=>f.mime||XMIME[fext(f.name)]||"";
 const PAGES="https://janekbauer02-cell.github.io/Technikerarbeit/",RAWB="https://raw.githubusercontent.com/janekbauer02-cell/Technikerarbeit/main/docs/";
@@ -1285,9 +1285,12 @@ function fileUrl(f){if(f.url)return f.url;if(f.path)return (location.protocol===
 function archRows(){return S.data.files.map(f=>Object.assign({},f,{folder:f.folder||(f.deadline?"9 Uploads zu Terminen":"9 Sonstiges"),family:f.family||f.name||"Datei",seq:(f.seq!==""&&f.seq!=null&&isFinite(+f.seq))?+f.seq:verNum(f.ver)}));}
 function archTree(){const t={};archRows().forEach(r=>{const fo=t[r.folder]=t[r.folder]||{};(fo[r.family]=fo[r.family]||[]).push(r);});
   Object.values(t).forEach(fams=>Object.values(fams).forEach(v=>v.sort((a,b)=>(b.seq-a.seq)||(b.date||"").localeCompare(a.date||"")||(b.updated||"").localeCompare(a.updated||""))));return t;}
-const newest=vers=>vers.find(v=>!v.missing)||null;
+const newest=vers=>vers.find(v=>!v.missing&&v.gilt)||vers.find(v=>!v.missing)||null;
+async function setGilt(id){const r=archRows().find(x=>x.id===id);if(!r)return;
+  const ids=archRows().filter(x=>x.folder===r.folder&&x.family===r.family).map(x=>x.id);
+  for(const i of ids){const f=S.data.files.find(x=>x.id===i);if(!f)continue;const want=i===id;if(!!f.gilt!==want)await save("files",i,Object.assign({},f,{gilt:want}));}}
 const famOrder=fams=>Object.keys(fams).sort((a,b)=>{const oa=Math.min(...fams[a].map(x=>x.order==null?999:x.order)),ob=Math.min(...fams[b].map(x=>x.order==null?999:x.order));return (oa-ob)||a.localeCompare(b,"de");});
-function nextVer(folder,family){const t=archTree();const v=(t[folder]&&t[folder][family])||[];if(!v.length)return "V1";const mx=Math.max(...v.map(x=>x.seq||0));return "V"+(mx+1);}
+function nextVer(folder,family){const t=archTree();const v=(t[folder]&&t[folder][family])||[];if(!v.length)return "V1";const mx=Math.max(...v.map(x=>x.seq||0));return "V"+(Math.floor(mx)+1);}
 
 async function storeFile(file,o){
   const e=fext(file.name);const mime=XMIME[e]||(file.type||"").split(";")[0]||"application/octet-stream";
@@ -1343,9 +1346,9 @@ VIEWS.dateien=()=>{
       h+=`<div class="fam" data-s="${esc(s_)}"><div class="famrow"><div class="fn"><b>${esc(fam)}</b> ${nw?pill(nw.ver||"aktuell","p-ok"):pill("Datei fehlt","p-warn")} ${top.missing&&nw?pill((top.ver||"neuere Version")+" fehlt noch","p-warn"):""}
         <div class="small muted">${nw?esc(nw.name)+" · "+(nw.date?fd(nw.date):"")+(nw.size?" · "+fsize(nw.size):""):esc(top.note||"")}</div></div>
         <div class="facts">${fileBtns(nw)}${can?`<button class="btn" data-upnew="${esc(key)}">Neue Version</button>`:""}<button class="btn" data-vtog="${esc(key)}" aria-expanded="${vOpen}">Verlauf (${vs.length})</button></div></div>
-        <div class="vtree" ${vOpen?"":"hidden"}>${vs.map(v=>`<div class="vnode${v.missing?" miss":""}"><div class="vtxt"><span class="vk">${esc(v.ver||"–")}</span> ${v===nw?pill("neueste","p-ok"):""}${v.missing?pill("fehlt","p-warn"):fileUrl(v)?pill("im Web-Archiv","p-ok"):pill("noch ohne Datei","")} <span class="small muted num">${v.date?fd(v.date):""}${v.size?" · "+fsize(v.size):""}</span>
+        <div class="vtree" ${vOpen?"":"hidden"}>${vs.map(v=>`<div class="vnode${v.missing?" miss":""}"><div class="vtxt"><span class="vk">${esc(v.ver||"–")}</span> ${v===nw?pill(v.gilt?"gilt":"neueste","p-ok"):""}${v.missing?pill("fehlt","p-warn"):fileUrl(v)?pill("im Web-Archiv","p-ok"):pill("noch ohne Datei","")} <span class="small muted num">${v.date?fd(v.date):""}${v.size?" · "+fsize(v.size):""}</span>
           <div class="small">${v.missing?"":esc(v.name)}${v.note?`<div class="muted">${nl(v.note)}</div>`:""}</div></div>
-          <div class="facts">${v.missing?(can?`<button class="btn sm pri" data-upslot="${esc(v.id)}">Datei hochladen</button>`:""):fileBtns(v,true)}${S.canWrite&&!S.offline?`<button class="btn sm" data-edit="files" data-id="${esc(v.id)}">Bearbeiten</button>`:""}</div></div>`).join("")}</div></div>`;});
+          <div class="facts">${(can&&!v.missing&&v!==nw)?`<button class="btn sm" data-gilt="${esc(v.id)}">Als gültig festlegen</button>`:""}${v.missing?(can?`<button class="btn sm pri" data-upslot="${esc(v.id)}">Datei hochladen</button>`:""):fileBtns(v,true)}${S.canWrite&&!S.offline?`<button class="btn sm" data-edit="files" data-id="${esc(v.id)}">Bearbeiten</button>`:""}</div></div>`).join("")}</div></div>`;});
     h+=`</div></details>`;});
   return h+`<p class="note">Größenlimit pro Datei: 20 MB. Jeder Upload ist ein Commit im Repo; Claude Code zu Hause holt die Dateien mit „git pull“. Keine vertraulichen Betriebsunterlagen hochladen (öffentliches Repo).</p>`;
 };
@@ -1356,6 +1359,7 @@ VIEWS_after.dateien=()=>{
   document.querySelectorAll("[data-vtog]").forEach(b=>b.onclick=()=>{const k=b.dataset.vtog;S.archVer[k]=!S.archVer[k];const tr=b.closest(".fam").querySelector(".vtree");tr.hidden=!S.archVer[k];b.setAttribute("aria-expanded",S.archVer[k]);});
   const up=$("#archup");if(up)up.onclick=()=>openUpload({});
   document.querySelectorAll("[data-upnew]").forEach(b=>b.onclick=()=>{const [fo,fam]=b.dataset.upnew.split("|");openUpload({folder:fo,family:fam});});
+  document.querySelectorAll("[data-gilt]").forEach(b=>b.onclick=()=>setGilt(b.dataset.gilt));
   document.querySelectorAll("[data-upslot]").forEach(b=>b.onclick=()=>{const r=archRows().find(x=>x.id===b.dataset.upslot);if(r)openUpload({folder:r.folder,family:r.family,ver:r.ver,date:r.date,note:r.note,slot:r.id});});
   const q=$("#archq");if(q){q.value=S.archQ||"";const f=()=>{S.archQ=q.value;const v=q.value.trim().toLowerCase();document.querySelectorAll(".fam").forEach(el=>{el.hidden=!!v&&!el.dataset.s.includes(v);});
     document.querySelectorAll("[data-fold]").forEach(d=>{const any=[...d.querySelectorAll(".fam")].some(x=>!x.hidden);d.hidden=!any;if(v&&any)d.open=true;});};q.oninput=f;if(q.value)f();}
@@ -1373,6 +1377,7 @@ function openUpload(p){
     <label for="u_fam">Dokument (bestehendes wählen = neue Version davon)<input id="u_fam" type="text" list="u_famdl" value="${esc(p.family||"")}" placeholder="z. B. Pflichtenheft"><datalist id="u_famdl"></datalist></label>
     <label for="u_ver">Version<input id="u_ver" type="text" value="${esc(p.ver||"")}"></label>
     <label for="u_date">Datum der Version<input id="u_date" type="date" value="${esc(p.date||new Date().toISOString().slice(0,10))}"></label>
+    <label id="u_giltw" hidden>Ist das die neueste Version?<select id="u_gilt"><option value="neu">Ja, neueste Version: gilt jetzt</option><option value="alt">Nein, ältere Version: gilt nicht</option></select></label>
     <label for="u_note">Notiz / was hat sich geändert?<textarea id="u_note">${esc(p.slot?"":p.note||"")}</textarea></label>
    </form><div id="u_msg" class="small muted"></div>
    <div class="mact"><div></div><div style="display:flex;gap:8px"><button class="btn" data-close="1">Abbrechen</button><button class="btn pri" id="u_go">Hochladen</button></div></div></div></div>`;
@@ -1380,13 +1385,16 @@ function openUpload(p){
   const curFold=()=>fold.value==="__new"?($("#u_foldn").value.trim()||"9 Sonstiges"):fold.value;
   const fill=()=>{$("#u_foldnl").hidden=fold.value!=="__new";$("#u_famdl").innerHTML=famList(curFold()).map(x=>`<option value="${esc(x)}">`).join("");};
   const sugg=()=>{if(!p.slot&&!ver.dataset.touched)ver.value=fam.value.trim()?nextVer(curFold(),fam.value.trim()):"V1";};
-  fold.onchange=()=>{fill();sugg();};fam.oninput=sugg;ver.oninput=()=>{ver.dataset.touched=1;};fill();sugg();
+  const updG=()=>{const ex=!p.slot&&famList(curFold()).includes(fam.value.trim());$("#u_giltw").hidden=!ex;};
+  fold.onchange=()=>{fill();sugg();updG();};fam.oninput=()=>{sugg();updG();};ver.oninput=()=>{ver.dataset.touched=1;};fill();sugg();updG();
   $("#u_file").onchange=()=>{const f=$("#u_file").files[0];if(f&&!fam.value.trim()){fam.value=f.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ");sugg();}};
   $("#u_go").onclick=async()=>{const f=$("#u_file").files[0];const m=$("#u_msg");if(!f){m.textContent="Bitte zuerst eine Datei wählen.";return;}
     const folder=curFold(),family=fam.value.trim()||f.name;const go=$("#u_go");go.disabled=true;m.textContent="Lädt hoch …";
     try{const st=await storeFile(f,{folder,family,ver:ver.value.trim()||"V1"});const v=ver.value.trim()||"V1";const base=p.slot?(S.data.files.find(x=>x.id===p.slot)||{}):{};
       const kind=base.kind||(/Aufgabenstellung/.test(folder)?"Aufgabenstellung":/Pflichtenheft/.test(folder)?"Pflichtenheft":/Projektplan/.test(folder)?"Projektplan":/Recherche/.test(folder)?"Datenblatt":/Schule/.test(folder)?"Schule":"Sonstiges");
-      const rec=Object.assign({},base,st,{name:f.name,folder,family,ver:v,seq:verNum(v)||base.seq||1,date:$("#u_date").value,note:$("#u_note").value,kind,missing:false,by:"Janek"});delete rec.enc;delete rec.assetId;delete rec.url;
+      const alt=!$("#u_giltw").hidden&&$("#u_gilt").value==="alt";
+      if(!alt&&!p.slot){for(const x of S.data.files.filter(x=>x.folder===folder&&(x.family||x.name)===family&&x.gilt)){await save("files",x.id,Object.assign({},x,{gilt:false}));}}
+      const rec=Object.assign({},base,st,{name:f.name,folder,family,ver:v,seq:verNum(v)||base.seq||1,date:$("#u_date").value,note:$("#u_note").value,kind,missing:false,by:"Janek",gilt:p.slot?!!base.gilt:!alt});delete rec.enc;delete rec.assetId;delete rec.url;
       const ok=await save("files",p.slot||null,rec);if(ok){S.archVer[folder+"|"+family]=true;const op=lsGet("archOpen",null);if(op&&!op.includes(folder))lsSet("archOpen",op.concat([folder]));closeModal();}else go.disabled=false;}
     catch(e){go.disabled=false;m.textContent="Hochladen hat nicht geklappt: "+(e&&(e.code==="unsupported_type"?"Dateityp wird nicht unterstützt":e.code==="quota_exceeded"?"Speicher voll":e.message)||"unbekannter Fehler");}};
 }
