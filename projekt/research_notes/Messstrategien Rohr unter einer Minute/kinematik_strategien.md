@@ -1,20 +1,9 @@
 # Messstrategien (Kinematik und Sensoranordnung) für Außen-Ø und Formabweichung eines dünnen Rohrs, Taktzeit < 60 s
 
-Randbedingungen (aus Auftrag): Rohr Ø 1–6,5 mm, Länge bis 3 m, Nitinol/Edelstahl/Tantal; je 2 mm ein Querschnitt (≈ 1500 Querschnitte); Kennwerte Ø und Ø max − Ø min über den Umfang; berührungslos, Führen/Stützen erlaubt.
-
-Hinweis zur Quellenlage: Fast alle Herstellerseiten (keyence.com, nordson.com, laserlinc.com, zumbach.com, sikora.net) sowie directindustry.com, patents.google.com, findlight.net und matterhackers.com waren in dieser Sitzung nicht abrufbar (DNS/Proxy-Sperre). Alle Herstellerwerte stammen daher aus Suchergebnis-Zusammenfassungen und sind als „Suchergebnis, nicht eingesehen“ markiert. Alle Taktzeiten und Fehlerwerte ohne Quelle sind „eigene Rechnung“; das Rechenskript liegt nicht im Repo (Scratchpad), die Formeln stehen hier.
-
-Gemeinsame Rechenbasis (eigene Rechnung):
-- 3000 mm in 60 s ⇒ mittlere Axialgeschwindigkeit v = 50 mm/s, wenn die ganze Minute gemessen wird. Mit realistischem Handling (Einlegen, Zentrieren, Auswerfen, z. B. 10–15 s) bleiben 45–50 s ⇒ v ≈ 60–67 mm/s.
-- Abtastabstand pro Messwert in Axialrichtung: Δz = v / f (f = Messrate je Achse). Bei f = 2400 Hz und v = 67 mm/s ⇒ Δz ≈ 0,028 mm. Die 2-mm-Forderung ist für die Axialrichtung damit kein Engpass; der Engpass ist die Abdeckung des Umfangs.
-- Eine Durchmessermessung (Schattenwurf-Mikrometer, Zweipunktmessung) bei Winkel φ deckt die Richtungen φ und φ+180° gleichzeitig ab. Für alle Durchmesserrichtungen reicht daher eine **halbe Umdrehung (180°)**, mit M gleichmäßig verteilten Achsen reichen 180°/M.
-
----
-
 ## 1. Strategievergleich: Geschwindigkeiten, Raten, Sensorzahl, Zeit für 1500 Querschnitte
 
 ### Takeaway
-Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam; unter 60 s kommen nur kontinuierliche Verfahren: feste Mehrachsköpfe mit Vorschub (c), Helixscan mit rotierendem Kopf oder rotierendem Rohr (b, d) und vor allem eine Silhouetten-Kamera mit langem Messfeld bei langsamer Rohrdrehung (f). Volle Umfangserfassung je 2 mm in < 60 s ist kinematisch plausibel, wenn das Rohr nur langsam (≈ 30–60 U/min) dreht und das Messfeld axial lang ist, oder wenn ein Kopf mit ≥ 750 U/min um das Rohr rotiert.
+Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam; unter 60 s kommen nur kontinuierliche Verfahren: feste Mehrachsköpfe mit Vorschub (c), Helixscan mit rotierendem Kopf oder rotierendem Rohr (b, d) und eine Silhouetten-Kamera mit langem Messfeld bei langsamer Rohrdrehung (f). Volle Umfangserfassung je 2 mm in < 60 s ist kinematisch plausibel, wenn das Rohr nur langsam (≈ 30–60 U/min) dreht und das Messfeld axial lang ist (f), oder wenn ein Kopf mit einigen hundert U/min um das Rohr rotiert (d). Bei (f) ist die Bedingung der Zielkonflikt Messfeldlänge gegen Genauigkeit: ein langes Feld (40 mm) hat laut Herstellerangabe ±1,2 µm, ein genaues Feld (Ø 6 mm) ist zu kurz für < 60 s und zu klein für Ø 6,5 mm. Ob (f) reicht, hängt an der noch offenen Toleranz für Ø max − Ø min.
 
 ### Cited Findings
 - Scanrate eines Vierachs-Schattenwurfmessgeräts: 2400 Scans/s je Achse, 9600 Scans/s gesamt (AccuScan 6012/6000) — [Nordson AccuScan 6000](https://www.nordson.com/en/Products/Measurement-and-Control-Products/AccuScan-6000) (Suchergebnis, nicht eingesehen); gleiche Angabe in der Pressemitteilung zum 6012 — [plasticsmachinerymanufacturing.com, AccuScan 6012 medical tubing](https://www.plasticsmachinerymanufacturing.com/thermoforming/article/13000341/ndc-accuscan-6012-gauge-zeros-in-on-medical-tubing) (Suchergebnis, nicht eingesehen).
@@ -29,6 +18,13 @@ Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam;
 
 ### Inferences (alles eigene Rechnung, Annahmen offen genannt)
 
+Randbedingungen (aus Auftrag): Rohr Ø 1–6,5 mm, Länge bis 3 m, Nitinol/Edelstahl/Tantal; je 2 mm ein Querschnitt (≈ 1500 Querschnitte); Kennwerte Ø und Ø max − Ø min über den Umfang; berührungslos, Führen/Stützen erlaubt. Laut `cockpit/daten/reqs.json` gilt außerdem r10 (Anf. 2.5): „Auswertung je Messpunkt, Mittelwerte unzulässig“; die Toleranz für Ø max − Ø min (r06, Anf. 2.1) ist offen, frühere Werte 0,010 / 0,025 mm (NiTi / Edelstahl) gelten als nicht gesichert.
+
+Gemeinsame Rechenbasis (eigene Rechnung):
+- 3000 mm in 60 s ⇒ mittlere Axialgeschwindigkeit v = 50 mm/s, wenn die ganze Minute gemessen wird. Mit realistischem Handling (Einlegen, Zentrieren, Auswerfen, z. B. 10–15 s) bleiben 45–50 s ⇒ v ≈ 60–67 mm/s.
+- Abtastabstand pro Messwert in Axialrichtung: Δz = v / f (f = Messrate je Achse). Bei f = 2400 Hz und v = 67 mm/s ⇒ Δz ≈ 0,028 mm. Die 2-mm-Forderung ist für die Axialrichtung damit kein Engpass; der Engpass ist die Abdeckung des Umfangs.
+- Eine Durchmessermessung (Schattenwurf-Mikrometer, Zweipunktmessung) bei Winkel φ deckt die Richtungen φ und φ+180° gleichzeitig ab. Für alle Durchmesserrichtungen reicht daher eine **halbe Umdrehung (180°)**, mit M gleichmäßig verteilten Achsen reichen 180°/M.
+
 **(a) Stop-and-go je Querschnitt mit Rotation**
 - Ablauf je Querschnitt: 2 mm verfahren + Ausschwingen + 180° drehen (Schattenwurf-Achse) + Messen.
 - Annahme: Verfahren 2 mm + Beruhigen 0,15 s, Drehung 180° bei 1 U/s = 0,5 s ⇒ ≈ 0,65 s/Querschnitt ⇒ 1500 × 0,65 s ≈ 975 s ≈ 16 min.
@@ -42,6 +38,7 @@ Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam;
 - Ganghöhe der Helix je volle Umdrehung p = v/n; mit M = 1 und n = 15 U/s ⇒ p = 4 mm je Umdrehung = 2 mm je halber Umdrehung. Die 2-mm-Forderung bedeutet also: **Ganghöhe je 180°/M ≤ 2 mm**, nicht je 360°.
 - Winkelauflösung: Δφ = 360°·n/f; bei n = 15 U/s, f = 2400 Hz ⇒ 2,25° je Messwert (80 Werte je 180°); bei f = 16 000 Hz ⇒ 0,34°.
 - Problem: Ein 3 m langes Rohr mit Ø 1 mm bei mehreren hundert U/min zu drehen erzeugt Schlag und Schwingen (Rohr ist biegeweich); Antrieb über die Länge und Führung nötig. Rohrdrehung ist bei 1–6,5 mm Ø und 3 m Länge nur bei niedriger Drehzahl realistisch (siehe f).
+- Torsion und Ruckgleiten: Wird das 3-m-Rohr nur an einem Ende gedreht, kann der Drehwinkel an der Messstelle durch Torsion und Reibung in den Stützen hinter dem Spannfutterwinkel zurückbleiben oder ruckeln. 180° am Futter garantieren dann keine 180° am Sensor. Abhilfe: Antrieb oder Mitnahme nahe der Messstelle, Winkelmessung am Rohr selbst oder Drehwinkel-Reserve über 180° einplanen. Gilt genauso für (f).
 - Zeit: ≈ 50 s Messen + Handling – kinematisch < 60 s möglich, mechanisch kritisch.
 
 **(c) Feste Mehrachsköpfe, nur Vorschub, keine Drehung**
@@ -65,8 +62,12 @@ Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam;
 - Kontinuierlich (Drehung + Vorschub): Ein Querschnitt bleibt L/v Sekunden im Feld; in dieser Zeit muss das Rohr 180° drehen ⇒ n ≥ v/(2L). Mit L = 60 mm (Feld Ø 65 mm, s. Findings) und v = 60 mm/s ⇒ n ≥ 0,5 U/s = 30 U/min. Mit L = 35 mm (Feld Ø 40 mm) ⇒ ≈ 52 U/min.
 - Bildrate für A Winkelstellungen je Querschnitt: f_Bild ≥ A·v/L; für A = 18 (10°-Raster) und L = 60 mm ⇒ 18 Bilder/s; für A = 36 ⇒ 36 Bilder/s. Bildrate des TM-X5000 nicht eingesehen (Gap).
 - Datenmenge: 50 s × 18–36 Bilder/s ≈ 900–1800 Bilder je Rohr; Auswertung ist Kantendetektion je Pixelspalte – rechnerisch machbar, aber Bildrate und Auswertezeit des konkreten Systems ungeklärt.
-- Diese Strategie entkoppelt Drehzahl und Vorschub am stärksten: niedrige Drehzahl (Rohr kann am Ende über Spannzange langsam gedreht werden), trotzdem volle Umfangsabdeckung je 2 mm. Kritisch: Rohrbiegung/Durchhang im Messfeld (Schärfentiefe ±20 mm laut Findings entschärft das), Rohrschlag verfälscht Ø nicht, solange das Rohr im telezentrischen Feld bleibt.
-- Zeit: ≈ 45–60 s; **< 60 s plausibel**, beste Kombination aus voller Umfangserfassung und niedriger Drehzahl.
+- Diese Strategie entkoppelt Drehzahl und Vorschub am stärksten: niedrige Drehzahl, trotzdem volle Umfangsabdeckung je 2 mm. Rohrschlag verfälscht den Ø nicht, solange das Rohr im telezentrischen Feld bleibt (Schärfentiefe ±20 mm laut Findings).
+- **Entscheidende Bedingung: Messfeldlänge gegen Genauigkeit.** Werte aus der Nachbar-Recherche `research_notes/Berührungslose Sensoren für drehende Rohre/bild_telezentrisch_2d.md` (dort als Suchergebnis [S] markiert): TM-X5006 Messbereich Ø 6 mm, Positionsgenauigkeit ±0,2–0,3 µm; TM-X5040 Hochgenauigkeitsbereich Ø 26 mm, ±1 µm (±2 µm im ganzen Feld); TM-X5065 Hochgenauigkeitsbereich Ø 40 mm, ±1,2 µm (±2,2 µm im ganzen Feld); Bildaufnahme ca. 24 ms bei vollem Feld, ca. 3 ms bei verkleinertem Bereich.
+  - Langes Feld, z. B. TM-X5065 mit L = 40 mm: n ≥ 60/(2·40) = 0,75 U/s = 45 U/min; bei ≈ 41 Bildern/s (24 ms) ⇒ A = 41·40/60 ≈ 27 Winkelstellungen je Querschnitt (≈ 6,7°). Kinematisch < 60 s, aber Genauigkeit ±1,2 µm.
+  - Genaues Feld, TM-X5006 mit L ≈ 4–6 mm: n ≥ 60/(2·5) = 6 U/s = 360 U/min, A = 41·5/60 ≈ 3–4 Winkel bei vollem Feld – zu wenig; im 3-ms-Modus (≈ 330 Bilder/s) ≈ 27 Winkel, aber mit verkleinertem Bereich. Zudem passt Ø 6,5 mm nicht in ein Ø-6-mm-Feld.
+  - Bewertung: Bei einer Toleranz von z. B. 10 µm (früherer, nicht gesicherter NiTi-Wert) und %GRR ≤ 10 % (reqs.json) sind ±1–2 µm Genauigkeit grenzwertig bis zu grob. Ob (f) mit langem Feld reicht, lässt sich erst mit der gesicherten Toleranz entscheiden; sonst nur mit mehreren genauen Kameras parallel (Kombination mit e).
+- Zeit: ≈ 45–60 s; **< 60 s kinematisch plausibel**, messtechnisch nur, wenn die Genauigkeit bei Messfeldlänge L zur Toleranz passt.
 - Variante Zeilen-/Linientriangulationssensoren: misst nur die zugewandte Seite (Radius, nicht Ø) ⇒ zwei gegenüberliegende Sensoren und eine Mittelpunktreferenz nötig; sonst gleiche Kinematik.
 
 **(g) Vollfeld-Verfahren (3D-Scan, CT, Photogrammetrie, viele Kameras)**
@@ -80,19 +81,19 @@ Stop-and-go mit Drehung (a) ist mit einem Kopf um den Faktor 15–20 zu langsam;
 |---|---|---|---|---|---|
 | (a) Stop-and-go | 180° je QS | 1 Achse | ≈ 16 min | ja | nein (erst mit ≈ 20 Köpfen) |
 | (b) Helix, Rohr dreht | 900/M U/min | M Achsen | ≈ 50 s | ja (Fenster 2 mm) | kinematisch ja, mechanisch kritisch |
-| (c) Mehrachskopf fest | keine | 2–8 Achsen | ≈ 50 s | nein, Unterschätzung | ja |
+| (c) Mehrachskopf fest | keine | 2–8 Achsen | ≈ 50 s | max − min: worst case −25 % (3 Achsen) bis −29 % (4 Achsen); mit Ellipsenanpassung exakt, wenn die Form elliptisch ist, sonst N ≥ k + 1 nötig | ja |
 | (d) Kopf rotiert | 900/M U/min (Kopf) | M Achsen | ≈ 50 s | ja (Fenster 2 mm) | ja, wenn Kopf schnell dreht |
 | (e) K Köpfe parallel | je nach Basis /K | K × Basis | Basis / K | wie Basis | erleichtert a, b, d |
-| (f) Kamera L ≈ 60 mm | ≈ 30 U/min | 1 Kamera | ≈ 50 s | ja (alle Winkel je QS) | ja, Bildrate klären |
+| (f) Kamera, L = 40 mm | ≈ 45 U/min | 1 Kamera | ≈ 50 s | ja (≈ 27 Winkel je QS) | kinematisch ja; Genauigkeit ±1,2 µm, Eignung hängt an Toleranz |
 | (g) Vollfeld | – | 50–200 Kameras / CT | s bis min | ja | Aufwand/Genauigkeit unplausibel |
 
 ### Gaps
+- Hinweis zur Quellenlage: Fast alle Herstellerseiten (keyence.com, nordson.com, laserlinc.com, zumbach.com, sikora.net) sowie directindustry.com, patents.google.com, findlight.net und matterhackers.com waren in dieser Sitzung nicht abrufbar (DNS/Proxy-Sperre). Alle Herstellerwerte stammen daher aus Suchergebnis-Zusammenfassungen und sind als „Suchergebnis, nicht eingesehen“ markiert. Alle Taktzeiten und Fehlerwerte ohne Quelle sind „eigene Rechnung“; das Rechenskript liegt nicht im Repo (Scratchpad), die Formeln stehen hier.
 - Keine Herstellerangabe zu Drehzahlen rotierender Ø-Messköpfe (Zumbach SMR) oder zur Schwenkfrequenz des DVO 2 gefunden.
 - Bildrate, Auswertezeit und Genauigkeit telezentrischer Kameras (TM-X5000 u. a.) nicht eingesehen; für (f) entscheidend.
 - Keine Quelle für CT oder Streifenprojektion an 3 m langen dünnen Rohren; keine Quelle zur Röntgenabsorption von Tantal in dieser Sitzung geprüft.
 - Handlingzeit (Einlegen, Ausrichten, Spannen eines 3-m-Rohrs) ist eine Annahme (10–15 s).
 
----
 
 ## 2. Wie misst die Industrie Ovalität inline, und wie ist „Ovalität“ dort definiert?
 
@@ -117,7 +118,6 @@ Inline (Draht, Kabel, Schlauch, Medizinschlauch) wird Ovalität mit 2-, 3- oder 
 - Kein Beleg gefunden, wie Medizinrohr-Hersteller (Nitinol/Edelstahl, Ø 1–6,5 mm) die Formabweichung bei der Endprüfung definieren (Achsen vs. voller Umfang).
 - Wie Sikora für Rohre Ovalität misst, ließ sich nicht klären (Suche zu „CENTERWAVE“ lieferte nur fachfremde Treffer).
 
----
 
 ## 3. Mathematischer Fehler bei N festen Achsen statt voller Drehung
 
@@ -144,10 +144,10 @@ Für eine Ellipse (2. Harmonische) liefert ein Gerät mit N gleichmäßig vertei
 | 18 | 98,5 % | −1,5 % | 99,5 % | −0,5 % |
 | 36 | 99,6 % | −0,4 % | 99,9 % | −0,1 % |
 
-- Geschlossene Formeln (Ellipse, kleine Ovalität): N gerade ⇒ worst case = cos(90°/N·2)… genauer: Anzeige/echt = cos(180°/N) für gerade N (N = 4: cos 45° = 0,707); N ungerade ⇒ (1 + cos(180°/N))/2 (N = 3: 0,75).
+- Geschlossene Formeln für den ungünstigsten Fall (Ellipse, kleine Ovalität): N gerade ⇒ Anzeige/echt = cos(180°/N) (N = 4: cos 45° = 0,707; N = 8: cos 22,5° = 0,924); N ungerade ⇒ (1 + cos(180°/N))/2 (N = 3: 0,75).
 - Bemerkenswert: Im **ungünstigsten** Fall ist ein Dreiachsgerät (−25 %) besser als ein Vierachsgerät (−29,3 %). Das Dreiachsgerät liegt immer zwischen 75 % und 86,6 %, das Vierachsgerät zwischen 70,7 % und 100 %. Nordsons Aussagen („4 Achsen 100 % bei Ausrichtung, 3 Achsen nie 100 %“) beschreiben den günstigsten Fall.
 - Nordsons „42 %“: mittlerer Fehler 3 Achsen 17,3 %, 4 Achsen 10,0 % ⇒ (17,3 − 10,0)/17,3 = 42 %. Die Zahl passt exakt zum **lagegemittelten** Fehler, nicht zum worst case (eigene Rechnung; dass Nordson so rechnet, ist nicht belegt).
-- **Rekonstruktion statt max − min:** Eine reine Ellipse hat 3 Unbekannte (D, Δ, φ0). Mit 3 oder mehr nicht redundanten Achsen kann man eine Sinusfunktion cos 2φ anpassen und Δ exakt bestimmen (bei 4 Achsen überbestimmt, Ausgleichsrechnung). Damit verschwindet die Unterschätzung für reine Ovalität; höhere gerade Harmonische (4., 6. …) verfälschen aber die Anpassung (Aliasing), wenn N zu klein ist. Für k-te Harmonische braucht man sinngemäß N > k/2 … k Achsen; die Konturform der realen Rohre (nur Ellipse oder auch höhere Formfehler) muss daher bekannt sein.
+- **Rekonstruktion statt max − min:** Eine reine Ellipse hat 3 Unbekannte (D, Δ, φ0). Mit 3 oder mehr nicht redundanten Achsen kann man eine Sinusfunktion cos 2φ anpassen und Δ exakt bestimmen (bei 4 Achsen überbestimmt, Ausgleichsrechnung). Damit verschwindet die Unterschätzung für reine Ovalität; höhere gerade Harmonische (4., 6. …) verfälschen aber die Anpassung (Aliasing), wenn N zu klein ist. Die N Achsen tasten w(φ) mit N Punkten über 180° ab; damit lassen sich gerade Harmonische bis zur Ordnung k nur eindeutig bestimmen, wenn N ≥ k + 1 (Ellipse k = 2 ⇒ N ≥ 3; zusätzlich 4. Harmonische ⇒ N ≥ 5); die Konturform der realen Rohre (nur Ellipse oder auch höhere Formfehler) muss daher bekannt sein.
 - **Gleichdick-Problem:** Für jede Durchmesser-(Zweipunkt-)Messung gilt w(φ) = r(φ) + r(φ + 180°); ungerade Harmonische (3-, 5-Bogen-Form) heben sich auf. Eine solche Form zeigt in **jeder** Richtung gleichen Ø, auch bei voller Drehung. Für die Kenngröße „Ø max − Ø min“ ist das konsistent (die Ø-Spanne ist tatsächlich null), für Rundheit (Radiusabweichung) nicht. Das Pflichtenheft fordert Ø max − Ø min – also genügt Zweipunktmessung, solange niemand Rundheit nach ISO 1101 erwartet.
 - Folgerung für (c): Bei Toleranz T für Ø max − Ø min müsste ein Gerät mit N Achsen den Grenzwert auf T × (Anzeige/echt, worst case) absenken, z. B. 3 Achsen ⇒ 0,75 T, 8 Achsen ⇒ 0,92 T, oder die Ellipsenanpassung nutzen.
 
@@ -155,7 +155,6 @@ Für eine Ellipse (2. Harmonische) liefert ein Gerät mit N gleichmäßig vertei
 - Keine Primärquelle (Paper/Norm) gefunden, die genau diese Tabelle (N Achsen ohne Drehung, worst case) veröffentlicht; die Werte sind eigene Rechnung und sollten durch Simulation im Projekt nachvollzogen werden.
 - Welche Harmonischen die realen gezogenen Rohre (Nitinol, Edelstahl, Tantal) zeigen, ist unbekannt; nötig für die Wahl von N.
 
----
 
 ## 4. Verletzt ein Helixscan „jeder Querschnitt in Toleranz“? Wie wird punktweise ausgewertet?
 
@@ -172,6 +171,7 @@ Ein Helixscan misst keinen echten ebenen Querschnitt, sondern setzt einen „Que
 ### Inferences (eigene Rechnung / Bewertung)
 - Fensterlänge: Δz_F = v / (2·M·n) (Vorschub während 180°/M). Bedingung für die Forderung „alle 2 mm“: Δz_F ≤ 2 mm. Bei (f) gilt analog: jeder Querschnitt wird in allen Winkeln an **derselben** axialen Stelle gemessen (Kamera sieht den ganzen Abschnitt), d. h. kein Fensterfehler – nur die Zeitpunkte unterscheiden sich. Das ist ein Vorteil von (f) gegenüber (b)/(d).
 - Fehler durch das Fenster: Ändert sich der Ø entlang z mit Steigung dD/dz (Konizität), erzeugt das Fenster eine Scheinovalität ≈ |dD/dz|·Δz_F. Beispiel: 1 µm Ø-Änderung je 10 mm und Δz_F = 2 mm ⇒ ≈ 0,2 µm Scheinovalität – vernachlässigbar. Lokale Fehler kürzer als das Fenster (Dellen, Knicke) werden nur in einem Teil der Winkel gesehen.
+- Anforderung r10 „Auswertung je Messpunkt, Mittelwerte unzulässig“: Ein Fenster, das Werte aus verschiedenen Winkeln zu einem Querschnitt zusammensetzt, ist keine Mittelung (max − min bleibt erhalten). Mehrfachmessungen gleicher Richtung zu mitteln (z. B. 70–100 Scans je 2 mm bei Strategie c) oder eine Ellipsenanpassung wären aber mit dem Betrieb abzustimmen, ob das unter „Mittelwerte unzulässig“ fällt.
 - Auswertung „punktweise“: Praktikabel ist ein gleitendes Fenster: für jede Position z_i (alle 2 mm) alle Messwerte aus [z_i − Δz_F/2, z_i + Δz_F/2] nehmen, nach Winkel sortieren, Ø max − Ø min bilden (oder Ellipse anpassen). So entsteht je 2 mm ein Wert; die Fenster überlappen oder stoßen aneinander, Lücken entstehen nicht, solange Δz_F ≥ Abstand der Auswertepositionen.
 - Ob „jeder Querschnitt“ im Pflichtenheft eine ebene Schnittfläche oder ein Abschnitt von 2 mm meint, muss mit dem Betrieb geklärt werden; bei „Abschnitt von 2 mm“ ist der Helixscan mit Δz_F ≤ 2 mm normgerecht im Sinne der Forderung.
 - Schlag/Mittelpunktwanderung: Für Schattenwurf-Mikrometer unkritisch (Ø ist lageunabhängig im Messfeld); für Triangulationssensoren (Radius) muss der Mittelpunkt aus gegenüberliegenden Sensoren bestimmt werden, sonst wird Schlag als Formfehler gemessen.
