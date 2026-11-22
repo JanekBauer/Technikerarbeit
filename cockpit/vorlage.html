@@ -440,7 +440,7 @@ const LISTS = {
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
   sensors:{coll:"sensors",title:"Sensorvergleich",
-    fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["variant","Variante/Größe","text"],["range","1 Messbereich (Text)","text"],["fittxt","Deckt Ø 1,0–6,5 mm? (ja/nein/knapp …)","text"],["rep","2 Wiederholgenauigkeit (mit Einheit)","text"],["repcond","2 Bedingungen dazu","area"],["lin","3 Messgenauigkeit / Linearität","text"],["pos","4 Zulässige Lage im Messfeld","area"],["axes","6 Messachsen","text"],["build","7 Bauform / freier Durchgang","area"],["trig","8 Trigger / Encoder","text"],["light","9 Lichtquelle / Laserklasse","text"],["acc","Genauigkeit (µm, Zahl, alt)","num"],["rate","5 Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"]],def:{contact:true}},
+    fields:[["nr","Nr. (wie OneNote)","text"],["ord","Sortierung (Zahl, leer = „Weitere Sensoren“)","num"],["maker","Hersteller","text"],["model","Modell","text"],["principle","Messprinzip","text"],["rmin","Messbereich min. (mm)","num"],["rmax","Messbereich max. (mm)","num"],["variant","Variante/Größe","text"],["range","1 Messbereich (Text)","text"],["fittxt","Deckt Ø 1,0–6,5 mm? (ja/nein/knapp …)","text"],["rep","2 Wiederholgenauigkeit (mit Einheit)","text"],["repcond","2 Bedingungen dazu","area"],["lin","3 Messgenauigkeit / Linearität","text"],["pos","4 Zulässige Lage im Messfeld","area"],["axes","6 Messachsen","text"],["build","7 Bauform / freier Durchgang","area"],["trig","8 Trigger / Encoder","text"],["light","9 Lichtquelle / Laserklasse","text"],["acc","Genauigkeit (µm, Zahl, alt)","num"],["rate","5 Abtastrate","text"],["contact","Berührungslos","bool"],["source","Quelle (Datenblatt)","text"],["note","Notiz","area"],["offen","Offen: noch nicht alle Punkte geprüft (eigene Liste)","bool"],["fragen","Offene Punkte / Fragen","area"],["url","Link zum Datenblatt (Hersteller)","text"]],def:{contact:true}},
   sources:{coll:"sources",title:"Quellenverzeichnis",
     fields:[["nr","Nr.","num"],["kind","Art","select",["Buch","Sammelwerk","Zeitschrift","Internet","Norm","Datenblatt","Besprechung","Sonstiges"]],["text","Quellenangabe (nach UP5-Schema)","area"],["accessed","Stand/Zugriff","date"],["used","Wo verwendet","text"]],def:{kind:"Buch"}},
   doku:{coll:"doku",title:"Doku-Speicher",
@@ -1154,8 +1154,9 @@ async function buildXlsx(sheetName,headers,rows){
 function sensorOrder(){const all=S.data.sensors.slice();const hasOrd=r=>r.ord!=null&&r.ord!=="";return all.filter(hasOrd).sort((a,b)=>a.ord-b.ord).concat(all.filter(r=>!hasOrd(r)));}
 VIEWS.sensoren=()=>{
   const all=S.data.sensors.slice();
-  const on=all.filter(r=>r.ord!=null&&r.ord!=="").sort((a,b)=>a.ord-b.ord);
-  const rest=all.filter(r=>!(r.ord!=null&&r.ord!==""));
+  const open=all.filter(r=>r.offen);
+  const on=all.filter(r=>!r.offen&&r.ord!=null&&r.ord!=="").sort((a,b)=>a.ord-b.ord);
+  const rest=all.filter(r=>!r.offen&&!(r.ord!=null&&r.ord!==""));
   const fById=id=>S.data.files.find(x=>x.id===id);
   const short=n=>String(n||"").replace(/\.pdf$/i,"").replace(/_Datasheet$/i,"").replace(/^cat--/,"").replace(/--de$/,"");
   const ext=f=>{const m=/\.([a-z0-9]+)$/i.exec(f.name||"");return m?m[1].toUpperCase():"DATEI";};
@@ -1187,10 +1188,14 @@ VIEWS.sensoren=()=>{
     ["rate","5 Abtastrate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],
     ["det","Alle Werte",det]];
   const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
+  const ds=r=>{const d=docs(r);const u=String(r.url||"").trim();const ok=/^https?:\/\//i.test(u);
+    return (r.docs||[]).length?d:(ok?`<a class="small" href="${esc(u)}" target="_blank" rel="noopener" data-noedit>Hersteller-Link</a>`:`<span class="pill p-warn">fehlt</span>`);};
+  const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
   return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
+  ${open.length?`<details class="restbox" open><summary>Offen – noch nicht alle Punkte geprüft (${open.length})</summary><p class="small muted">Sensoren ohne geprüftes Datenblatt oder mit offenen Fragen. Zeile anklicken zum Bearbeiten; wenn alle 9 Punkte belegt sind, „Offen“ abwählen und eine Nummer vergeben.</p>${listTable("sensors",open,openCols)}</details>`:""}
   ${rest.length?`<details class="restbox"><summary>Weitere Sensoren ohne Nummer (${rest.length})</summary>${listTable("sensors",rest,restCols)}</details>`:""}
   ${(kat.excluded||[]).length?`<details class="restbox"><summary>Nicht aufgenommen – Messbereich deckt Ø 1,0–6,5 mm nicht ab (${kat.excluded.length})</summary><table class="small"><tbody>${kat.excluded.map(e=>`<tr><td><b>${esc(e[0])}</b></td><td>${esc(e[1])}</td></tr>`).join("")}</tbody></table></details>`:""}`;
 };
