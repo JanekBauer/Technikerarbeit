@@ -1268,10 +1268,15 @@ async function moveCheckItem(srcId,i,dlId){
   else{await save("checks",nid(),{title:dl.title,hint:dl.date?fd(dl.date):"",items:[Object.assign({},item)]});}
 alert2("Verschoben nach „"+dl.title+"“.");
 }
+/* Datum einer Checkliste: eigenes Datum, sonst Freitag bzw. verknüpfter Termin */
+function ckDate(c){
+  if(c.datum)return c.datum;
+  if(String(c.id).startsWith("fr-"))return String(c.id).slice(3);
+  if(c.termin){const d=S.data.deadlines.find(x=>x.id===c.termin);if(d&&d.date)return d.date;}
+  return "9999-12-31";
+}
 VIEWS.meilensteine=()=>{
-  const order=["m1","m2","m3","formalia","abgabe","praesi"];
-  const rk=c=>{const i=order.indexOf(c.id);return i>=0?i:(String(c.id).startsWith("fr-")?100:50);};
-  const lists=S.data.checks.slice().sort((a,b)=>(rk(a)-rk(b))||String(a.id).localeCompare(String(b.id)));const ro=!S.canWrite||S.offline;
+  const lists=S.data.checks.slice().sort((a,b)=>ckDate(a).localeCompare(ckDate(b))||String(a.id).localeCompare(String(b.id)));const ro=!S.canWrite||S.offline;
   const isDone=l=>{const it=l.items||[];return it.length>0&&it.every(x=>x.done);};
   const openL=lists.filter(l=>!isDone(l)),doneL=lists.filter(isDone);
   const showDone=lsGet("ckDone",false);
@@ -1279,7 +1284,7 @@ VIEWS.meilensteine=()=>{
   const card=l=>{const it=l.items||[];const d=it.filter(x=>x.done).length;return `<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3>${esc(l.title)}</h3><span style="display:flex;gap:8px;align-items:center"><span class="num small">${d}/${it.length}</span>${ro?"":`<button class="btn sm danger" data-ckdellist="${esc(l.id)}">Liste löschen</button>`}</span></div><div class="bar" style="margin-bottom:8px"><i style="width:${it.length?d/it.length*100:0}%"></i></div>
    ${l.hint?`<p class="note">${esc(l.hint)}</p>`:""}
    ${it.map((x,i)=>`<label class="ck ${x.done?"done":""}"><input type="checkbox" data-ck="${esc(l.id)}" data-i="${i}" ${x.done?"checked":""} ${ro?"disabled":""}><span>${esc(x.t)}</span>${ro?"":`<span style="white-space:nowrap"><button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="-1" ${i===0?"disabled":""} aria-label="Punkt nach oben">↑</button> <button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="1" ${i===it.length-1?"disabled":""} aria-label="Punkt nach unten">↓</button> <button class="btn sm" data-ckdel="${esc(l.id)}" data-i="${i}" aria-label="Punkt löschen">×</button></span>`}</label>${ro?"":`<div class="small" style="margin:-4px 0 8px 28px"><select data-ckto="${esc(l.id)}" data-i="${i}" aria-label="In Termin verschieben" style="max-width:100%"><option value="">→ zu einem Termin verschieben …</option>${termOpts}</select></div>`}`).join("")}
-   ${ro?"":`<div class="toolbar" style="margin-top:8px"><select data-ckaddtask="${esc(l.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="flex:1;min-width:0"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}${ro?"":`<div class="toolbar" style="margin-top:8px"><input data-cknew="${esc(l.id)}" placeholder="Punkt hinzufügen" aria-label="Neuer Punkt" style="flex:1;min-width:0"><button class="btn sm" data-ckadd="${esc(l.id)}">+</button></div>`}</div>`;};
+   ${ro?"":`<div style="margin-top:8px;min-width:0"><select data-ckaddtask="${esc(l.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="width:100%;max-width:100%;box-sizing:border-box"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}${ro?"":`<div class="toolbar" style="margin-top:8px"><input data-cknew="${esc(l.id)}" placeholder="Punkt hinzufügen" aria-label="Neuer Punkt" style="flex:1;min-width:0"><button class="btn sm" data-ckadd="${esc(l.id)}">+</button></div>`}</div>`;};
   return `<div class="head"><div><span class="tag">Schule · UP0 / UP5 / UP7</span><h1>Checklisten</h1><p>Pflichtunterlagen und Prüfpunkte für die Meilensteine, die Formalia der Dokumentation, die Abgabe und die Präsentation.</p></div></div>
   <div class="toolbar"><span class="pill p-acc">${openL.length} offen</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="ckdone" ${showDone?"checked":""}> erledigte anzeigen (${doneL.length})</label></div>
   <h3 class="small muted" style="margin:12px 0 6px">Offen</h3>
@@ -1522,7 +1527,7 @@ function prepHtml(d){
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
   return `<div class="tsec"><h3>Checkliste <span class="small muted">${n} von ${items.length} erledigt</span></h3>
     <p class="note" style="margin:0 0 6px">Checkliste „${esc(ck.title)}“. Abhaken geht direkt hier.</p>
-    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul>${ro?"":`<div class="toolbar" style="margin-top:8px"><select data-ckaddtask="${esc(ck.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="flex:1;min-width:0"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}</div>`;
+    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul>${ro?"":`<div style="margin-top:8px;min-width:0"><select data-ckaddtask="${esc(ck.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="width:100%;max-width:100%;box-sizing:border-box"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}</div>`;
 }
 /* neueste Version der Kerndokumente (Aufgabenstellung, Pflichtenheft, Projektplan) */
 function latestDocsHtml(){
