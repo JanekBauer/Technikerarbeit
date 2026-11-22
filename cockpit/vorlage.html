@@ -900,8 +900,25 @@ VIEWS.zeitleiste=()=>{
   const svg=timelineSvg();
   return `<div class="head"><div><span class="tag">Steuerung</span><h1>Terminleiste</h1><p>Schulische und betriebliche Termine.<br><span style="color:var(--ok)">Grün</span> = erledigt · <span style="color:var(--warn)">Gelb</span> = Betrieb · <span style="color:var(--accent)">Blau</span> = Schule</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px">${svg}</div>`+
-  listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${r.approx?"ca. ":""}${dueCell(r.date,r.status==="erledigt")}</div>`],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]]);
+  listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${r.approx?"ca. ":""}${dueCell(r.date,r.status==="erledigt")}</div>`],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]])+frBlock();
 };
+
+/* Freitage (jeden Freitag) als öffnbare Termine, standardmäßig eingeklappt */
+const FR_VON="2026-11-01",FR_BIS="2027-06-30";
+/* Zuordnung eines Fälligkeitsdatums: früheste offene Termin am oder nach dem Datum, sonst der Freitag am oder nach dem Datum (gleicher Tag: echter Termin) */
+function terminFor(due){
+  if(!due)return null;
+  const fd0=new Date(due+"T12:00:00");fd0.setDate(fd0.getDate()+(5-fd0.getDay()+7)%7);
+  const fri=fd0.getFullYear()+"-"+String(fd0.getMonth()+1).padStart(2,"0")+"-"+String(fd0.getDate()).padStart(2,"0");
+  const real=S.data.deadlines.filter(x=>x.status!=="erledigt"&&x.date&&x.date>=due).sort((a,b)=>a.date<b.date?-1:1)[0];
+  if(real&&real.date<=fri)return real;
+  return frDeadline("fr-"+fri);
+}
+function frList(){const out=[];const d=new Date(FR_VON+"T12:00:00");d.setDate(d.getDate()+(5-d.getDay()+7)%7);const bis=new Date(FR_BIS+"T12:00:00");
+  while(d<=bis){out.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"));d.setDate(d.getDate()+7);}return out;}
+function frBlock(){const show=lsGet("frShow",false);const fr=frList();
+  return `<div class="toolbar" style="margin-top:14px"><label class="small"><input type="checkbox" id="frshow" ${show?"checked":""}> Freitage anzeigen (${fr.length})</label></div>`+
+    (show?`<div class="grid g2">${fr.map(f=>{const n=(S.data.checks||[]).find(c=>c.id==="fr-"+f||c.termin==="fr-"+f);return `<div class="panel click" data-termin="fr-${esc(f)}"><b>${esc(fd(f))}</b> <span class="small muted">Freitag${n?" · Checkliste "+(n.items||[]).filter(x=>x.done).length+"/"+(n.items||[]).length:""}</span></div>`;}).join("")}</div>`:"");}
 
 function icsEsc(s){return String(s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");}
 function icsFold(l){const o=[];let s=l;while(s.length>60){o.push(s.slice(0,60));s=" "+s.slice(60);}o.push(s);return o.join("\r\n");}
@@ -915,7 +932,7 @@ function buildIcs(){
   L.push("END:VCALENDAR");
   return L.map(icsFold).join("\r\n")+"\r\n";
 }
-VIEWS_after.zeitleiste=()=>{const b=$("#icsbtn");if(b)b.onclick=async()=>{b.disabled=true;try{await saveBlob("Termine_Technikerarbeit.ics",new Blob([buildIcs()],{type:"text/calendar"}));}catch(e){alert2("Kalenderdatei konnte nicht erstellt werden.");}b.disabled=false;};};
+VIEWS_after.zeitleiste=()=>{const fq=$("#frshow");if(fq)fq.onchange=()=>{lsSet("frShow",fq.checked);render();};const b=$("#icsbtn");if(b)b.onclick=async()=>{b.disabled=true;try{await saveBlob("Termine_Technikerarbeit.ics",new Blob([buildIcs()],{type:"text/calendar"}));}catch(e){alert2("Kalenderdatei konnte nicht erstellt werden.");}b.disabled=false;};};
 
 /* ---------- Verknüpfungen: Fragen, Entscheidungen, Widersprüche, Anforderungen ---------- */
 function refTokens(s){return String(s||"").split(/[,;]/).map(t=>t.trim().toLowerCase().replace(/^anf\.?\s*/,"")).filter(Boolean);}
@@ -1247,7 +1264,8 @@ alert2("Verschoben nach „"+dl.title+"“.");
 }
 VIEWS.meilensteine=()=>{
   const order=["m1","m2","m3","formalia","abgabe","praesi"];
-  const lists=S.data.checks.slice().sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));const ro=!S.canWrite||S.offline;
+  const rk=c=>{const i=order.indexOf(c.id);return i>=0?i:(String(c.id).startsWith("fr-")?100:50);};
+  const lists=S.data.checks.slice().sort((a,b)=>(rk(a)-rk(b))||String(a.id).localeCompare(String(b.id)));const ro=!S.canWrite||S.offline;
   const isDone=l=>{const it=l.items||[];return it.length>0&&it.every(x=>x.done);};
   const openL=lists.filter(l=>!isDone(l)),doneL=lists.filter(isDone);
   const showDone=lsGet("ckDone",false);
@@ -1438,6 +1456,7 @@ function openTermin(id){S.terminId=id;S.modalOpen=true;renderTermin(true);}
 /* ---------- Vorbereitung zu einem Termin ---------- */
 const CHK_FOR_TERMIN={d05:"m1",d08:"m2",d10:"m3",d11:"abgabe",d12:"praesi",d13:"praesi"};
 function checkFor(d){
+  if(String(d.id).startsWith("fr-"))return (S.data.checks||[]).find(c=>c.id===d.id||c.termin===d.id)||null;
   const id=CHK_FOR_TERMIN[d.id];
   return (S.data.checks||[]).find(c=>c.id===id)||(S.data.checks||[]).find(c=>c.title===d.title)||null;
 }
@@ -1459,7 +1478,6 @@ function latestFor(d){
 }
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
-  if(String(d.id).startsWith("fr-"))return '<div class="tsec"><h3>Checkliste</h3><p class="muted small">Für Freitage gibt es keine Checkliste.</p></div>';
   const ck=checkFor(d);
   if(!ck)return `<div class="tsec"><h3>Checkliste</h3><p class="muted small">Für diesen Termin gibt es noch keine Checkliste.</p>${ro?"":'<button class="btn sm" data-mkck="1">Checkliste anlegen</button>'}</div>`;
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
@@ -1475,7 +1493,7 @@ function latestDocsHtml(){
   if(!list.length)return "";
   return `<h4 style="margin:12px 0 4px">Aktuelle Unterlagen (neueste Version)</h4><div class="tbl"><table><tbody>${list.map(f=>`<tr><td>${esc(f.family||f.name)} <span class="small muted">${esc(f.ver||"")}</span></td><td class="small">${esc(f.name)}</td><td>${fileBtns(f,true)}</td></tr>`).join("")}</tbody></table></div>`;
 }
-function frDeadline(id){const rec=(S.data.freitage||[]).find(x=>x.id===id)||{};return Object.assign({id,title:"Freitag (Platzhalter)",date:String(id).slice(3),kind:"betrieb",status:"geplant",note:"",approx:false,log:[]},rec,{id});}
+function frDeadline(id){const rec=(S.data.freitage||[]).find(x=>x.id===id)||{};return Object.assign({id,title:"Freitag, "+fd(String(id).slice(3)),date:String(id).slice(3),kind:"betrieb",status:"geplant",note:"",approx:false,log:[]},rec,{id});}
 function renderTermin(first){
   const isFr=String(S.terminId||"").startsWith("fr-");
   const d=isFr?frDeadline(S.terminId):S.data.deadlines.find(x=>x.id===S.terminId);if(!d){closeModal();return;}
@@ -1483,7 +1501,7 @@ function renderTermin(first){
   const ro=!S.canWrite||S.offline;const n=d.date?days(d.date):null;
   const files=S.data.files.filter(f=>f.deadline===d.id).sort((a,b)=>(b.updated||"").localeCompare(a.updated||""));
   const log=(d.log||[]).slice().reverse();
-  const tasks=S.data.tasks.filter(t=>t.status!=="erledigt"&&t.due&&d.date&&t.due<=d.date).sort(sortDue);
+  const tasks=S.data.tasks.filter(t=>t.status!=="erledigt"&&t.due&&d.date&&(isFr?terminFor(t.due).id===d.id:t.due<=d.date)).sort(sortDue);
   const draft=($("#tlog")||{}).value||"";
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="${esc(d.title)}">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${d.kind==="betrieb"?"Betrieb":"Schule"} · Termin</span><h2>${esc(d.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro||isFr?"":`<button class="btn danger" id="tdel">${S.tDelSure===d.id?"Wirklich löschen?":"Termin löschen"}</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
@@ -1505,7 +1523,7 @@ function renderTermin(first){
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const upd=async ch=>{const cur=S.data[coll].find(x=>x.id===d.id)||d;await save(coll,d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
-  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);if(!(S.data.checks||[]).some(c=>c.title===d.title))await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
+  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{if(String(d.id).startsWith("fr-")){if(!checkFor(d))await save("checks",d.id,{title:fd(d.date),hint:"",items:[],termin:d.id});return;}const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);if(!(S.data.checks||[]).some(c=>c.title===d.title))await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
   document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
   document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
@@ -1526,15 +1544,16 @@ function openTask(id){S.taskId=id;S.modalOpen=true;renderTask(true);}
 function renderTask(first){
   const t=S.data.tasks.find(x=>x.id===S.taskId);if(!t){closeModal();return;}
   const ro=!S.canWrite||S.offline;
-  const dl=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date&&t.due&&d.date>=t.due).sort((x,y)=>x.date<y.date?-1:1)[0];
+  const dl=t.due?terminFor(t.due):null;
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="${esc(t.title)}">
    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Offener Punkt${t.prio?" · Prio "+esc(t.prio):""}</span><h2>${esc(t.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn sm" id="kedit">Bearbeiten</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
-   <p class="small muted" style="margin:4px 0">${esc(t.who||"")}${t.chat?" · Chat "+esc(t.chat):""} · ${dueCell(t.due,false)} · ${stPill(t.status)}${dl?" · vor Termin „"+esc(dl.title)+"“":""}</p>
+   <p class="small muted" style="margin:4px 0">${esc(t.who||"")}${t.chat?" · Chat "+esc(t.chat):""} · ${dueCell(t.due,false)} · ${stPill(t.status)}${dl?` · vor Termin „<a href="#" id="dllink">${esc(dl.title)}</a>“`:""}</p>
    ${t.note?`<p>${nl(t.note)}</p>`:""}
    ${ro?"":`<div class="tsec"><h3>Status</h3><div class="toolbar" style="margin:0">${["offen","in Arbeit","erledigt"].filter(s=>s!==t.status).map(s=>`<button class="btn sm" data-kstat="${s}">auf „${s}“</button>`).join("")}</div></div>`}
   </div></div>`;
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const ke=$("#kedit");if(ke)ke.onclick=()=>{S.taskId=null;openEditor("tasks",t.id);};
+  const dll=$("#dllink");if(dll)dll.onclick=ev=>{ev.preventDefault();S.taskId=null;openTermin(dl.id);};
 
   document.querySelectorAll("[data-kstat]").forEach(b=>b.onclick=async()=>{const cur=S.data.tasks.find(x=>x.id===t.id)||t;await save("tasks",t.id,Object.assign({},cur,{status:b.dataset.kstat}));if(b.dataset.kstat==="erledigt")closeModal();});
 }
