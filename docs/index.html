@@ -421,7 +421,7 @@ const LISTS = {
   conflicts:{coll:"conflicts",title:"Widersprüche",
     fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
-    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung","abschluss","kilog","daten"]],["title","Titel","text"],["detail","Inhalt (bei KI-Logbuch: Art der Hilfe)","area"],["fach","Fachlicher Text durch KI (nur KI-Logbuch)","bool"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["beleg","Beleg (Dokument, nur bei Abschluss)","text"],["ziel","Betrifft Eintrag (ID, nur bei Abschluss)","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
+    fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung","abschluss","kilog","daten"]],["title","Titel","text"],["detail","Inhalt (bei KI-Logbuch: Art der Hilfe)","area"],["fach","Fachlicher Text durch KI (nur KI-Logbuch)","bool"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["beleg","Beleg (Dokument, nur bei Abschluss)","text"],["ziel","Betrifft Eintrag (ID, nur bei Abschluss)","text"],["coll","Sammlung im Cockpit (nur bei Daten)","text"],["docId","ID des Datensatzes zum Überschreiben (nur bei Daten, leer = neu)","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
   kilog:{coll:"kilog",title:"KI-Logbuch",
     fields:[["date","Datum","date"],["help","Art der Hilfe","area"],["fach","Fachlicher Text durch KI","bool"]],def:{}},
@@ -541,8 +541,20 @@ const groupOf=k=>PERSON_KEYS.includes(k)?"person":k;
 function optsFor(group,base){
   if(group==="person"){return ["",...(S.data.optionen||[]).filter(o=>o.feld==="person").map(o=>o.wert)];}
   const extra=(S.data.optionen||[]).filter(o=>o.feld===group).map(o=>o.wert);return [...new Set([...base,...extra])];}
+/* Postfach: je Zielkategorie nur die nötigen Felder zeigen */
+const PF_SHOW={
+  aufgabe:["kind","title","detail","who","ask","due","prio","stand","vorschlag","date","status"],
+  entscheidung:["kind","title","detail","who","ask","due","prio","stand","vorschlag","date","status"],
+  aenderung:["kind","title","detail","vorschlag","date","status"],
+  abschluss:["kind","title","detail","beleg","ziel","vorschlag","date","status"],
+  kilog:["kind","title","detail","fach","date","status"],
+  daten:["kind","title","detail","coll","docId","vorschlag","date","status"]
+};
+/* Werte des offenen Fensters sammeln (für das Neuaufbauen beim Wechsel der Art) */
+function collectEdForm(){const o={};document.querySelectorAll("#edform [data-k]").forEach(el=>{o[el.dataset.k]=el.dataset.bool?el.checked:el.value;});return o;}
 function openEditor(key,id,preset){
-  const L=LISTS[key];const rec=id?(S.data[L.coll].find(x=>x.id===id)||{}):Object.assign({},L.def,preset||{});
+  const L=LISTS[key];let rec=id?(S.data[L.coll].find(x=>x.id===id)||{}):Object.assign({},L.def,preset||{});
+  if(key==="postfach"&&S.pfDraft){rec=Object.assign({},rec,S.pfDraft);S.pfDraft=null;}
   S.modalOpen=true;
   const ro=!S.canWrite||S.offline;
   const fieldHtml=(k,lab,type,opts)=>{
@@ -559,7 +571,8 @@ function openEditor(key,id,preset){
   };
   let f="";let buf="";let rowKey=null;
   const flush=()=>{if(buf){f+=`<div class="frow">${buf}</div>`;buf="";}};
-  L.fields.forEach(([k,lab,type,opts,row])=>{
+  const FL=key==="postfach"?L.fields.filter(([k])=>(PF_SHOW[rec.kind||"aufgabe"]||PF_SHOW.aufgabe).includes(k)):L.fields;
+  FL.forEach(([k,lab,type,opts,row])=>{
     const h=fieldHtml(k,lab,type,opts);
     if(row){if(rowKey!==row){flush();rowKey=row;}buf+=`<div>${h}</div>`;}
     else{flush();rowKey=null;f+=h;}
@@ -581,6 +594,7 @@ function openEditor(key,id,preset){
       mSync(h);}
     else{const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;}
     await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
+  if(key==="postfach"){const ks=$("#f_postfach_kind");if(ks)ks.onchange=()=>{S.pfDraft=collectEdForm();openEditor(key,id,preset);};}
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
     const obj=Object.assign({},rec);
     document.querySelectorAll("#edform [data-k]").forEach(el=>{const k=el.dataset.k;obj[k]=el.dataset.bool?el.checked:el.value;
