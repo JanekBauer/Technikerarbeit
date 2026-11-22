@@ -1,0 +1,48 @@
+name: Freitags-Vorbereitung
+
+# Jeden Freitag um 7:50 Uhr Berliner Zeit. GitHub kennt nur UTC, deshalb laufen zwei Zeitpläne
+# (05:50 und 06:50 UTC). Der Lauf prüft die Berliner Stunde und arbeitet nur um 7 Uhr weiter.
+# Die Datei entsteht auch dann, wenn Claude Code nicht erreichbar ist.
+on:
+  schedule:
+    - cron: "50 5 * * 5"
+    - cron: "50 6 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vorbereiten:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Nur um 7 Uhr Berliner Zeit arbeiten
+        id: zeit
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Europe/Berlin date +%H)" != "07" ]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            echo "Berliner Zeit ist $(TZ=Europe/Berlin date +%H:%M) - dieser Lauf wird übersprungen."
+          fi
+
+      - name: Vorbereitungsdatei erzeugen
+        if: steps.zeit.outputs.skip != '1'
+        run: python3 cockpit/vorbereitung.py
+
+      - name: Seite neu bauen
+        if: steps.zeit.outputs.skip != '1'
+        run: python3 cockpit/build.py
+
+      - name: Änderung zurückschreiben
+        if: steps.zeit.outputs.skip != '1'
+        run: |
+          git add "docs" "cockpit/daten/files.json"
+          if [ -n "$(git status --porcelain docs cockpit/daten/files.json)" ]; then
+            git config user.name "cockpit-bot"
+            git config user.email "cockpit-bot@users.noreply.github.com"
+            git commit -m "Cockpit: Vorbereitungsdatei für den Freitag erstellt"
+            git push
+          else
+            echo "Keine Änderung"
+          fi
