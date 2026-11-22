@@ -868,6 +868,9 @@ async function pfClose(p){
 async function pfAccept(id,pre){
   const p=pre||S.data.postfach.find(x=>x.id===id);if(!p)return;
   if(p.kind==="abschluss"){await pfClose(p);return;}
+  /* allgemeiner Vorschlag: Datensatz für eine beliebige Sammlung (z. B. Sensoren, Anforderungen, Morphologischer Kasten) */
+  if(p.kind==="daten"){if(!p.coll||!p.payload){alert2("Dieser Eintrag ist unvollständig (Sammlung oder Inhalt fehlt).");return;}
+    const did=p.docId||nid();if(await save(p.coll,did,p.payload))await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:p.coll+"/"+did}));return;}
   if(p.kind==="kilog"){const kid=nid();const day=p.date||new Date().toISOString().slice(0,10);
     if(await save("kilog",kid,{date:day,help:p.detail||p.title||"",fach:!!p.fach}))await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:"kilog/"+kid}));
     return;}
