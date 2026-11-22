@@ -378,6 +378,20 @@ h3 a.small:hover{text-decoration:underline}
   window.addEventListener("beforeunload",function(e){if(pendCount()){e.preventDefault();e.returnValue="";}});
   /* Offene Änderungen nach dem Neuladen wieder anzeigen */
   loadPend();
+  /* Frischer Stand aus dem Repo: die eingebettete Fassung kann veraltet sein (Browser- oder Seiten-Cache).
+     Offene Änderungen dieses Browsers bleiben oben erhalten. */
+  function refresh(){
+    return Promise.all(Object.keys(DATA).map(function(c){
+      return fetch("https://raw.githubusercontent.com/"+REPO+"/"+BRANCH+"/"+DIR+c+".json?t="+Date.now(),{cache:"no-store"})
+        .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+        .then(function(fresh){
+          if(PEND[c])fresh=mergeEntries(fresh,PEND[c].base,PEND[c].local);
+          DATA[c]=fresh;emit(c);
+        })
+        .catch(function(){/* eingebettete Fassung bleibt stehen */});
+    }));
+  }
+  refresh();
   Object.keys(PEND).forEach(function(c){if(PEND[c].local)DATA[c]=PEND[c].local;});
   showBar();
 })();
@@ -874,12 +888,20 @@ async function pfClose(p){
   const t=S.data.tasks.find(x=>x.id===p.ziel);
   if(!t){alert2("Der betroffene Eintrag wurde nicht gefunden. Bitte das Feld „Betrifft Eintrag“ prüfen.");return;}
   const obj=Object.assign({},t,{status:"erledigt"});
-  if(t.typ==="entscheidung"){obj.by=t.by||p.who||"";obj.reason=t.reason||p.detail||"";
+  if(t.typ==="entscheidung"){obj.by=t.by||p.who||"Janek Bauer";obj.reason=t.reason||p.detail||"";
     if(!obj.by||!obj.reason){alert2("Für eine Entscheidung braucht „erledigt“ „Entschieden von“ und „Begründung“.");return;}}
   if(!(await save("tasks",t.id,obj)))return;
   await save("postfach",p.id,Object.assign({},p,{status:"übernommen",ziel:"tasks/"+t.id}));
 }
+/* Doppelte Übernahme ausschließen: ein Eintrag wird nur einmal übernommen, auch bei Doppelklick */
+const PF_BUSY={};
 async function pfAccept(id,pre){
+  const cur=S.data.postfach.find(x=>x.id===id)||pre;
+  if(cur&&cur.status==="übernommen"){alert2("Dieser Eintrag ist schon übernommen.");return;}
+  if(PF_BUSY[id])return;PF_BUSY[id]=true;
+  try{await pfAcceptRaw(id,pre);}finally{delete PF_BUSY[id];}
+}
+async function pfAcceptRaw(id,pre){
   const p=pre||S.data.postfach.find(x=>x.id===id);if(!p)return;
   if(p.kind==="abschluss"){await pfClose(p);return;}
   /* allgemeiner Vorschlag: Datensatz für eine beliebige Sammlung (z. B. Sensoren, Anforderungen, Morphologischer Kasten) */
