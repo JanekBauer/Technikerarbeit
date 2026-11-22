@@ -139,3 +139,18 @@ Janek hat die Datenblätter geliefert. Sie liegen jetzt im Archiv und sind ausge
 | Aeroel XLS13XY/480 (/A) | ±0,15 µm | T = 1 s, ±2σ | 0,075 µm | ja / ja / ja |
 
 Neu ist: Aeroel gibt als einziger Hersteller die **Einzelabtastung** an (Fn. 11). Für das XLS13XY/1500 sind das ±0,75 µm (±2σ) bei Ø ≤ 3 mm und ±1,5 µm bei Ø > 3 mm. Das ergibt σ ≈ 0,38 bzw. 0,75 µm. Diese Werte sind die erste Herstellerangabe zur Frage `pv-ent-mittelung`. Ohne Mittelung liegt danach auch das XLS13XY/1500 über Szenario B.
+
+## Nachtrag 22.11.2026 (2): Drehung des Rohres und Schattenbild
+
+Frage: Ergibt ein 2D-Schattenbild bei 360°-Drehung des Rohres die Zylinderform?
+
+**Antwort (Physik, eigene Überlegung):** Das Schattenbild liefert pro Drehwinkel φ die Breite des Rohres in der Messrichtung. Ø max(φ) − Ø min(φ) je Längenposition ist die Zylinderform nach PH-Definition (PH Kap. 5.3). Die Breite in fester Richtung ändert sich bei einem runden Querschnitt nicht, wenn die Rohrachse quer zum Strahl wandert. Grenzen:
+
+1. Versatz entlang der optischen Achse verändert den Messfehler (RIFTEK Handbuch Kap. 6.1: Fehler nur gültig bis ±1 mm bzw. ±5 mm entlang der Achse, je Modell).
+2. Winkelauflösung = Bildrate / Drehzahl. Bei 3 s je Umdrehung (Schätzung): RF656.2D ~1,8°, RF657.2D ~5°, RF657R.2D ~30° (Bilder 65/24/4 je s, RIFTEK Kap. 6.1).
+3. Keine Helixabtastung (Cockpit, Entscheidung Baidinger 13.11.): Drehung nur an festen Stationen. 2D-Sensor: ca. 150–200 Stationen je 3-m-Rohr, grob 9–12 min je Rohr (Schätzung). 1D-Sensor (ODC2700): jeder der 1501 Punkte eine Station, grob 75 min je Rohr (Schätzung).
+4. Dynamik beim Drehen dünner Nitinol-Rohre (Schwingung, Durchbiegung) und offene Kontaktstellen (PH 3.2).
+
+**Korrektur zu Abschnitt 3 (Messzeit):** Die Zeiten dort setzen ein Bild je Messpunkt voraus. Für den 2D-Sensor trifft das nicht zu (viele Punkte je Bild). Ohne Drehung an den Stationen fehlt außerdem die Zeit für das Drehen. Die Zahlen gelten nur als Messzeit je Punkt; die Gesamtzeit ist nach Abschnitt 'Nachtrag (2)' neu zu rechnen.
+
+**Offene Frage:** Zylinderform nach PH (Ø max − Ø min) oder nach ISO 1101 (Abweichung vom Bestzylinder). Siehe pv-ent-zylinderform-bezug.
