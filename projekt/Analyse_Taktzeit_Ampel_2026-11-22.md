@@ -42,3 +42,30 @@ Drei Sensoren aus der Web-Suche sind doppelt eingetragen (IDs mws0ln0abedtb XLS1
 
 ## Umsetzung im Cockpit
 Sensorvergleich: Spalte „Taktzeit je Rohr“ mit Ampelpunkt. Rote Sensoren und Dubletten stehen im Kasten „Entfallen“. Die Werte stehen als Tabelle `TAKT` in cockpit/vorlage.html, nicht in sensors.json.
+
+## Korrektur 22.11.2026 (Servo dreht durchgehend)
+
+Frühere Fassung: Jede Station brauchte 3 s Drehung plus 0,5 s Bremsen. Das war falsch. Der Servo dreht durchgehend mit konstanter Drehzahl und hält nicht an. Angehalten wird nur die Achse zwischen den Messstationen.
+
+Neues Modell:
+- Umdrehungszeit T = N / Bildrate, mit N = 72 Bilder je Umdrehung (5°-Schritt). Die Drehzahl wird so eingestellt, dass alle Bilder gerade rechtzeitig vorliegen.
+- Station = T + 0,5 s (Verfahrachse anhalten und beruhigen). Kein Bremsen des Servos.
+- 1D-Sensor: Umdrehung 1 s (Annahme für die kleinste sinnvolle Drehzahl), Station = 1,5 s.
+
+Ergebnis je 3-m-Rohr (1501 Prüfstellen):
+| Sensor | Stationen | Station | Taktzeit | Ampel |
+|---|---|---|---|---|
+| RF656.2D-40x50 | 60 | 1,94 s | 1,9 min | gelb |
+| RF656.2D-25x35 | 86 | 1,94 s | 2,8 min | gelb |
+| RF656.2D-15x20 | 150 | 1,94 s | 4,8 min | gelb (knapp) |
+| RF656.2D-8x10 | 300 | 1,94 s | 9,7 min | rot |
+| RF657.2D-60x80 | 38 | 3,5 s | 2,2 min | gelb |
+| RF657.2D-40x50 | 60 | 3,5 s | 3,5 min | gelb |
+| RF657.2D-25x35 | 86 | 3,5 s | 5,0 min | rot (knapp) |
+| RF657.2D-15x20 | 150 | 3,5 s | 8,8 min | rot |
+| RF657R.2D (alle Größen) | 30–120 | 9–37 min | rot |
+| 1D (alle) | 1501 | 1,5 s | 37,5 min | rot |
+
+Begründung der Grenze: Die Bildrate (RF656 mit Controller SuM 50/s, RF657 24/s) bestimmt die Umdrehungszeit. Ein schnellerer Servo hilft nur, wenn die Bildrate mitzieht. Der Winkelschritt wird durch die Oberwellen-Frage (pv-ent-oberwellen) bestimmt. Bei 2,5° verdoppeln sich die Bilder je Umdrehung.
+
+Offen: Ob die Verfahrachse ohne Helix wirklich nur zwischen den Stationen anhält (Anf. 2.3 und Entscheidung pv-ent-drehung-stationen), und die Dynamik eines durchgehend drehenden dünnen Nitinol-Rohrs.
