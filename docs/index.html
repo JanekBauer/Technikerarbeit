@@ -404,7 +404,7 @@ const NAV = [
   ["Steuerung",[["start","Übersicht"],["zeitleiste","Terminleiste","deadlines"],["postfach","Postfach","postfach"],["offen","Aufgaben","tasks"],["entscheidungen","Entscheidungen","decisions"]]],
   ["Ablage",[["dateien","Archiv","files"]]],
   ["Pflichtenheft",[["anforderungen","Anforderungen","reqs"],["aenderungsdoku","Änderungsdoku","changes"]]],
-  ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["bewertung","Bewertung"],["rechner","Rechner"]]],
+  ["Lösungsphase",[["sensoren","Sensorvergleich","sensors"],["morpho","Morph. Kasten"],["variantenauswahl","Variantenauswahl"],["bewertung","Bewertung"],["rechner","Rechner"]]],
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
   ["Einstellungen",[["einstellungen","Optionen"]]]
 ];
@@ -1210,13 +1210,13 @@ VIEWS.morpho=()=>{
   const m=mkNorm(getTool("morph",MORPH_DEF));const ro=!S.canWrite||S.offline;
   const nrOf=id=>m.rows.findIndex(o=>o.id===id)+1;
   const cols=Math.max(3,...m.rows.map(r=>r.ideas.length));
-  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 06</span><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungsideen. Unter „Abhängig von“ die Nummern der Teilfunktionen anklicken, die nur gemeinsam mit dieser Zeile entschieden werden dürfen (UP4) – die Verknüpfung gilt automatisch in beide Richtungen. Gespeichert wird automatisch.</p></div>
+  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 06</span><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungen. Eine Lösung je Teilfunktion ergibt eine Kombination (Konzept). Nicht umsetzbare Lösungen gleich streichen; Varianten, die Festanforderungen nicht erfüllen, werden nicht weiterverfolgt. Unter „Abhängig von“ die Nummern der Teilfunktionen anklicken, die nur gemeinsam mit dieser Zeile entschieden werden dürfen (UP4) – die Verknüpfung gilt automatisch in beide Richtungen. Gespeichert wird automatisch.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="mk_addcol">Ideen-Spalte +</button><button class="btn pri" id="mk_addrow">Teilfunktion +</button></div>`}</div>
-  <div class="tbl mk"><table><thead><tr><th>Nr.</th><th>Teilfunktion</th><th>Abhängig von</th>${Array.from({length:cols},(_,i)=>`<th>Idee ${i+1}</th>`).join("")}<th></th></tr></thead><tbody>`;
+  <div class="tbl mk"><table><thead><tr><th>Nr.</th><th>Teilfunktion</th><th>Abhängig von</th>${Array.from({length:cols},(_,i)=>`<th>Lösung ${i+1}</th>`).join("")}<th></th></tr></thead><tbody>`;
   if(!m.rows.length)h+=`<tr><td colspan="${cols+4}" class="empty">Noch keine Teilfunktionen. Leg mit „Teilfunktion +“ die erste an.</td></tr>`;
   m.rows.forEach((r,ri)=>{h+=`<tr><td class="nr">TF${ri+1}</td><td><textarea rows="1" data-mk="fn" data-r="${ri}" ${ro?"readonly":""} aria-label="Teilfunktion">${esc(r.fn)}</textarea></td><td><div class="deps" role="group" aria-label="Abhängig von">${m.rows.length<2?'<span class="small muted">–</span>':m.rows.map((o,oi)=>o===r?"":`<button type="button" class="depchip ${r.deps.includes(o.id)?"on":""}" data-mkdep="${ri}|${oi}" aria-pressed="${r.deps.includes(o.id)}" ${ro?"disabled":""} title="${esc(o.fn||"Teilfunktion "+(oi+1))}">TF${oi+1}</button>`).join("")}</div></td>${Array.from({length:cols},(_,i)=>`<td><textarea rows="1" data-mk="idea" data-r="${ri}" data-i="${i}" ${ro?"readonly":""} aria-label="Idee ${i+1}">${esc(r.ideas[i]||"")}</textarea></td>`).join("")}<td style="white-space:nowrap">${ro?"":`<button class="btn sm" data-mkmv="${ri}|-1" ${ri===0?"disabled":""} aria-label="Zeile nach oben" title="nach oben">↑</button> <button class="btn sm" data-mkmv="${ri}|1" ${ri===m.rows.length-1?"disabled":""} aria-label="Zeile nach unten" title="nach unten">↓</button> <button class="btn sm" data-mkins="${ri}" aria-label="Neue Zeile darunter einfügen" title="Zeile darunter einfügen">+</button> <button class="btn sm" data-mkdel="${ri}" aria-label="Zeile löschen" title="löschen">×</button>`}</td></tr>`;});
   h+=`</tbody></table></div>
-  <div class="head" style="margin-top:22px"><div><h2>Gesamtvarianten</h2><p>Je Variante pro Teilfunktion eine Idee wählen. Die Namen übernimmt die Bewertung.</p></div>${ro?"":`<button class="btn pri" id="mk_addvar">Variante +</button>`}</div>
+  <div class="head" style="margin-top:22px"><div><h2>Konzepte (Kombinationen)</h2><p>Je Konzept pro Teilfunktion eine Lösung wählen. Die Konzepte werden in der Variantenauswahl weiterverarbeitet.</p></div>${ro?"":`<button class="btn pri" id="mk_addvar">Variante +</button>`}</div>
   <div class="grid g2">${m.variants.map((v,vi)=>`<div class="panel"><div class="toolbar"><input data-mv="name" data-v="${vi}" value="${esc(v.name)}" ${ro?"readonly":""} aria-label="Variantenname" style="font:inherit;font-weight:600;flex:1;min-width:0;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--ink)">${ro?"":`<button class="btn sm" data-mvdel="${vi}">Löschen</button>`}</div>
    ${m.rows.map((r,ri)=>`<label class="small muted" style="display:grid;gap:2px;margin-bottom:6px">TF${ri+1} · ${esc(r.fn||"Teilfunktion "+(ri+1))}${r.deps.length?` <span title="abhängig">(↔ ${r.deps.map(nrOf).filter(n=>n).map(n=>"TF"+n).join(", ")})</span>`:""}<select data-mv="pick" data-v="${vi}" data-r="${ri}" ${ro?"disabled":""} style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--ink)"><option value="">– wählen –</option>${r.ideas.map((id_,ii)=>id_?`<option value="${ii}" ${String(v.pick&&v.pick[r.id])===String(ii)?"selected":""}>${esc(id_)}</option>`:"").join("")}</select></label>`).join("")}</div>`).join("")||'<div class="empty">Noch keine Varianten.</div>'}</div>`;
   return h;
@@ -1239,6 +1239,41 @@ VIEWS_after.morpho=()=>{
   document.querySelectorAll("[data-mvdel]").forEach(b=>b.onclick=()=>{const m=get();m.variants.splice(+b.dataset.mvdel,1);put(m,1);});
 };
 
+/* ---------- Variantenauswahl ---------- */
+VIEWS.variantenauswahl=()=>{
+  const e=getTool("eval",EVAL_DEF);const ro=!S.canWrite||S.offline;
+  const attrs=e.attrs||[];const vs=e.variants||[];
+  const fReqs=S.data.reqs.filter(r=>r.art==="F").sort(byNr);
+  const cell=(v,vi,a)=>`<input data-evd="${esc(a.id)}" data-v="${vi}" value="${esc((v.desc&&v.desc[a.id])||"")}" ${ro?"readonly":""} aria-label="${esc(a.name)} für ${esc(v.name)}" style="width:100%;min-width:90px;font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--ink)">`;
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Variantenauswahl</h1><p>Ablauf: 1. Varianten aus dem Morph. Kasten bilden (je Teilfunktion eine Lösung, nur verträgliche Kombinationen), 2. Varianten beschreiben, damit die Bewertung darauf angewendet werden kann, 3. Varianten ausschließen, die eine Festanforderung nicht erfüllen. Nicht umsetzbare Lösungen werden schon im Morph. Kasten gestrichen.</p></div>
+  ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impv">Varianten aus Morph. Kasten übernehmen</button></div>`}</div>
+  <div class="grid g2">
+  <div class="panel"><h3>1. Varianten</h3><p class="note">Aus dem Morph. Kasten übernommene Konzepte erscheinen hier mit ihrem Namen.</p>
+   ${vs.map((v,vi)=>`<div class="toolbar"><input data-evvname="${vi}" value="${esc(v.name)}" ${ro?"readonly":""} aria-label="Variantenname" style="flex:1;min-width:0">${ro?"":`<button class="btn sm" data-evvdel="${vi}" aria-label="Variante löschen">×</button>`}</div>`).join("")||'<div class="empty">Noch keine Varianten.</div>'}
+   ${ro?"":`<div class="toolbar" style="margin-top:10px"><input id="ev_newv" placeholder="Variante hinzufügen" aria-label="Neue Variante"><button class="btn sm" id="ev_addv">+</button></div>`}</div>
+  <div class="panel"><h3>2. Festanforderungen je Variante</h3><p class="note">Eine Variante, die eine Festanforderung verletzt, scheidet aus und wird nicht bewertet. Festanforderungen werden nicht gewichtet.</p>
+   ${fReqs.length?`<details><summary class="small">Festanforderungen anzeigen (${fReqs.length})</summary><ul class="small">${fReqs.map(r=>`<li>${esc(r.nr)} ${esc(r.text)}</li>`).join("")}</ul></details>`:""}
+   ${vs.map((v,vi)=>`<label class="chk small" style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" data-ev="fok" data-v="${vi}" ${v.fOk!==false?"checked":""} ${ro?"disabled":""}>${esc(v.name)} erfüllt alle Festanforderungen</label>`).join("")||'<div class="empty">Noch keine Varianten.</div>'}
+  </div>
+  </div>
+  <div class="panel" style="margin-top:14px"><h3>3. Varianten beschreiben</h3><p class="note">Eigenschaften je Variante, z. B. Leistung, Gewicht, Schnittbreite. Die Eigenschaften legt man hier fest; die Bewertungskriterien folgen in der Bewertung.</p>
+   ${vs.length&&attrs.length?`<div class="tbl"><table><thead><tr><th>Eigenschaft</th>${vs.map(v=>`<th>${esc(v.name)}</th>`).join("")}<th></th></tr></thead><tbody>${attrs.map((a,ai)=>`<tr><td>${esc(a.name)}</td>${vs.map((v,vi)=>`<td>${cell(v,vi,a)}</td>`).join("")}<td>${ro?"":`<button class="btn sm" data-evadel="${ai}" aria-label="Eigenschaft löschen">×</button>`}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">Noch keine Eigenschaften oder Varianten.</div>'}
+   ${ro?"":`<div class="toolbar" style="margin-top:10px"><input id="ev_newa" placeholder="Eigenschaft hinzufügen (z. B. Gewicht)" aria-label="Neue Eigenschaft"><button class="btn sm" id="ev_adda">+</button></div>`}
+  </div>`;
+};
+VIEWS_after.variantenauswahl=()=>{
+  const get=()=>getTool("eval",EVAL_DEF);const put=(e,re)=>{saveTool("eval",e);if(re)render();};
+  const nv=(name)=>({id:nid(),name,scores:{},fOk:true,cost:"",desc:{}});
+  const av=$("#ev_addv");if(av)av.onclick=()=>{const t=$("#ev_newv").value.trim();if(!t)return;const e=get();if(!e.variants.some(v=>v.name===t))e.variants.push(nv(t));put(e,1);};
+  const aa=$("#ev_adda");if(aa)aa.onclick=()=>{const t=$("#ev_newa").value.trim();if(!t)return;const e=get();e.attrs=(e.attrs||[]).concat([{id:nid(),name:t}]);put(e,1);};
+  const iv=$("#ev_impv");if(iv)iv.onclick=()=>{const m=getTool("morph",MORPH_DEF);const e=get();m.variants.forEach(v=>{if(v.name&&!e.variants.some(x=>x.name===v.name))e.variants.push(nv(v.name));});put(e,1);};
+  document.querySelectorAll("[data-evadel]").forEach(b=>b.onclick=()=>{const e=get();const [a]=(e.attrs||[]).splice(+b.dataset.evadel,1);if(a)e.variants.forEach(v=>{if(v.desc)delete v.desc[a.id];});put(e,1);});
+  document.querySelectorAll("[data-evvdel]").forEach(b=>b.onclick=()=>{const e=get();e.variants.splice(+b.dataset.evvdel,1);put(e,1);});
+  document.querySelectorAll("[data-evvname]").forEach(el=>el.onchange=()=>{const e=get();const v=e.variants[+el.dataset.evvname];if(v&&el.value.trim()){v.name=el.value.trim();put(e,1);}});
+  document.querySelectorAll("[data-evd]").forEach(el=>el.onchange=()=>{const e=get();const v=e.variants[+el.dataset.v];if(!v)return;v.desc=v.desc||{};v.desc[el.dataset.evd]=el.value;put(e);});
+  document.querySelectorAll('[data-ev="fok"]').forEach(el=>el.onchange=()=>{const e=get();e.variants[+el.dataset.v].fOk=el.checked;put(e);});
+};
+
 /* ---------- Bewertung ---------- */
 const EVAL_DEF={criteria:[],pair:{},variants:[],hzul:""};
 function weights(e){const n=e.criteria.length;if(!n)return[];const sc=e.criteria.map(()=>0);let any=false;
@@ -1254,26 +1289,22 @@ VIEWS.bewertung=()=>{
     e.criteria.forEach((c,i)=>{[1.2,0.8].forEach(fac=>{const w2=w.map((x,j)=>j===i?x*fac:x);const t=w2.reduce((a,b)=>a+b,0)||1;const wn=w2.map(x=>x/t);const best=res.filter(r=>r.ok).map(r=>({id:r.v.id,s:scoreVar(e,r.v,wn)})).sort((a,b)=>b.s-a.s)[0];if(best.id!==top)flips.push(`${c.name} ${fac>1?"+":"−"}20 %`);});});
     sens=flips.length?`<div class="banner">Das Ergebnis kippt, wenn sich diese Gewichte ändern: ${esc(flips.join(", "))}. Gewichtung mit dem Betrieb absichern.</div>`:`<p>${pill("robust","p-ok")} Die beste Variante bleibt vorn, auch wenn jedes Gewicht um ±20 % schwankt.</p>`;}
   const n=e.criteria.length;
-  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Festanforderungen prüfen (Ausschluss), 2. Kriterien aus M-/W-Anforderungen, 3. paarweiser Vergleich für Gewichte, 4. Punkte 0–4 nach VDI 2225, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
-  ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impv">Varianten aus Morph. Kasten</button><button class="btn" id="ev_impc">Kriterien aus M/W-Anforderungen</button></div>`}</div>
-  <div class="grid g2">
-  <div class="panel"><h3>1. Festanforderungen je Variante</h3><p class="note">Eine Variante, die eine Festanforderung verletzt, scheidet aus. Festanforderungen werden nicht gewichtet.</p>
-   ${fReqs.length?`<details><summary class="small">Festanforderungen anzeigen (${fReqs.length})</summary><ul class="small">${fReqs.map(r=>`<li>${esc(r.nr)} ${esc(r.text)}</li>`).join("")}</ul></details>`:""}
-   ${e.variants.map((v,vi)=>`<label class="chk small" style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" data-ev="fok" data-v="${vi}" ${v.fOk!==false?"checked":""} ${ro?"disabled":""}>${esc(v.name)} erfüllt alle Festanforderungen</label>`).join("")||'<div class="empty">Noch keine Varianten.</div>'}
-   ${ro?"":`<div class="toolbar" style="margin-top:10px"><input id="ev_newv" placeholder="Variante hinzufügen" aria-label="Neue Variante"><button class="btn sm" id="ev_addv">+</button></div>`}</div>
-  <div class="panel"><h3>2. Bewertungskriterien</h3>
+  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Bewertungskriterien festlegen (ca. 5, höchstens 10, positiv formuliert: mehr Punkte = besser), 2. paarweiser Vergleich für Gewichte, 3. Punkte je Variante, 4. Nutzwert und prozentuale Erfüllung, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
+  ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impc">Kriterien aus M/W-Anforderungen</button></div>`}</div>
+  <div>
+  <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser.</p>
    ${e.criteria.map((c,ci)=>`<div class="toolbar"><span class="num" style="width:22px">K${ci+1}</span><input data-ev="cname" data-c="${ci}" value="${esc(c.name)}" ${ro?"readonly":""} aria-label="Kriterium" style="flex:1;min-width:0"><span class="num small">${f2((w[ci]||0)*100,1)} %</span>${ro?"":`<button class="btn sm" data-evdelc="${ci}" aria-label="Kriterium löschen">×</button>`}</div>`).join("")||'<div class="empty">Noch keine Kriterien.</div>'}
    ${ro?"":`<div class="toolbar"><input id="ev_newc" placeholder="Kriterium hinzufügen" aria-label="Neues Kriterium"><button class="btn sm" id="ev_addc">+</button></div>`}</div>
   </div>
-  <div class="panel" style="margin-top:14px"><h3>3. Paarweiser Vergleich</h3><p class="note">Je Paar: Welches Kriterium ist wichtiger? 2 Punkte für das wichtigere, je 1 bei Gleichstand. Gewicht = Punkte / Summe. Ein Kriterium mit 0 Punkten hat Gewicht 0 – prüfen, ob es dann überhaupt nötig ist.</p>
+  <div class="panel" style="margin-top:14px"><h3>2. Paarweiser Vergleich</h3><p class="note">Je Paar: Welches Kriterium ist wichtiger? 2 Punkte für das wichtigere, je 1 bei Gleichstand. Gewicht = Punkte / Summe. Ein Kriterium mit 0 Punkten hat Gewicht 0 – prüfen, ob es dann überhaupt nötig ist.</p>
    ${n>1?`<div class="tbl"><table><tbody>${(()=>{let r="";for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const k=e.criteria[i].id+"|"+e.criteria[j].id;const v=e.pair[k];r+=`<tr><td class="small">K${i+1} ${esc(e.criteria[i].name)}</td><td><select data-ev="pair" data-k="${k}" ${ro?"disabled":""} aria-label="Vergleich K${i+1} mit K${j+1}"><option value="" ${v===undefined||v===""?"selected":""}>–</option><option value="2" ${v==2?"selected":""}>wichtiger als</option><option value="1" ${v==1?"selected":""}>gleich wichtig wie</option><option value="0" ${v==0&&v!==""?"selected":""}>weniger wichtig als</option></select></td><td class="small">K${j+1} ${esc(e.criteria[j].name)}</td></tr>`;}return r;})()}</tbody></table></div>`:'<div class="empty">Mindestens zwei Kriterien anlegen.</div>'}</div>
-  <div class="panel" style="margin-top:14px"><h3>4. Punkte je Variante (0 = unbefriedigend … 4 = ideal)</h3>
+  <div class="panel" style="margin-top:14px"><h3>3. Punkte je Variante (0 = unbefriedigend … 4 = ideal)</h3>
    ${e.variants.length&&n?`<div class="tbl"><table><thead><tr><th>Kriterium</th><th>Gewicht</th>${e.variants.map(v=>`<th>${esc(v.name)}</th>`).join("")}</tr></thead><tbody>${e.criteria.map((c,ci)=>`<tr><td>K${ci+1} ${esc(c.name)}</td><td class="num">${f2(w[ci]*100,1)} %</td>${e.variants.map((v,vi)=>`<td><select data-ev="score" data-v="${vi}" data-c="${c.id}" ${ro?"disabled":""} aria-label="Punkte"><option value="">–</option>${[0,1,2,3,4].map(g=>`<option ${String(v.scores&&v.scores[c.id])===String(g)?"selected":""}>${g}</option>`).join("")}</select></td>`).join("")}</tr>`).join("")}
    <tr><td>Herstellkosten H (€) für wirtsch. Wertigkeit</td><td></td>${e.variants.map((v,vi)=>`<td><input data-ev="cost" data-v="${vi}" type="number" step="any" value="${esc(v.cost||"")}" ${ro?"readonly":""} style="width:100px" aria-label="Kosten"></td>`).join("")}</tr></tbody></table></div>
    <div class="toolbar" style="margin-top:8px"><label class="small muted" for="ev_hzul">Zulässige Herstellkosten H<sub>zul</sub> (€)</label><input id="ev_hzul" data-ev="hzul" type="number" step="any" value="${esc(e.hzul)}" ${ro?"readonly":""} style="width:120px"></div>`:'<div class="empty">Varianten und Kriterien anlegen.</div>'}</div>
   <div class="grid g2" style="margin-top:14px">
-   <div class="panel"><h3>5. Ergebnis</h3>${res.length?`<div class="tbl"><table><thead><tr><th>Rang</th><th>Variante</th><th>Nutzwert</th><th>techn. Wertigkeit x</th><th>wirtsch. y</th></tr></thead><tbody>${res.slice().sort((a,b)=>(b.ok-a.ok)||(b.nw-a.nw)).map(r=>`<tr><td class="num">${r.ok?ranked.indexOf(r)+1:"–"}</td><td>${esc(r.v.name)} ${r.ok?"":pill("scheidet aus","p-bad")}</td><td class="num">${f2(r.nw,2)}</td><td class="num">${f2(r.x,2)}</td><td class="num">${f2(r.y,2)}</td></tr>`).join("")}</tbody></table></div>${sens}`:'<div class="empty">Noch nichts zu bewerten.</div>'}
-    <p class="note">x = Nutzwert / 4. y nach VDI 2225: 0,7·H<sub>zul</sub>/H (höchstens 1). Ideale Lösung x = y = 1.</p></div>
+   <div class="panel"><h3>4. Ergebnis</h3>${res.length?`<div class="tbl"><table><thead><tr><th>Rang</th><th>Variante</th><th>Nutzwert</th><th>techn. Wertigkeit x</th><th>wirtsch. y</th></tr></thead><tbody>${res.slice().sort((a,b)=>(b.ok-a.ok)||(b.nw-a.nw)).map(r=>`<tr><td class="num">${r.ok?ranked.indexOf(r)+1:"–"}</td><td>${esc(r.v.name)} ${r.ok?"":pill("scheidet aus","p-bad")}</td><td class="num">${f2(r.nw,2)}</td><td class="num">${f2(r.x,2)}</td><td class="num">${f2(r.y,2)}</td></tr>`).join("")}</tbody></table></div>${sens}`:'<div class="empty">Noch nichts zu bewerten.</div>'}
+    <p class="note">Prozentuale Erfüllung = Nutzwert / max. Punkte (4). x = Nutzwert / 4. y nach VDI 2225: 0,7·H<sub>zul</sub>/H (höchstens 1). Ideale Lösung x = y = 1.</p></div>
    <div class="panel"><h3>Stärkediagramm (VDI 2225)</h3>${(()=>{const pts=res.filter(r=>isFinite(r.x)&&isFinite(r.y));let s=`<svg viewBox="0 0 300 300" width="100%" style="max-width:340px" role="img" aria-label="Stärkediagramm technische gegen wirtschaftliche Wertigkeit"><rect x="40" y="10" width="250" height="250" fill="none" stroke="var(--line)"/><line x1="40" y1="260" x2="290" y2="10" stroke="var(--muted)" stroke-dasharray="4 3"/>`;
      [0,0.5,1].forEach(t=>{s+=`<text x="${40+t*250}" y="276" font-size="11" text-anchor="middle" fill="var(--muted)">${f2(t,1)}</text><text x="34" y="${264-t*250}" font-size="11" text-anchor="end" fill="var(--muted)">${f2(t,1)}</text>`;});
      s+=`<text x="165" y="295" font-size="11" text-anchor="middle" fill="var(--muted)">technische Wertigkeit x</text><text x="10" y="135" font-size="11" text-anchor="middle" fill="var(--muted)" transform="rotate(-90 10 135)">wirtschaftliche Wertigkeit y</text>`;
@@ -1284,10 +1315,7 @@ VIEWS.bewertung=()=>{
 };
 VIEWS_after.bewertung=()=>{
   const get=()=>getTool("eval",EVAL_DEF);const put=(e,re)=>{saveTool("eval",e);if(re)render();};
-  const addV=name=>{const e=get();if(name&&!e.variants.some(v=>v.name===name))e.variants.push({id:nid(),name,scores:{},fOk:true,cost:""});return e;};
-  const av=$("#ev_addv");if(av)av.onclick=()=>{const t=$("#ev_newv").value.trim();if(t)put(addV(t),1);};
-  const ac=$("#ev_addc");if(ac)ac.onclick=()=>{const t=$("#ev_newc").value.trim();if(!t)return;const e=get();e.criteria.push({id:nid(),name:t});put(e,1);};
-  const iv=$("#ev_impv");if(iv)iv.onclick=()=>{const m=getTool("morph",MORPH_DEF);let e=get();m.variants.forEach(v=>{if(v.name&&!e.variants.some(x=>x.name===v.name))e.variants.push({id:nid(),name:v.name,scores:{},fOk:true,cost:""});});put(e,1);};
+      const ac=$("#ev_addc");if(ac)ac.onclick=()=>{const t=$("#ev_newc").value.trim();if(!t)return;const e=get();e.criteria.push({id:nid(),name:t});put(e,1);};
   const ic=$("#ev_impc");if(ic)ic.onclick=()=>{const e=get();S.data.reqs.filter(r=>r.art==="M"||r.art==="W").sort(byNr).forEach(r=>{const nm=(r.nr?r.nr+" ":"")+(r.text||"").split("\n")[0].slice(0,60);if(!e.criteria.some(c=>c.name===nm))e.criteria.push({id:nid(),name:nm});});put(e,1);};
   document.querySelectorAll("[data-evdelc]").forEach(b=>b.onclick=()=>{const e=get();const c=e.criteria.splice(+b.dataset.evdelc,1)[0];Object.keys(e.pair).forEach(k=>{if(k.indexOf(c.id)>=0)delete e.pair[k];});put(e,1);});
   document.querySelectorAll("[data-ev]").forEach(el=>{const h=re=>{const e=get();const t=el.dataset.ev;
