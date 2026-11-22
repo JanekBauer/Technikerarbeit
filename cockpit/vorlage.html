@@ -485,7 +485,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(S.dirty&&!S.modalOpe
 async function save(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
   const body=Object.assign({},obj);delete body.id;body.updated=new Date().toISOString();
-  try{await S.db.collection(coll).doc(id||nid()).set(body);return true;}
+  try{const did=id||nid();await S.db.collection(coll).doc(did).set(body);if(coll==="tasks")await syncTaskCheck(did,body);return true;}
   catch(e){if(e&&e.code==="invalid_argument"){S.canWrite=false;}alert2(e&&e.code==="quota_exceeded"?"Speicher voll: bitte alte Einträge löschen.":"Speichern hat nicht geklappt. Bitte erneut versuchen.");render();return false;}
 }
 async function del(coll,id){if(!S.db||!S.canWrite)return;try{await S.db.collection(coll).doc(id).delete();}catch(e){alert2("Löschen hat nicht geklappt.");}}
@@ -1483,6 +1483,31 @@ async function addTaskToCheck(ckId,taskId){
   const t=S.data.tasks.find(x=>x.id===taskId),ck=S.data.checks.find(x=>x.id===ckId);if(!t||!ck)return;
   if((ck.items||[]).some(x=>x.ref==="tasks/"+t.id))return;
   const c=JSON.parse(JSON.stringify(ck));c.items=(c.items||[]).concat([{t:t.title,done:false,ref:"tasks/"+t.id}]);await save("checks",ck.id,c);
+}
+/* Fälligkeit → Checkliste des Termins bzw. Freitags: jede Aufgabe mit Datum steht dort, wo sie erledigt werden muss */
+function ckIdFor(tg){
+  if(String(tg.id).startsWith("fr-"))return {id:tg.id,create:{title:fd(tg.date),hint:"",items:[],termin:tg.id}};
+  const ex=checkFor(tg);if(ex)return {id:ex.id,create:null};
+  return {id:"dl-"+tg.id,create:{title:tg.title,hint:tg.date?fd(tg.date):"",items:[],termin:tg.id}};
+}
+async function syncTaskCheck(tid,task){
+  try{
+    const ref="tasks/"+tid;const done=task.status==="erledigt";
+    const tg=task.due?terminFor(task.due):null;
+    let tgtId=null,spec=null;
+    if(tg){const r=ckIdFor(tg);tgtId=r.id;spec=r.create;}
+    for(const c of (S.data.checks||[])){
+      const has=(c.items||[]).some(x=>x.ref===ref);const should=c.id===tgtId;
+      if(!has&&!should)continue;
+      const cc=JSON.parse(JSON.stringify(c));
+      cc.items=(cc.items||[]).filter(x=>x.ref!==ref);
+      if(should)cc.items.push({t:task.title||"",done:done,ref:ref});
+      await save("checks",c.id,cc);
+    }
+    if(tgtId&&!(S.data.checks||[]).some(c=>c.id===tgtId)){
+      await save("checks",tgtId,Object.assign({},spec,{items:[{t:task.title||"",done:done,ref:ref}]}));
+    }
+  }catch(e){console.error("Checkliste konnte nicht aktualisiert werden",e);}
 }
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
