@@ -778,7 +778,7 @@ VIEWS.aufgaben=()=>{
   if(f.st==="erledigt")rows=rows.filter(t=>t.status==="erledigt");
   if(f.who)rows=rows.filter(t=>t.who===f.who);
   rows.sort(sortDue);
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Was wer bis wann erledigen muss. Antippen zum Bearbeiten.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
+  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Wer bis wann was erledigt. Zum Bearbeiten antippen.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
   const who=`<select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select>`;
   const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
   if(view==="board"){
@@ -829,7 +829,7 @@ VIEWS.postfach=()=>{
   const show=lsGet("pfDrop",false);
   const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
   const dropped=S.data.postfach.filter(p=>p.status==="verworfen");
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Hier landet alles zuerst. Im Eingang entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
+  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Neue Vorschläge kommen zuerst in den Eingang. Dort entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
   return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span>${can?'<button class="btn" id="pruefbtn">Dokumente prüfen</button>':""}<label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
     listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Quelle / Vorschlag von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."})+
     (show?`<h3 style="margin-top:18px">Verworfen (${dropped.length})</h3><p class="small muted">Zum Wiederherstellen Eintrag antippen und den Eingang auf „neu“ setzen.</p>`+
@@ -854,7 +854,7 @@ VIEWS.offen=()=>{
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Alles, was zu tun ist. Entscheidungen stehen hier auch: dieselbe Karte wie unter Entscheidungen, der Status gilt überall. Karten ziehen ändert den Status.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Offene Punkte. Entscheidungen stehen hier ebenfalls, als gleiche Karte wie unter Entscheidungen; der Status gilt überall. Eine Karte in eine andere Spalte zu ziehen ändert den Status.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
 VIEWS_after.offen=()=>{
   if(!(S.canWrite&&!S.offline))return;
@@ -934,7 +934,7 @@ async function pfAcceptRaw(id,pre){
 VIEWS.aenderungsdoku=()=>{
   const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
-  return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Änderungsdoku</h1><p>Wird erst geführt, wenn das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig wird. Bis dahin bleibt sie leer. Als Tabelle in Word einfügbar.</p></div>${newBtn("changes","Neue Änderung")}</div>
+  return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Änderungsdoku</h1><p>Wird erst geführt, sobald das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig wird. Bis dahin bleibt sie leer. Als Tabelle lässt sie sich nach Word kopieren.</p></div>${newBtn("changes","Neue Änderung")}</div>
   <div class="toolbar"><span class="pill p-acc">${ch.length} Einträge</span><span style="flex:1"></span><button class="btn" id="chcopy">Für Word kopieren</button></div>`+
   listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]],{empty:"Noch keine Änderungen. Einträge kommen erst nach der Unterschrift des Pflichtenhefts."})+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`;
