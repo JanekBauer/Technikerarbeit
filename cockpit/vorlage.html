@@ -1275,6 +1275,13 @@ VIEWS_after.variantenauswahl=()=>{
 
 /* ---------- Bewertung ---------- */
 const EVAL_DEF={criteria:[],pair:{},variants:[],hzul:""};
+/* Kriterien: Anforderungsnummer aus dem Namen, Sortierung nach Pflichtenheft, Doppelungen */
+const critNr=c=>{const m=/^\s*(\d+(?:\.\d+)*)/.exec((c&&c.name)||"");return m?m[1]:"";};
+const critCmp=(a,b)=>{const x=critNr(a),y=critNr(b);if(!x&&!y)return 0;if(!x)return 1;if(!y)return -1;const p=x.split(".").map(Number),q=y.split(".").map(Number);for(let i=0;i<Math.max(p.length,q.length);i++){const d=(p[i]||0)-(q[i]||0);if(d)return d;}return 0;};
+function critClean(e){const keep={};const drop=new Set();const info=x=>(e.variants||[]).filter(v=>v.scores&&v.scores[x.id]!==undefined&&v.scores[x.id]!=="").length+Object.keys(e.pair||{}).filter(k=>k.split("|").indexOf(x.id)>=0).length;
+  e.criteria.forEach(c=>{const k=critNr(c)||("name:"+c.name);const cur=keep[k];if(!cur){keep[k]=c;return;}if(info(c)>info(cur)){drop.add(cur.id);keep[k]=c;}else drop.add(c.id);});
+  if(drop.size){e.criteria=e.criteria.filter(c=>!drop.has(c.id));Object.keys(e.pair||{}).forEach(k=>{if(k.split("|").some(id=>drop.has(id)))delete e.pair[k];});(e.variants||[]).forEach(v=>{if(v.scores)drop.forEach(id=>delete v.scores[id]);});}
+  e.criteria.sort(critCmp);return drop.size;}
 function weights(e){const n=e.criteria.length;if(!n)return[];const sc=e.criteria.map(()=>0);let any=false;
   for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const v=e.pair[e.criteria[i].id+"|"+e.criteria[j].id];if(v===undefined||v==="")continue;any=true;const p=Number(v);sc[i]+=p;sc[j]+=2-p;}
   const tot=sc.reduce((a,b)=>a+b,0);return !any||!tot?e.criteria.map(()=>1/n):sc.map(s=>s/tot);}
@@ -1292,7 +1299,8 @@ VIEWS.bewertung=()=>{
   let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Bewertungskriterien festlegen (ca. 5, höchstens 10, positiv formuliert: mehr Punkte = besser), 2. paarweiser Vergleich für Gewichte, 3. Punkte je Variante, 4. Nutzwert und prozentuale Erfüllung, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impc">Kriterien aus M/W-Anforderungen</button></div>`}</div>
   <div>
-  <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser.</p>
+  <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser. Reihenfolge wie im Pflichtenheft (K1 = erste Anforderung).</p>
+   ${(()=>{const nrs=e.criteria.map(c=>critNr(c)||c.name);const dup=nrs.length-new Set(nrs).size;const unsorted=e.criteria.some((c,i,a)=>i>0&&critCmp(a[i-1],c)>0);const too=e.criteria.length>10;if(!dup&&!unsorted&&!too)return "";return `<div class="banner">${dup?dup+" Doppelung(en) mit gleicher Anforderungsnummer. ":""}${too?e.criteria.length+" Kriterien, Obergrenze 10. ":""}${unsorted?"Reihenfolge weicht vom Pflichtenheft ab. ":""}${ro?"":'<button class="btn sm" id="ev_clean">Bereinigen und nach Pflichtenheft sortieren</button>'}</div>`;})()}
    ${e.criteria.map((c,ci)=>`<div class="toolbar"><span class="num" style="width:22px">K${ci+1}</span><input data-ev="cname" data-c="${ci}" value="${esc(c.name)}" ${ro?"readonly":""} aria-label="Kriterium" style="flex:1;min-width:0"><span class="num small">${f2((w[ci]||0)*100,1)} %</span>${ro?"":`<button class="btn sm" data-evdelc="${ci}" aria-label="Kriterium löschen">×</button>`}</div>`).join("")||'<div class="empty">Noch keine Kriterien.</div>'}
    ${ro?"":`<div class="toolbar"><input id="ev_newc" placeholder="Kriterium hinzufügen" aria-label="Neues Kriterium"><button class="btn sm" id="ev_addc">+</button></div>`}</div>
   </div>
@@ -1319,7 +1327,8 @@ VIEWS.bewertung=()=>{
 VIEWS_after.bewertung=()=>{
   const get=()=>getTool("eval",EVAL_DEF);const put=(e,re)=>{saveTool("eval",e);if(re)render();};
       const ac=$("#ev_addc");if(ac)ac.onclick=()=>{const t=$("#ev_newc").value.trim();if(!t)return;const e=get();e.criteria.push({id:nid(),name:t});put(e,1);};
-  const ic=$("#ev_impc");if(ic)ic.onclick=()=>{const e=get();S.data.reqs.filter(r=>r.art==="M"||r.art==="W").sort(byNr).forEach(r=>{const nm=(r.nr?r.nr+" ":"")+(r.text||"").split("\n")[0].slice(0,60);if(!e.criteria.some(c=>c.name===nm))e.criteria.push({id:nid(),name:nm});});put(e,1);};
+  const ic=$("#ev_impc");if(ic)ic.onclick=()=>{const e=get();S.data.reqs.filter(r=>r.art==="M"||r.art==="W").sort(byNr).forEach(r=>{const nm=(r.nr?r.nr+" ":"")+(r.text||"").split("\n")[0].slice(0,60);const nr=String(r.nr||"").trim();if(e.criteria.some(c=>c.name===nm||(nr&&critNr(c)===nr)))return;e.criteria.push({id:nid(),name:nm});});e.criteria.sort(critCmp);put(e,1);};
+  const cl=$("#ev_clean");if(cl)cl.onclick=()=>{const e=get();critClean(e);put(e,1);};
   document.querySelectorAll("[data-pm]").forEach(el=>el.onchange=()=>{const e=get();const i=+el.dataset.i,j=+el.dataset.j;const a=e.criteria[i].id,b=e.criteria[j].id;const val=el.value===""?"":Number(el.value);if(i<j)e.pair[a+"|"+b]=val;else e.pair[b+"|"+a]=val===""?"":2-val;put(e,1);});
   document.querySelectorAll("[data-evdelc]").forEach(b=>b.onclick=()=>{const e=get();const c=e.criteria.splice(+b.dataset.evdelc,1)[0];Object.keys(e.pair).forEach(k=>{if(k.indexOf(c.id)>=0)delete e.pair[k];});put(e,1);});
   document.querySelectorAll("[data-ev]").forEach(el=>{const h=re=>{const e=get();const t=el.dataset.ev;
