@@ -154,3 +154,29 @@ Frage: Ergibt ein 2D-Schattenbild bei 360°-Drehung des Rohres die Zylinderform?
 **Korrektur zu Abschnitt 3 (Messzeit):** Die Zeiten dort setzen ein Bild je Messpunkt voraus. Für den 2D-Sensor trifft das nicht zu (viele Punkte je Bild). Ohne Drehung an den Stationen fehlt außerdem die Zeit für das Drehen. Die Zahlen gelten nur als Messzeit je Punkt; die Gesamtzeit ist nach Abschnitt 'Nachtrag (2)' neu zu rechnen.
 
 **Offene Frage:** Zylinderform nach PH (Ø max − Ø min) oder nach ISO 1101 (Abweichung vom Bestzylinder). Siehe pv-ent-zylinderform-bezug.
+
+## Nachtrag 22.11.2026 (3): Bildrate und Winkelschritt (Drehung, keine Helix)
+
+Ausgangslage: Keine Helixabtastung (Anforderung: Zylinderform je Messpunkt alle 2 mm innerhalb der Toleranz). Frage: Welche Bildrate ist nötig, damit die Winkelschritte nicht zu groß werden?
+
+**Winkelschritt aus der Formordnung (eigene Rechnung):** Annahme: Oberwelle n mit Amplitude A = 10 µm; Fehler von Max/Min durch Abtastung höchstens 1 µm (10 % einer Toleranz von 10 µm). Fehler ≈ A·(1 − cos(n·Δφ/2)) ≤ 1 µm ⇒ Δφ ≤ 51,6°/n.
+n = 2: 25,8° · n = 3: 17,2° · n = 6: 8,6° · n = 10: 5,2° · n = 12: 4,3° · n = 20: 2,6°.
+Offen: welche Oberwellen real auftreten (QM / Baidinger).
+
+**Bildrate bei fester Frequenz (eigene Rechnung):** f = 360° / (Δφ · T_Umdrehung).
+- Δφ 5°: T = 3 s → 24/s; T = 6 s → 12/s
+- Δφ 2,5°: T = 3 s → 48/s; T = 6 s → 24/s
+- Δφ 1,8°: T = 3 s → 67/s; T = 6 s → 33/s
+
+**Korrektur zur Bildrate RF656.2D:** Mit Controller SuM sind 50 Messungen/s die Grenze, nicht 65/s (RIFTEK Kap. 6.1 und Sensor-Eintrag). Der RF657.2D ist mit 24/s begrenzt, der RF657R.2D mit 4/s.
+
+**Auslösung über den Drehgeber:** Der RIFTEK-Sensor hat 1 Synchronisationseingang (Kap. 6.1). Bei Auslösung je Winkelschritt hängt der Schritt nicht von der Bildrate ab. Limit: Verarbeitung des Controllers. Bei SuM (50/s) und 3 s je Umdrehung ist der kleinste Schritt rund 2,4°.
+
+**Stationszeit (Schätzung, ohne Verfahren, 150–200 Stationen je 3-m-Rohr):**
+- 3 s je Umdrehung: ca. 10–12 min je Rohr; Schritt nur ab ca. 2,4° möglich
+- 6 s je Umdrehung, 2,5°: ca. 20–25 min je Rohr
+- 6 s je Umdrehung, 5°: ca. 15–20 min je Rohr; nur bis Oberwelle ca. 10
+
+**Bewegungsunschärfe:** Belichtung RF657 15 µs, RF656 100 µs. An den Silhouettenkanten verläuft die Bewegung parallel zur Kante; Unschärfe dort voraussichtlich gering. Am Aufbau zu prüfen.
+
+**Empfehlung (Analyse, keine Festlegung):** Zuerst Oberwellen klären. Bis n = 6 genügen 5°-Schritte; darüber 2,5° oder feiner. Der RF657.2D ist nur mit Drehgeber-Auslösung sinnvoll; der RF656.2D mit SuM ist knapp.
