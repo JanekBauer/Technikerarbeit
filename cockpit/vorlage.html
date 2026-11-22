@@ -488,7 +488,7 @@ async function save(coll,id,obj){
   try{const did=id||nid();await S.db.collection(coll).doc(did).set(body);if(coll==="tasks")await syncTaskCheck(did,body);return true;}
   catch(e){if(e&&e.code==="invalid_argument"){S.canWrite=false;}alert2(e&&e.code==="quota_exceeded"?"Speicher voll: bitte alte Einträge löschen.":"Speichern hat nicht geklappt. Bitte erneut versuchen.");render();return false;}
 }
-async function del(coll,id){if(!S.db||!S.canWrite)return;try{await S.db.collection(coll).doc(id).delete();}catch(e){alert2("Löschen hat nicht geklappt.");}}
+async function del(coll,id){if(!S.db||!S.canWrite)return;try{await S.db.collection(coll).doc(id).delete();if(coll==="tasks")await syncTaskCheck(id,{title:"",due:"",status:"offen"});}catch(e){alert2("Löschen hat nicht geklappt.");}}
 function alert2(t){S.msg=t;render();setTimeout(()=>{S.msg=null;render();},4000);}
 function tool(id){return S.data.tools.find(t=>t.id===id)||null;}
 const toolTimers={};
@@ -590,6 +590,12 @@ function openEditor(key,id,preset){
     sb.disabled=true;const ok=await save(L.coll,id,obj);if(ok&&key==="deadlines"&&!id)await save("checks",nid(),{title:obj.title||"",hint:obj.date?fd(obj.date):"",items:[]});if(ok)closeModal();else sb.disabled=false;};
   const pfb=$("#pfbtn");if(pfb)pfb.onclick=async()=>{if(!pfb.dataset.sure){pfb.dataset.sure=1;pfb.textContent="Wirklich ins Postfach?";return;}await toPostfach(L.coll,id,rec);};
   const db_=$("#delbtn");if(db_)db_.onclick=async()=>{if(db_.dataset.sure){await del(L.coll,id);closeModal();}else{db_.dataset.sure=1;db_.textContent="Wirklich löschen?";}};
+}
+async function toPostfach(coll,id,rec){
+  const ent=rec.typ==="entscheidung"||coll==="decisions";
+  const entry={kind:ent?"entscheidung":"aufgabe",title:rec.title||rec.text||"",detail:rec.note||"",vorschlag:rec.source||"",who:rec.who||"",ask:rec.ask||"",due:rec.due||"",prio:rec.prio||"2",stand:rec.status||"offen",date:rec.date||"",status:"neu",altColl:"tasks",alt:rec};
+  const ok=await save("postfach",nid(),entry);
+  if(ok){await del(coll,id);closeModal();}
 }
 function closeModal(){$("#modal").innerHTML="";S.modalOpen=false;S.terminId=null;S.taskId=null;render();}
 
