@@ -61,3 +61,19 @@ Diese Punkte hat die KI als Vorschlag ins Postfach gelegt:
 - Platzbedarf L × B (Anf. 5.1) → `pv-ent-platzbedarf`
 - QM-Vorgaben ISO 13485 für ein neues Prüfmittel (PH 5.3) → `pv-ent-qm-pruefmittel`
 - Die früheren Aufgaben „Toleranzen je Werkstoff mit QM“ und „%GRR bestätigen“ fehlen in `tasks.json`. Laut CLAUDE.md gelten sie damit als gelöscht. Inhaltlich sind sie in `pv-ent-toleranz-grr` wieder enthalten; Janek entscheidet.
+
+## 5. Prüfung der offenen Fragen aus dem Statusbericht (Abschnitt 5)
+
+| Nr. | Frage | Durch PH V1.2 beantwortet? | Öffentliche Quelle? | Nur der Betrieb kann antworten | Postfach |
+|---|---|---|---|---|---|
+| 1 | Toleranzwerte Zylinderform NiTi/Edelstahl | nein ([?]) | nein (Rohrspezifikation, vertraulich) | ja (QM, Baidinger) | pv-ent-toleranz-grr |
+| 2 | %GRR-Grenze, Bezug Toleranzbreite | teilweise (2.4: ≤ 10 % „bezogen auf die Toleranz“) | AIAG MSA 4. Aufl., Tab. II-D 1 (nur über Sekundärquelle) | Bezug bei einseitiger Toleranz: ja | pv-ent-toleranz-grr |
+| 3 | Taktzeit pro Rohr | nein (4.1 W ohne Wert) | nein | ja | vorhandene Entscheidung „Taktzeit pro Rohr“ |
+| 4 | Platzbedarf L × B | nein (5.1 W, offen) | nein | ja | pv-ent-platzbedarf |
+| 5 | Kontaktwerkstoffe | nein | nein (betriebsspezifisch) | ja | vorhandene Aufgabe „Zulässige Kontaktstellen …“ |
+| 6 | Bilder Stents/Marker | nein („(Bild)“ Platzhalter) | – | ja | vorhandene Aufgabe |
+| 7 | PH-Freigabe-Datum | **ja: 27.11.2026** (Kap. 5.2) | – | Bestätigung d04 | pv-abs-ph-freigabe, pv-daten-d04 |
+| 8 | Herstellerangaben Ø 1–6,5 mm | nein | Datenblätter zeigen nur Werte für Ø 10 mm bzw. 2-mm-Prüfstift | Hersteller | pv-auf-herstellerfragen |
+| 9 | QM-Vorgaben ISO 13485 | nein (5.3: „wird mit dem QM geklärt“) | Norm nicht frei zugänglich | ja (QM) | pv-ent-qm-pruefmittel |
+| 10 | Lieferprüfprotokolle, Bedeutung für die Abnahme | nein | – | ja | pv-ent-lieferpruefprotokolle |
+| 11 | Kostenrahmen | **ja**: 5.3 „wird nach dem Konzept erstellt“ | – | später | kein Eintrag nötig |
