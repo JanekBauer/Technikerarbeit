@@ -1273,7 +1273,7 @@ VIEWS.meilensteine=()=>{
   const card=l=>{const it=l.items||[];const d=it.filter(x=>x.done).length;return `<div class="panel"><div class="toolbar" style="justify-content:space-between"><h3>${esc(l.title)}</h3><span style="display:flex;gap:8px;align-items:center"><span class="num small">${d}/${it.length}</span>${ro?"":`<button class="btn sm danger" data-ckdellist="${esc(l.id)}">Liste löschen</button>`}</span></div><div class="bar" style="margin-bottom:8px"><i style="width:${it.length?d/it.length*100:0}%"></i></div>
    ${l.hint?`<p class="note">${esc(l.hint)}</p>`:""}
    ${it.map((x,i)=>`<label class="ck ${x.done?"done":""}"><input type="checkbox" data-ck="${esc(l.id)}" data-i="${i}" ${x.done?"checked":""} ${ro?"disabled":""}><span>${esc(x.t)}</span>${ro?"":`<span style="white-space:nowrap"><button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="-1" ${i===0?"disabled":""} aria-label="Punkt nach oben">↑</button> <button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="1" ${i===it.length-1?"disabled":""} aria-label="Punkt nach unten">↓</button> <button class="btn sm" data-ckdel="${esc(l.id)}" data-i="${i}" aria-label="Punkt löschen">×</button></span>`}</label>${ro?"":`<div class="small" style="margin:-4px 0 8px 28px"><select data-ckto="${esc(l.id)}" data-i="${i}" aria-label="In Termin verschieben" style="max-width:100%"><option value="">→ zu einem Termin verschieben …</option>${termOpts}</select></div>`}`).join("")}
-   ${ro?"":`<div class="toolbar" style="margin-top:8px"><input data-cknew="${esc(l.id)}" placeholder="Punkt hinzufügen" aria-label="Neuer Punkt" style="flex:1;min-width:0"><button class="btn sm" data-ckadd="${esc(l.id)}">+</button></div>`}</div>`;};
+   ${ro?"":`<div class="toolbar" style="margin-top:8px"><select data-ckaddtask="${esc(l.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="flex:1;min-width:0"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}${ro?"":`<div class="toolbar" style="margin-top:8px"><input data-cknew="${esc(l.id)}" placeholder="Punkt hinzufügen" aria-label="Neuer Punkt" style="flex:1;min-width:0"><button class="btn sm" data-ckadd="${esc(l.id)}">+</button></div>`}</div>`;};
   return `<div class="head"><div><span class="tag">Schule · UP0 / UP5 / UP7</span><h1>Checklisten</h1><p>Pflichtunterlagen und Prüfpunkte für die Meilensteine, die Formalia der Dokumentation, die Abgabe und die Präsentation.</p></div></div>
   <div class="toolbar"><span class="pill p-acc">${openL.length} offen</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="ckdone" ${showDone?"checked":""}> erledigte anzeigen (${doneL.length})</label></div>
   <h3 class="small muted" style="margin:12px 0 6px">Offen</h3>
@@ -1288,6 +1288,7 @@ VIEWS_after.meilensteine=()=>{
   document.querySelectorAll("[data-ckmv]").forEach(b=>b.onclick=ev=>{ev.preventDefault();const i=+b.dataset.i,j=i+Number(b.dataset.d);upd(b.dataset.ckmv,c=>{if(j<0||j>=c.items.length)return;const t=c.items[i];c.items[i]=c.items[j];c.items[j]=t;});});
   const ckd=$("#ckdone");if(ckd)ckd.onchange=()=>{lsSet("ckDone",ckd.checked);render();};
   document.querySelectorAll("[data-ckdellist]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Wirklich löschen?";return;}await del("checks",b.dataset.ckdellist);});
+  document.querySelectorAll("[data-ckaddtask]").forEach(sel=>sel.onchange=()=>addTaskToCheck(sel.dataset.ckaddtask,sel.value));
   document.querySelectorAll("[data-ckadd]").forEach(b=>b.onclick=()=>{const inp=document.querySelector(`[data-cknew="${b.dataset.ckadd}"]`);const t=inp.value.trim();if(t)upd(b.dataset.ckadd,c=>{c.items.push({t,done:false});});});
 };
 
@@ -1476,6 +1477,13 @@ function latestFor(d){
     (list.length?`<div class="tbl"><table><tbody>${list.map(f=>`<tr><td>${esc(f.family)} <span class="small muted">${esc(f.ver||"")}</span></td><td class="small">${esc(f.name)}</td><td>${fileBtns(f,true)}</td></tr>`).join("")}</tbody></table></div>`:"")+
     (missing.length?`<p class="small muted">Noch nicht im Archiv: ${esc(missing.join(", "))}</p>`:"");
 }
+/* Offene Aufgaben und Entscheidungen als Punkte in eine Checkliste übernehmen */
+function ckTaskOpts(){return S.data.tasks.filter(t=>t.status!=="erledigt").sort(sortDue).map(t=>`<option value="${esc(t.id)}">${t.typ==="entscheidung"?"Entscheidung: ":""}${esc(t.title)}</option>`).join("");}
+async function addTaskToCheck(ckId,taskId){
+  const t=S.data.tasks.find(x=>x.id===taskId),ck=S.data.checks.find(x=>x.id===ckId);if(!t||!ck)return;
+  if((ck.items||[]).some(x=>x.ref==="tasks/"+t.id))return;
+  const c=JSON.parse(JSON.stringify(ck));c.items=(c.items||[]).concat([{t:t.title,done:false,ref:"tasks/"+t.id}]);await save("checks",ck.id,c);
+}
 function prepHtml(d){
   const ro=!S.canWrite||S.offline;
   const ck=checkFor(d);
@@ -1483,7 +1491,7 @@ function prepHtml(d){
   const items=ck.items||[];const n=items.filter(x=>x.done).length;
   return `<div class="tsec"><h3>Checkliste <span class="small muted">${n} von ${items.length} erledigt</span></h3>
     <p class="note" style="margin:0 0 6px">Checkliste „${esc(ck.title)}“. Abhaken geht direkt hier.</p>
-    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul></div>`;
+    <ul class="clean">${items.map((it,i)=>`<li style="padding:4px 0"><label style="display:flex;gap:8px;align-items:flex-start;cursor:${ro?"default":"pointer"}"><input type="checkbox" data-chk="${esc(ck.id)}|${i}" ${it.done?"checked":""} ${ro?"disabled":""} style="margin-top:4px"><span class="${it.done?"muted":""}" style="${it.done?"text-decoration:line-through":""}">${esc(it.t)}</span></label></li>`).join("")}</ul>${ro?"":`<div class="toolbar" style="margin-top:8px"><select data-ckaddtask="${esc(ck.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="flex:1;min-width:0"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}</div>`;
 }
 /* neueste Version der Kerndokumente (Aufgabenstellung, Pflichtenheft, Projektplan) */
 function latestDocsHtml(){
@@ -1523,6 +1531,7 @@ function renderTermin(first){
   if(first){const c=$("#modal [data-close]:not(.modal-bg)");if(c)c.focus();}
   const upd=async ch=>{const cur=S.data[coll].find(x=>x.id===d.id)||d;await save(coll,d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
+  document.querySelectorAll("[data-ckaddtask]").forEach(sel=>sel.onchange=()=>addTaskToCheck(sel.dataset.ckaddtask,sel.value));
   document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{if(String(d.id).startsWith("fr-")){if(!checkFor(d))await save("checks",d.id,{title:fd(d.date),hint:"",items:[],termin:d.id});return;}const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);if(!(S.data.checks||[]).some(c=>c.title===d.title))await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
   document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
   document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
