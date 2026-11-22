@@ -124,3 +124,18 @@ Gesperrte Hosts in dieser Sitzung: `www.mitutoyo.com`, `www.marposs.com`, `res.c
 2. LS-9030 (alle Varianten) und ODC2700-10/-40 liegen mit voller Mittelung unter allen drei Grenzen. Ohne Mittelung ist der ODC2700-10 nach grober Schätzung deutlich besser [S].
 3. Für RIFTEK fehlt die Wiederholgenauigkeit. Ohne Herstellerangabe ist keine %GRR-Aussage möglich.
 4. Die Sensorwahl hängt an drei Klärungen: Toleranzwerte, Zulässigkeit der Mittelung, Definition der Zylinderform (je Querschnitt oder ganzes Rohr).
+
+## Nachtrag 22.11.2026: Datenblätter Mitutoyo und Aeroel
+
+Janek hat die Datenblätter geliefert. Sie liegen jetzt im Archiv und sind ausgewertet. Die Werte und Notizen stehen im Sensorvergleich unter Nr. 9 und 10. Abschnitt 5 ist damit erledigt. Die Einordnung gegen die Szenarien ist eine eigene Rechnung der KI: σ aus der ±2σ-Angabe des Herstellers.
+
+| Sensor | Wiederholgenauigkeit [H] | Bedingung [H] | σ [R] | A / B / C |
+|---|---|---|---|---|
+| Mitutoyo LSM-501S | ±0,04 µm | ±2σ, Ø 10 mm, 0,32 s / 512-fach (Bulletin 2101, S. 12) | 0,02 µm | ja / ja / ja |
+| Mitutoyo LSM-503S | ±0,11 µm | wie oben (S. 14) | 0,055 µm | ja / ja / ja |
+| Mitutoyo LSM-6902H/6900 | ±0,03 µm (Ø 10 mm) | ±2σ, 1,28 s / 1024-fach (S. 8) | 0,015 µm | ja / ja / ja |
+| Mitutoyo LSM-506S | ±0,36 µm | wie LSM-501S (S. 16) | 0,18 µm | ja / nein / ja |
+| Aeroel XLS13XY/1500 (/A) | ±0,04 µm | T = 1 s, ±2σ (Datenblatt S. 4, Fn. 11) | 0,02 µm | ja / ja / ja |
+| Aeroel XLS13XY/480 (/A) | ±0,15 µm | T = 1 s, ±2σ | 0,075 µm | ja / ja / ja |
+
+Neu ist: Aeroel gibt als einziger Hersteller die **Einzelabtastung** an (Fn. 11). Für das XLS13XY/1500 sind das ±0,75 µm (±2σ) bei Ø ≤ 3 mm und ±1,5 µm bei Ø > 3 mm. Das ergibt σ ≈ 0,38 bzw. 0,75 µm. Diese Werte sind die erste Herstellerangabe zur Frage `pv-ent-mittelung`. Ohne Mittelung liegt danach auch das XLS13XY/1500 über Szenario B.
