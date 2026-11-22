@@ -552,7 +552,7 @@ function openEditor(key,id,preset){
       const all=[...new Set([...optsFor(grp,opts),...sel])].filter(Boolean);
       return `<div class="mfield"><span class="mlab">${lab}</span><details class="mdrop"><summary>${sel.length?esc(sel.join(", ")):"– auswählen –"}</summary><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div></details><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
         (!ro?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" data-multi="1" style="margin:4px 0 8px">+ neue Option</button>`:"");}
-    if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(CAP(o)||"–")}</option>`).join("")}</select></label>`+
+    if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(OPT_LAB[o]||CAP(o)||"–")}</option>`).join("")}</select></label>`+
         (addBtn?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" style="margin:4px 0 8px">+ neue Option</button>`:"");
     if(type==="bool")return `<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
     return `<label for="${fid}">${lab}<input id="${fid}" data-k="${k}" type="${type==="date"?"date":type==="num"?"number":"text"}" ${type==="num"?'step="any"':""} value="${esc(v)}"></label>`;
@@ -838,6 +838,8 @@ VIEWS_after.offen=()=>{
 };
 
 /* Übernahme aus dem Eingang: Status, Datum, Inhalt und Vorschlag bleiben erhalten */
+/* Anzeigenamen für Optionen, deren Wert (z. B. aenderung) gespeichert bleibt */
+const OPT_LAB={aenderung:"Änderung",kilog:"KI-Log"};
 const PF_KIND_COLL={aufgabe:"tasks",entscheidung:"tasks",aenderung:"changes",abschluss:"tasks",kilog:"kilog"};
 const PF_STAT={"offen":"offen","in Arbeit":"in Arbeit","erledigt":"erledigt","entfallen":"entfallen","bestätigt":"erledigt","beantwortet":"erledigt","abgesagt":"entfallen","geklärt":"erledigt"};
 function pfAltRecord(p){
