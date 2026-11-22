@@ -1,12 +1,12 @@
 name: Freitags-Vorbereitung
 
-# Jeden Freitag gegen 7:50 Uhr Berliner Zeit (Läufe von 7 bis 8:59 Uhr werden ausgeführt). GitHub kennt nur UTC, deshalb laufen zwei Zeitpläne
-# (05:50 und 06:50 UTC). Ist die Datei schon da, passiert nichts. Verspätete Läufe bleiben im Fenster.
+# Jeden Freitag gegen 6:00 Uhr Berliner Zeit (Läufe von 5 bis 7:59 Uhr werden ausgeführt). GitHub kennt nur UTC, deshalb laufen zwei Zeitpläne
+# (04:00 und 05:00 UTC). Ist die Datei schon da, passiert nichts. Verspätete Läufe bleiben im Fenster.
 # Die Datei entsteht auch dann, wenn Claude Code nicht erreichbar ist.
 on:
   schedule:
-    - cron: "50 5 * * 5"
-    - cron: "50 6 * * 5"
+    - cron: "0 4 * * 5"
+    - cron: "0 5 * * 5"
   workflow_dispatch:
 
 permissions:
@@ -18,11 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Nur um 7 Uhr Berliner Zeit arbeiten
+      - name: Nur früh morgens (Berliner Zeit) arbeiten
         id: zeit
         run: |
           h=$(TZ=Europe/Berlin date +%H)
-          if [ "${{ github.event_name }}" = "schedule" ] && { [ "$h" -lt 7 ] || [ "$h" -gt 8 ]; }; then
+          if [ "${{ github.event_name }}" = "schedule" ] && { [ "$h" -lt 5 ] || [ "$h" -gt 7 ]; }; then
             echo "skip=1" >> "$GITHUB_OUTPUT"
             echo "Berliner Zeit ist $(TZ=Europe/Berlin date +%H:%M) - dieser Lauf wird übersprungen."
           fi
