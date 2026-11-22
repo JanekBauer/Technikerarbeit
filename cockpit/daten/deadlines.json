@@ -1,6 +1,6 @@
 [
 {"id":"d01","title":"Kick-off im Betrieb","date":"2026-10-23","approx":false,"kind":"betrieb","status":"erledigt","note":""},
-{"id":"d04","title":"PH-Freigabe + Unterschrift im Betrieb","date":"2026-12-04","approx":false,"kind":"betrieb","status":"geplant","note":"Festgelegt 18.11.: Fr. 27.11.26. Pflichtenheft V1 und Cockpit stimmen. Im Projektplan (Rillsoft) auf 27.11. setzen.","updated":"2026-11-21T13:28:51.015Z"},
+{"id":"d04","title":"PH-Freigabe + Unterschrift im Betrieb","date":"2026-11-27","approx":false,"kind":"betrieb","status":"geplant","note":"PH V1.2 Kap. 5.2: 27.11.2026 Abstimmung und Freigabe des Pflichtenhefts (übernommen aus PH V1.2; vorher im Cockpit 04.12.2026).","updated":"2026-11-22T15:30:51.002Z"},
 {"id":"d05","title":"MS 1 – Projektplanung und -vorbereitung","date":"2026-11-20","approx":false,"kind":"schule","status":"erledigt","note":"Fr. 20.11.2026, 9:30–10:30 Uhr, mit Hr. Graudejus de Olio vereinbart (Janek, 14.11.)","updated":"2026-11-21T13:00:30.290Z"},
 {"id":"d07","title":"Gesetzliche Frist finale AS","date":"2027-01-08","approx":true,"kind":"schule","status":"geplant","note":"Anfang Januar 2027"},
 {"id":"d08","title":"MS 2 – Projektdurchführung","date":"2027-01-15","approx":false,"kind":"schule","status":"geplant","note":"Festgelegt 18.11.: 15.01.27 (Janek). Projektplan (M2) wird angepasst. Vorher Abstimmung schriftlich sichern.","updated":"2026-11-18T21:00:00Z"},
