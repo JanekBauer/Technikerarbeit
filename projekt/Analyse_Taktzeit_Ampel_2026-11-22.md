@@ -69,3 +69,32 @@ Ergebnis je 3-m-Rohr (1501 Prüfstellen):
 Begründung der Grenze: Die Bildrate (RF656 mit Controller SuM 50/s, RF657 24/s) bestimmt die Umdrehungszeit. Ein schnellerer Servo hilft nur, wenn die Bildrate mitzieht. Der Winkelschritt wird durch die Oberwellen-Frage (pv-ent-oberwellen) bestimmt. Bei 2,5° verdoppeln sich die Bilder je Umdrehung.
 
 Offen: Ob die Verfahrachse ohne Helix wirklich nur zwischen den Stationen anhält (Anf. 2.3 und Entscheidung pv-ent-drehung-stationen), und die Dynamik eines durchgehend drehenden dünnen Nitinol-Rohrs.
+
+## Nachtrag (4): Alle Sensoren neu, Modell mit durchgehend drehendem Rohr
+
+Modell: 72 Winkel je Umdrehung (5°). 1D-Sensor: je 2-mm-Punkt eine Messzeit nach Rep-Bedingung des Herstellers (Mittelung ÷ Rate), mindestens eine Umdrehung, plus Achse anhalten je Punkt. 2D-Sensor: Umdrehung = 72 Bilder ÷ Bildrate, plus Achse anhalten je Station. Ergebnis je 3-m-Rohr (1501 Prüfstellen bzw. 3000 mm ÷ Feldlänge).
+
+Achse anhalten je Punkt (t_move): 0,5 s (konservativ, Ampel im Sensorvergleich), 0,1 s und 0,05 s als Empfindlichkeit.
+
+| Sensor | 0,5 s | 0,1 s | 0,05 s |
+|---|---|---|---|
+| LS-9030 / -M / -D, LS-9120M | 15,7 min | 5,7 min | 4,5 min |
+| ODC2700-10 / -40 | 14,2 | 4,2 | 3,0 |
+| ODC2520-46 / -090 | 13,2 | 3,2 | 2,0 |
+| ODC1200 / 1201 (alle) | 12,5 | 2,5 | 1,3 |
+| LSM-501S / -503S / -506S | 16,5 | 6,5 | 5,3 |
+| LSM-512S / -516S / -6902H / -9506 | 20,5 | 10,5 | 9,3 |
+| XLS13XY / XLS35XY (alle) | 37,5 | 27,5 | 26,3 |
+| RF656.2D-40x50 / 25x35 / 15x20 / 8x10 | 1,9 / 2,8 / 4,8 / 9,7 | 1,5 / 2,2 / 3,9 / 7,7 | 1,5 / 2,1 / 3,7 / 7,5 |
+| RF657.2D-60x80 / 40x50 / 25x35 / 15x20 | 2,2 / 3,5 / 5,0 / 8,8 | 2,0 / 3,1 / 4,4 / 7,8 | 1,9 / 3,0 / 4,4 / 7,6 |
+| RF657R.2D (rund, alle) | 9–37 | 9–36 | 9–36 |
+
+Zur Frage „LS-9030 unter 3 min“: Die Abtastrate (16.000/s) ist nicht der Engpass. Der Engpass ist die Wiederholgenauigkeit ±0,1 µm, die nur mit 2048-facher Mittelung gilt. Das braucht 0,128 s je Punkt. Bei 1501 Punkten sind das allein 192 s = 3,2 min, ohne jede Achsbewegung. Unter 3 min ist mit dieser Rep-Bedingung nicht möglich.
+
+Zusätzlich zu prüfen: Mittelung über 2048 Werte bei drehendem Rohr mittelt die Breiten über den Winkel. Bei 1 Umdrehung je s würden so rund 46° gemittelt und die Form ginge verloren. Die Mittelung muss also winkelsynchron erfolgen oder das Rohr steht. Das ist eine Frage an Keyence: Rep bei kleinerer Mittelung (z. B. 256 oder 512) und bei Einzelmessung.
+
+Hinweis Anforderung 2.4 (Mindestanforderung %GRR ≤ 10 %): ODC1200/1201 (Rep 40–140 µm) und ODC2520 (5 µm) erfüllen die Rep-Anforderung in allen drei Szenarien nicht. Sie scheiden damit unabhängig von der Taktzeit aus.
+
+Dubletten: mws0ln0abedtb (XLS13XY), mws0lnc4mbahq (LSM-501S), mws0lnnai0kol (LSM-503S) wurden nach cockpit/daten/_Versionen/sensors_dubletten_2026-11-22.json verschoben, nicht gelöscht.
+
+Offen: Wert für t_move (Entscheidung Janek, pv-ent-taktampel). Die Ampel im Sensorvergleich rechnet mit 0,5 s.
