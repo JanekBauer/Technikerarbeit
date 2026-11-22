@@ -16,5 +16,6 @@
 {"id":"k-20261117-sensorwerte","date":"2026-11-17","help":"Übertragen von Herstellerangaben mit Quelle, keine Bewertung, kein fachlicher Text","fach":false,"updated":"2026-11-21T11:43:19.459Z"},
 {"id":"k-20261120-ph-v12","date":"2026-11-20","help":"Formulierungen für das Pflichtenheft nach Janeks Vorgaben; Entscheidungen bleiben bei Janek und Betrieb","fach":true,"updated":"2026-11-20T12:30:00Z"},
 {"id":"k-20261120-as-v43","date":"2026-11-20","help":"Formulierungsvorschläge für die Aufgabenstellung nach Janeks Vorgaben; Definition der Zylinderform bleibt offen (mit Betrieb und QM)","fach":true,"updated":"2026-11-20T12:20:00Z"},
-{"id":"k-chat05-20261107","date":"2026-11-07","help":"Websuche, Auswertung von Datenblättern/Katalogen (19 Geräte)","fach":true,"updated":"2026-11-20T12:00:00Z"}
+{"id":"k-chat05-20261107","date":"2026-11-07","help":"Websuche, Auswertung von Datenblättern/Katalogen (19 Geräte)","fach":true,"updated":"2026-11-20T12:00:00Z"},
+{"id":"mwrwtdn1f8nyi","date":"2026-11-22","help":"KI hat den Statusbericht projekt/Statusbericht_2026-11-22.md erstellt: Abgleich mit dem Pflichtenheft V1.2 (Stand 20.11.2026) und den Cockpit-Daten, Vorprüfung der Sensoren nach Katalogwerten (ohne Messung), Vorschläge für die nächsten Arbeitspakete und ein Auftrag für eine weitere Sitzung. Fachlicher Text: Sensor-Vorprüfung und Herleitung der %GRR-Grenze.","fach":true,"updated":"2026-11-22T14:05:50.030Z"}
 ]
