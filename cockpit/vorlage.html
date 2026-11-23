@@ -418,7 +418,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"]],
+    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["entscheidung","Gehört zu Entscheidung","dec"],["antwort","Antwort (Ergebnis der Frage)","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","erledigt"]],["note","Notiz","area"]],
@@ -461,6 +461,7 @@ const fd = s=>{const d=pd(s);return d?d.toLocaleDateString("de-DE",{day:"2-digit
 const days = s=>{const d=pd(s);return d?Math.round((d-today())/864e5):null;};
 const nid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 /* Präfixe je Sammlung (siehe CLAUDE.md, Abschnitt Präfixe): neue Nummer = höchste vergebene +1, auch über offene Vorschläge */
+const isAufg=t=>!!t&&t.typ!=="entscheidung";
 const colOf=t=>t&&t.typ==="entscheidung"&&t.status==="entschieden"?"erledigt":(t&&t.status||"offen");
 const ID_PREF={tasks:"t",postfach:"p",kilog:"k",deadlines:"d",reqs:"r",sensors:"s",sources:"q",files:"f",doku:"dk",checks:"c",tools:"wz",optionen:"o",freitage:"fr",packages:"pk",changes:"ae"};
 function idPrefix(coll,obj){return coll==="tasks"&&obj&&obj.typ==="entscheidung"?"e":(ID_PREF[coll]||"x");}
@@ -517,7 +518,7 @@ async function save(coll,id,obj){
 async function saveDirect(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
   const body=Object.assign({},obj);delete body.id;body.updated=new Date().toISOString();
-  try{const did=id||nidFor(coll,body);await S.db.collection(coll).doc(did).set(body);if(coll==="tasks")await syncTaskCheck(did,body);return true;}
+  try{const did=id||nidFor(coll,body);await S.db.collection(coll).doc(did).set(body);if(coll==="tasks"){await syncTaskCheck(did,body);await syncLinks(did,body);}return true;}
   catch(e){if(e&&e.code==="invalid_argument"){S.canWrite=false;}alert2(e&&e.code==="quota_exceeded"?"Speicher voll: bitte alte Einträge löschen.":"Speichern hat nicht geklappt. Bitte erneut versuchen.");render();return false;}
 }
 async function del(coll,id){
@@ -570,7 +571,7 @@ function navHtml(){
   let h=`<div style="padding:0 0 10px"><button class="btn" id="srchbtn" style="width:100%">Suchen</button><button class="btn pri" id="pendgo" style="width:100%;margin-top:8px">Aktualisieren</button></div>`;
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
-      if(c==="tasks")n=arr.filter(x=>colOf(x)!=="erledigt").length;
+      if(c==="tasks")n=arr.filter(x=>isAufg(x)&&colOf(x)!=="erledigt").length;
       if(c==="postfach")n=arr.filter(x=>x.status==="neu").length;
       if(k==="entscheidungen")n=S.data.tasks.filter(x=>x.typ==="entscheidung"&&(x.status||"offen")==="offen").length;
       if(c==="reqs")n=new Set(reqWarnings().map(w=>w[0])).size;
@@ -632,6 +633,7 @@ function openEditor(key,id,preset){
       const all=[...new Set([...optsFor(grp,opts),...sel])].filter(Boolean);
       return `<div class="mfield"><span class="mlab">${lab}</span><details class="mdrop"><summary>${sel.length?esc(sel.join(", ")):"– auswählen –"}</summary><div class="mchecks">${all.map(o=>`<label class="chk"><input type="checkbox" class="mchk" data-mk="${k}" value="${esc(o)}" ${sel.includes(o)?"checked":""}>${esc(o)}</label>`).join("")}</div></details><input type="hidden" id="${fid}" data-k="${k}" value="${esc(sel.join(", "))}"></div>`+
         (!ro?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" data-multi="1" style="margin:4px 0 8px">+ neue Option</button>`:"");}
+    if(type==="dec"){const ds=(S.data.tasks||[]).filter(t=>t.typ==="entscheidung").sort((a,b)=>String(a.title).localeCompare(String(b.title),"de"));return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}"><option value="">– keine –</option>${ds.map(d=>`<option value="${esc(d.id)}" ${String(v)===d.id?"selected":""}>${esc(shortT(d.title||"(ohne Titel)"))}</option>`).join("")}</select></label>`;}
     if(type==="select")return `<label for="${fid}">${lab}<select id="${fid}" data-k="${k}">${optsFor(grp,opts).map(o=>`<option ${String(v)===o?"selected":""} value="${esc(o)}">${esc(OPT_LAB[o]||CAP(o)||"–")}</option>`).join("")}</select></label>`+
         (addBtn?`<button type="button" class="btn sm" data-addopt="${fid}" data-group="${grp}" style="margin:4px 0 8px">+ neue Option</button>`:"");
     if(type==="bool")return `<label class="chk" for="${fid}"><input type="checkbox" id="${fid}" data-k="${k}" data-bool="1" ${v?"checked":""}>${lab}</label>`;
@@ -663,6 +665,7 @@ function openEditor(key,id,preset){
     else{const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;}
     await save("optionen",nidFor("optionen"),{feld:b.dataset.group,wert:v});});
   if(key==="postfach"){const ks=$("#f_postfach_kind");if(ks)ks.onchange=()=>{S.pfDraft=collectEdForm();openEditor(key,id,preset);};}
+  if(key==="decisions"&&id){const lk=(S.data.tasks||[]).filter(t=>isAufg(t)&&t.entscheidung===id);const box=document.createElement("div");box.className="tsec";box.innerHTML=`<h3>Verknüpfte Aufgaben (${lk.length})</h3>`+(lk.length?lk.map(t=>`<div class="small" style="padding:3px 0">${stPill(t.status)} ${esc(t.title||"")}${t.antwort?`<div class="muted">Antwort: ${esc(t.antwort)}</div>`:""}</div>`).join(""):`<p class="small muted">Noch keine Aufgabe verknüpft. Die Aufgabe trägst du unter „Gehört zu Entscheidung“ ein.</p>`);const fe=$("#edform");if(fe)fe.appendChild(box);}
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
     const obj=Object.assign({},rec);
     document.querySelectorAll("#edform [data-k]").forEach(el=>{const k=el.dataset.k;obj[k]=el.dataset.bool?el.checked:el.value;
@@ -743,9 +746,9 @@ function wpList(start){
 }
 function weekReport(start){
   const ch=wpChanges(start,wpNext(start));
-  const done=ch.filter(x=>x.c==="tasks"&&colOf(S.data.tasks.find(t=>t.id===x.id))==="erledigt");
+  const done=ch.filter(x=>x.c==="tasks"&&isAufg(S.data.tasks.find(t=>t.id===x.id))&&colOf(S.data.tasks.find(t=>t.id===x.id))==="erledigt");
   const groups={};ch.forEach(x=>{groups[x.kind]=(groups[x.kind]||0)+1;});
-  const open=S.data.tasks.filter(t=>colOf(t)!=="erledigt").sort(sortDue).slice(0,5);
+  const open=S.data.tasks.filter(t=>isAufg(t)&&colOf(t)!=="erledigt").sort(sortDue).slice(0,5);
   const nxt=S.data.deadlines.filter(d=>d.status!=="erledigt"&&d.date&&days(d.date)>=0).sort((a,b)=>a.date<b.date?-1:1).slice(0,3);
   return `Wochenbericht Technikerarbeit – ${wpRange(start)}\n\nErledigt in dieser Woche:\n${done.length?done.map(x=>"- "+x.label).join("\n"):"- –"}\n\nGeändert: ${ch.length} Einträge (${Object.entries(groups).map(([k,n])=>n+" "+k).join(", ")||"keine"})\n\nNächste Schritte:\n${open.map(t=>"- "+t.title+(t.due?" (bis "+fd(t.due)+")":"")).join("\n")}\n\nNächste Termine:\n${nxt.map(d=>"- "+fd(d.date)+": "+d.title).join("\n")}`;
 }
@@ -787,7 +790,7 @@ VIEWS.start=()=>{
   const nxt=dl.find(d=>days(d.date)>=0)||dl[0];
   const fri=(()=>{const d=new Date();d.setDate(d.getDate()+(5-d.getDay()+7)%7);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");})();
   const nt=(!nxt||!nxt.date||nxt.date>fri)?{id:null,title:"Freitag (Platzhalter)",date:fri,fri:true}:nxt;
-  const open=S.data.tasks.filter(t=>colOf(t)!=="erledigt");
+  const open=S.data.tasks.filter(t=>isAufg(t)&&colOf(t)!=="erledigt");
   const over=open.filter(t=>t.due&&days(t.due)<0);
   const dk=S.data.doku.slice();const pPlan=dk.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),pDone=dk.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
   const dkSt=["Idee","Notizen","Entwurf","fertig"].map(s=>[s,dk.filter(r=>r.status===s).length]);
@@ -823,7 +826,7 @@ VIEWS.aufgaben=()=>{
   const f=lsGet("taskFilter",{who:"",st:"offen"});
   const view=lsGet("taskView","tabelle");
   const can=S.canWrite&&!S.offline;
-  let rows=S.data.tasks.slice();
+  let rows=S.data.tasks.filter(isAufg);
   if(f.st==="offen")rows=rows.filter(t=>colOf(t)!=="erledigt");
   if(f.st==="über")rows=rows.filter(t=>colOf(t)!=="erledigt"&&t.due&&days(t.due)<0);
   if(f.st==="erledigt")rows=rows.filter(t=>colOf(t)==="erledigt");
@@ -833,7 +836,7 @@ VIEWS.aufgaben=()=>{
   const who=`<select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select>`;
   const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
   if(view==="board"){
-    const all=S.data.tasks.filter(t=>!f.who||t.who===f.who);
+    const all=S.data.tasks.filter(t=>isAufg(t)&&(!f.who||t.who===f.who));
     const cols=["offen","in Arbeit","erledigt"];
     const board=cols.map(c=>{
       let items=all.filter(t=>(t.status||"offen")===c);
@@ -901,11 +904,11 @@ VIEWS.offen=()=>{
   const can=S.canWrite&&!S.offline;
   const cols=["offen","in Arbeit","erledigt"];
   const board=cols.map(c=>{
-    const list=S.data.tasks.filter(t=>colOf(t)===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
+    const list=S.data.tasks.filter(t=>isAufg(t)&&colOf(t)===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Offene Punkte. Entscheidungen stehen hier ebenfalls, als gleiche Karte wie unter Entscheidungen; der Status gilt überall. Eine Karte in eine andere Spalte zu ziehen ändert den Status.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen stehen unter Entscheidungen. Eine Aufgabe ist mit ihrer Entscheidung verknüpft: Mit der Antwort wird die Entscheidung entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
 VIEWS_after.offen=()=>{
   if(!(S.canWrite&&!S.offline))return;
@@ -1056,13 +1059,13 @@ VIEWS.entscheidungen=()=>{
   const openN=all.filter(t=>(t.status||"offen")==="offen"||t.status==="in Arbeit").length;
   const cols=["offen","entschieden","entfallen"];
   const sortIt=(x,y)=>(x.due||"9999").localeCompare(y.due||"9999");
-  const card=d=>`<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(shortT(d.title||"(ohne Titel)"))}</div></div>`;
+  const card=d=>{const na=S.data.tasks.filter(t=>isAufg(t)&&t.entscheidung===d.id&&colOf(t)!=="erledigt").length;return `<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(shortT(d.title||"(ohne Titel)"))}</div>${na?`<div class="small muted">${na} ${na===1?"Aufgabe":"Aufgaben"} offen</div>`:""}</div>`;};
   const board=cols.map(c=>{
     const list=all.filter(d=>(d.status||"offen")===c).sort(c==="entschieden"?(x,y)=>String(y.date||"").localeCompare(String(x.date||"")):sortIt);
     const shown=c==="entschieden"?list.slice(0,10):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss. Dieselben Karten wie unter Aufgaben. Für „entschieden“ braucht es „Entschieden von“ und „Begründung“ (Karte antippen).</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
+  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss. Eine Entscheidung wird entschieden, sobald eine verknüpfte Aufgabe mit Antwort erledigt ist, oder von Hand mit „Entschieden von“ und „Begründung“.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board">${board}</div>`;
 };
@@ -1599,6 +1602,26 @@ function ckIdFor(tg){
   if(String(tg.id).startsWith("fr-"))return {id:tg.id,create:{title:fd(tg.date),hint:"",items:[],termin:tg.id}};
   const ex=checkFor(tg);if(ex)return {id:ex.id,create:null};
   return {id:"dl-"+tg.id,create:{title:tg.title,hint:tg.date?fd(tg.date):"",items:[],termin:tg.id}};
+}
+/* Verknüpfung Aufgabe ↔ Entscheidung: Antwort erledigt die Aufgabe und entscheidet die Entscheidung, und umgekehrt */
+async function syncLinks(id,obj){
+  try{
+    const all=S.data.tasks||[];
+    if(obj.typ==="entscheidung"){
+      if(obj.status!=="entschieden")return;
+      for(const t of all.filter(t=>isAufg(t)&&t.entscheidung===id&&t.status!=="erledigt")){
+        await save("tasks",t.id,Object.assign({},t,{status:"erledigt",antwort:t.antwort||obj.reason||""}));
+      }
+      return;
+    }
+    if(obj.status==="erledigt"&&obj.entscheidung){
+      const d=all.find(x=>x.id===obj.entscheidung&&x.typ==="entscheidung");
+      if(!d||d.status==="entschieden")return;
+      const reason=obj.antwort||d.reason||"";
+      if(!reason)return;
+      await save("tasks",d.id,Object.assign({},d,{status:"entschieden",reason:reason,by:d.by||obj.ask||obj.who||"",date:d.date||obj.date||new Date().toISOString().slice(0,10)}));
+    }
+  }catch(e){console.error("Verknüpfung konnte nicht aktualisiert werden",e);}
 }
 async function syncTaskCheck(tid,task){
   try{
