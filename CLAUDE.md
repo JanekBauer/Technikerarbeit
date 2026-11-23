@@ -7,7 +7,8 @@ Version 2, freigegeben von Janek am 23.11.2026. Vorgänger: `cockpit/_Versionen/
 - Janek wird mit „Janek“ angesprochen. Antworten auf Deutsch.
 - **Vor jeder Aufgabe zuerst `git pull`** (Branch `main`). Janek ändert im Web-Cockpit; die Änderungen kommen als Vorschläge ins Postfach.
 - **Maßgeblich für den Projektstand** sind die Dokumente im Repo. Die Dateien in `cockpit/daten/*.json` sind die Abbildung davon. Weichen sie voneinander ab, gewinnt das Dokument, und die Abweichung wird als Postfach-Vorschlag angelegt.
-- **Jede Änderung an Daten läuft über das Postfach.** Ausnahmen stehen in Abschnitt 9.
+- **Jede Änderung an Projektdaten läuft über das Postfach.** Ausnahmen stehen in Abschnitt 9.
+- **Änderungen an der Cockpit-Oberfläche** (Felder, Ansichten, Layout, Abläufe in `cockpit/vorlage.html` und `cockpit/build.py`) sind keine Daten. Sie kommen als Auftrag im Chat, werden direkt umgesetzt und auf `main` committet. Sie erscheinen nie im Postfach.
 - Was in den Daten fehlt, wurde gelöscht. Was dort „erledigt“ ist, ist erledigt. Keine älteren Chat-Stände als Wahrheit nehmen.
 
 ## 1. Wo was liegt
@@ -128,6 +129,7 @@ Ein Vorschlag mit `kind: "daten"` ist immer vollständig: Sammlung, ID, neuer In
 
 Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 
+0. **Cockpit-Oberfläche:** Änderungen an `cockpit/vorlage.html` und `cockpit/build.py` auf Auftrag im Chat, direkt committet. Kein Postfach-Vorschlag. Ein neues Feld im Formular ist keine Dateneingabe und erzeugt keinen Vorschlag.
 1. **Das Postfach selbst** (neue Einträge anlegen, Status setzen).
 2. **Spiegelung Aufgabe ↔ Checkliste:** Ändert Janek eine Aufgabe und übernimmt sie, wird die zugehörige Checkliste automatisch mitgeführt. Sie ist abgeleitet, kein eigener Vorschlag.
 3. **Checklisten und Werkzeuge:** Haken in Checklisten (`checks`) und Eingaben in den Werkzeugen (Morph. Kasten, Bewertung: `tools`) werden direkt gespeichert. Sie sind laufende Arbeitsstände und würden das Postfach überfluten.
