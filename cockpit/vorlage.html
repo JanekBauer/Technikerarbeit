@@ -4,15 +4,15 @@
 <title>TA-Cockpit Messanlage</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: Prüfprotokoll-Optik – linke Navigationsleiste (oben auf dem Handy), rechts Arbeitsfläche mit Tabellen und Karten */
 :root{
-  --bg:#eef1f4; --panel:#ffffff; --panel2:#f6f8fa; --ink:#17212b; --muted:#5b6876; --line:#d5dbe2;
-  --accent:#28598a; --accent-ink:#ffffff; --accent-soft:#dde8f3;
+  --bg:#f2f1ec; --panel:#fbfbf8; --panel2:#f3f3ee; --ink:#171b1f; --muted:#5d646c; --line:#d6d7d0;
+  --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e3eaf2;
   --ok:#2f7d4f; --ok-soft:#dcefe3; --warn:#a86a00; --warn-soft:#f7ead0; --bad:#b33a2e; --bad-soft:#f6dcd8; --off:#8a96a3; --off-soft:#e7ebef;
-  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-body:"Barlow","Segoe UI",Arial,sans-serif; --f-mono:"JetBrains Mono",Consolas,monospace;
-  --r:10px; --shadow:0 1px 2px rgba(23,33,43,.06),0 1px 1px rgba(23,33,43,.03);
+  --f-disp:"IBM Plex Sans","Segoe UI",Arial,sans-serif; --f-body:"IBM Plex Sans","Segoe UI",Arial,sans-serif; --f-mono:"IBM Plex Mono",Consolas,monospace;
+  --r:4px; --shadow:none;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#11161c; --panel:#18202a; --panel2:#1d2732; --ink:#e3e8ee; --muted:#9aa7b4; --line:#2c3845;
@@ -25,25 +25,26 @@
   --ok:#6cc58f; --ok-soft:#1d3527; --warn:#e2b04f; --warn-soft:#3a2f17; --bad:#f08a7e; --bad-soft:#40211d; --off:#7f8b97; --off-soft:#252f39;
   color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
-h1,h2,h3{font-family:var(--f-disp);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0}
-h1{font-size:26px} h2{font-size:22px} h3{font-size:17px}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+h1,h2,h3{font-family:var(--f-disp);font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h1{font-size:28px;line-height:1.2} h2{font-size:20px;line-height:1.3} h3{font-size:15px}
 .app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
 nav{background:var(--panel);border-right:1px solid var(--line);padding:18px 12px 24px;position:sticky;top:0;height:100vh;overflow:auto}
 .brand{padding:4px 8px 14px;border-bottom:1px solid var(--line);margin-bottom:8px}
 .brand b{font-family:var(--f-disp);font-size:22px;font-weight:700;display:block;line-height:1.1}
 .brand span{color:var(--muted);font-size:12.5px}
-.navgrp{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:16px 8px 6px}
+.navgrp{font-size:12.5px;font-weight:600;color:var(--muted);padding:18px 10px 6px}
 nav a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;margin:1px 0;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14.5px;transition:background .12s}
 nav a:hover{background:var(--panel2)}
-nav a.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+nav a.on{background:transparent;color:var(--accent);font-weight:600;box-shadow:inset 2px 0 0 var(--accent);border-radius:0}
 nav a .cnt{font-family:var(--f-mono);font-size:11.5px;line-height:1;padding:3px 6px;border-radius:999px;background:var(--panel2);color:var(--muted);min-width:22px;text-align:center}
-nav a.on .cnt{background:rgba(255,255,255,.22);color:var(--accent-ink)}
+nav a.on .cnt{background:var(--accent-soft);color:var(--accent)}
 #srchbtn{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-weight:400}
 #srchbtn::after{content:"/";font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
 main{padding-block:56px 60px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));min-width:0}
 .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
-.head p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.head p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.head>div>.tag{display:none}
 .tag{font-family:var(--f-body);font-size:12.5px;color:var(--muted)}
 .banner{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);padding:8px 12px;border-radius:var(--r);margin-bottom:14px;font-size:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
@@ -53,7 +54,7 @@ main{padding-block:56px 60px;padding-left:max(24px,env(safe-area-inset-left,0px)
 .wide{grid-column:1/-1}
 a.big{display:block;color:inherit;text-decoration:none}
 a.big:hover{border-color:var(--accent)}
-.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;border-radius:8px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .12s,background .12s}
+.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:var(--r);cursor:pointer;transition:border-color .12s,background .12s}
 .btn:hover{border-color:var(--accent);background:var(--panel2)}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.pri:hover{filter:brightness(1.06);background:var(--accent)}
@@ -111,8 +112,8 @@ tbody tr.click{cursor:pointer} tbody tr.click:hover td{background:var(--panel2)}
 .cd .d{font-family:var(--f-mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .cd .d small{font-size:12px;font-weight:400;color:var(--muted)}
 .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px}
-.big{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow)}
-.big .n{font-family:var(--f-disp);font-size:44px;font-weight:700;line-height:1}
+.big{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px}
+.big .n{font-family:var(--f-mono);font-size:40px;font-weight:500;line-height:1;letter-spacing:-.02em}
 .big .l{color:var(--muted);font-size:13.5px}
 .amp{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);align-items:start}
 .amp:last-child{border-bottom:none}
@@ -838,7 +839,7 @@ VIEWS.aufgaben=()=>{
   if(f.st==="erledigt")rows=rows.filter(t=>colOf(t)==="erledigt");
   if(f.who)rows=rows.filter(t=>t.who===f.who);
   rows.sort(sortDue);
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Wer bis wann was erledigt. Zum Bearbeiten antippen.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
+  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Jede Aufgabe mit Verantwortlichem und Frist. Zum Bearbeiten antippen.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
   const who=`<select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select>`;
   const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
   if(view==="board"){
@@ -914,7 +915,7 @@ VIEWS.offen=()=>{
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div>${cardMeta(t)}</div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen stehen unter Entscheidungen. Eine Aufgabe ist mit ihrer Entscheidung verknüpft: Mit der Antwort wird die Entscheidung entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board" style="--cols:3">${board}</div>`;
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen haben eigene Karten im Bereich Entscheidungen. Hängt eine Aufgabe an einer Entscheidung, wird die Entscheidung mit der Antwort entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board" style="--cols:3">${board}</div>`;
 };
 VIEWS_after.offen=()=>{
   if(!(S.canWrite&&!S.offline))return;
@@ -1071,7 +1072,7 @@ VIEWS.entscheidungen=()=>{
     const shown=c==="entschieden"?list.slice(0,10):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss. Eine Entscheidung wird entschieden, sobald eine verknüpfte Aufgabe mit Antwort erledigt ist, oder von Hand mit „Entschieden von“ und „Begründung“.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
+  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was noch entschieden werden muss. Eine Entscheidung gilt als getroffen, sobald eine verknüpfte Aufgabe mit Antwort erledigt ist, oder wenn du sie von Hand mit „Entschieden von“ und „Begründung“ abschließt.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board" style="--cols:3">${board}</div>`;
 };
@@ -1103,7 +1104,7 @@ const MAT={nitinol:{n:"Nitinol (austenitisch)",E:75,rho:6.45},nitinolM:{n:"Nitin
 const CASES={ss:{n:"Zwei Stützen, gelenkig (Einfeldträger)",k:5/384},ff:{n:"Beidseitig eingespannt",k:1/384},cont:{n:"Viele Stützen, Innenfeld (Durchlaufträger, Näherung)",k:1/384*1.0},cant:{n:"Kragarm (überstehendes Ende)",k:1/8}};
 VIEWS.rechner=()=>{
   const c=lsGet("calc",{mat:"nitinol",E:"",D:6.5,s:0.3,L:300,cs:"ss",fz:0.01,dmin:1.0,dmax:6.5,tol:10});
-  return `<div class="head"><div><span class="tag">Lösungsphase</span><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte und müssen mit einer Quelle belegt werden.</p></div></div>
+  return `<div class="head"><div><span class="tag">Lösungsphase</span><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte. Jeder Wert braucht eine Quelle.</p></div></div>
   <div class="grid g2">
    <div class="panel calc"><h3>Durchbiegung durch Eigengewicht</h3>
     <div class="in"><label for="c_mat">Werkstoff<select id="c_mat">${Object.entries(MAT).map(([k,m])=>`<option value="${k}" ${c.mat===k?"selected":""}>${m.n}</option>`).join("")}</select></label>
@@ -1202,7 +1203,7 @@ VIEWS.sensoren=()=>{
   const ds=r=>{const d=docs(r);const u=String(r.url||"").trim();const ok=/^https?:\/\//i.test(u);
     return (r.docs||[]).length?d:(ok?`<a class="small" href="${esc(u)}" target="_blank" rel="noopener" data-noedit>Hersteller-Link</a>`:`<span class="pill p-warn">fehlt</span>`);};
   const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["rep","Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}">${esc(r.rep||"–")}</span>`],["rate","Rate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],["det","Alle Werte",det],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Sensoren aus Datenblättern und Katalogen, die Ø 1,0 bis 6,5 mm abdecken. Grundmodelle haben ganze Nummern, Varianten x.1, x.2 usw. Der Datei-Chip öffnet direkt die Katalogseite. Zum Bearbeiten die Zeile anklicken.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
@@ -1415,7 +1416,7 @@ VIEWS.doku=()=>{
   const rows=S.data.doku.slice().sort(byNr);
   const plan=rows.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),done=rows.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
   const pct=v=>Math.min(100,v/60*100);
-  return `<div class="head"><div><span class="tag">Schule · UP5 · Chat 10</span><h1>Doku-Speicher</h1><p>Sachlogische Gliederung, nicht chronologisch. Notizen, Abbildungsideen und Quellen sammeln, solange sie frisch sind. Den Text schreibst du selbst.</p></div>${newBtn("doku","Neues Kapitel")}</div>
+  return `<div class="head"><div><span class="tag">Schule · UP5 · Chat 10</span><h1>Doku-Speicher</h1><p>Die Gliederung folgt der Sache, nicht der Chronologie. Notizen, Abbildungsideen und Quellen festhalten, solange sie frisch sind. Den Text schreibst du selbst.</p></div>${newBtn("doku","Neues Kapitel")}</div>
   <div class="panel" style="margin-bottom:14px"><div class="toolbar" style="justify-content:space-between"><b>Seitenumfang (Ziel 30–60 Seiten ohne Deckblatt, Verzeichnisse, Anhang)</b><span class="num">${f2(done,0)} geschrieben · ${f2(plan,0)} geplant</span></div>
    <svg viewBox="0 0 600 34" width="100%" role="img" aria-label="Seitenbalken"><rect x="0" y="8" width="600" height="14" rx="7" fill="var(--off-soft)"/><rect x="${30/60*600}" y="8" width="${300}" height="14" fill="var(--ok-soft)"/><rect x="0" y="8" width="${pct(plan)*6}" height="14" rx="7" fill="var(--accent-soft)"/><rect x="0" y="8" width="${pct(done)*6}" height="14" rx="7" fill="var(--accent)"/><text x="300" y="33" font-size="10" text-anchor="middle" fill="var(--muted)">30</text><text x="597" y="33" font-size="10" text-anchor="end" fill="var(--muted)">60</text></svg>
    ${plan>60?`<p>${pill("Plan über 60 Seiten","p-bad")}</p>`:plan&&plan<30?`<p>${pill("Plan unter 30 Seiten","p-warn")}</p>`:""}

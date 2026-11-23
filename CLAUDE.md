@@ -150,3 +150,10 @@ Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 ## 12. Geplante Aufgaben
 
 - Die Freitags-Vorbereitung (`vorbereitung.yml`) läuft automatisch. Aufbau, Zeitplan und Prompt stehen in `projekt/Geplante_Aufgabe_Wochenstatus_Freitag.md`.
+
+## 13. Texte für die Technikerarbeit
+
+- Jeder Text, den Claude Code für die Technikerarbeit schreibt, vor allem die Dokumentation, läuft vor der Abgabe durch zwei Prüfungen: den Unslop-Skill (deutsche Texte, Modus „Rewrite“) und den Humanizer. Für deutsche Texte gilt die Unslop-Regelbibliothek. Der Humanizer ist englischsprachig und greift bei deutschen Texten nur mit den allgemeinen Prinzipien.
+- Der Ablauf: erst Inhalt und Quellen festlegen, dann die beiden Prüfungen. Keine Zahl, kein Name und kein Datum wird dabei ergänzt, was nicht in der Quelle steht. Fehlende Angaben werden als Lücke gemeldet.
+- Der Schreibstil bleibt Janeks eigener. Bei Texten, die er selbst schreibt, bleiben seine Formulierungen erhalten. Die Prüfung meldet nur, was auffällt.
+- Die Gestaltung der Oberfläche folgt dem Entwurf im Repo (Schrift IBM Plex, Mono für Kennungen, keine Schatten, Ecken mit 4 px). Neue Bereiche halten sich daran.
