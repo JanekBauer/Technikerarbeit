@@ -44,7 +44,6 @@ nav a.on .cnt{background:var(--accent-soft);color:var(--accent)}
 main{padding-block:56px 60px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));min-width:0}
 .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
 .head p{margin:6px 0 0;color:var(--muted);max-width:68ch}
-.head>div>.tag{display:none}
 .tag{font-family:var(--f-body);font-size:12.5px;color:var(--muted)}
 .banner{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);padding:8px 12px;border-radius:var(--r);margin-bottom:14px;font-size:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
@@ -592,7 +591,7 @@ function render(){
   let pre="";
   if(S.offline)pre+=`<div class="banner">Die Daten des Cockpits sind gerade nicht erreichbar. Bitte die Seite neu laden.</div>`;
   else if(S.slow)pre+=`<div class="banner">Die Daten antworten gerade langsam. Angezeigtes kann veraltet sein.</div>`;
-  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten und Löschen oben rechts „Bearbeiten freischalten“ wählen (GitHub-Token nötig). Hoch- und Herunterladen von Dateien geht im Archiv.</div>`;
+  if(!S.canWrite&&!S.offline)pre+=`<div class="banner">Lesefassung. Zum Bearbeiten oben rechts „Bearbeiten freischalten“ wählen.</div>`;
   if(S.msg)pre+=`<div class="banner">${esc(S.msg)}</div>`;
   $("#main").innerHTML=pre+v();
   S.dirty=false;
@@ -811,7 +810,7 @@ VIEWS.start=()=>{
   const past=wpList(curStart).slice(1,20);
   const pastPanel=`<div class="panel" style="height:170px;overflow:auto;box-sizing:border-box;margin:0"><h3>Frühere Wochenberichte</h3>${past.length?`<ul class="clean">${past.map(s=>{const n=wpChanges(s,wpNext(s)).length;return `<li style="padding:6px 0;border-bottom:1px solid var(--line)"><a href="#" data-wp="${s}" style="display:flex;justify-content:space-between;gap:8px;color:inherit;text-decoration:none"><span>${esc(wpRange(s))}</span><span class="muted small">${n} Änderungen</span></a></li>`;}).join("")}</ul>`:'<p class="muted small">Noch keine früheren Berichte.</p>'}</div>`;
   const lastUpd=COLLS.reduce((m,c)=>S.data[c].reduce((mm,r)=>r.updated&&r.updated>mm?r.updated:mm,m),"");
-  return `<div class="head"><div><span class="tag">Technikerarbeit · Janek Bauer</span><h1>Übersicht</h1>
+  return `<div class="head"><div><h1>Übersicht</h1>
     <p class="small muted">Stand: ${lastUpd?new Date(lastUpd).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–"}</p></div></div>
   <div class="hero">
     <a class="big" ${nt.id?`href="#" data-termin="${esc(nt.id)}"`:`href="#" data-termin="fr-${esc(nt.date)}"`}><div class="l">Nächster Termin</div><div class="n">${nt.date?(days(nt.date)<0?"–":days(nt.date)):"–"}<span style="font-size:18px"> Tage</span></div><div class="l">${nt.date?esc(nt.title)+" · "+(nt.approx?"ca. ":"")+fd(nt.date):"Keine Termine angelegt"}</div></a>
@@ -839,7 +838,7 @@ VIEWS.aufgaben=()=>{
   if(f.st==="erledigt")rows=rows.filter(t=>colOf(t)==="erledigt");
   if(f.who)rows=rows.filter(t=>t.who===f.who);
   rows.sort(sortDue);
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Offene Punkte</h1><p>Jede Aufgabe mit Verantwortlichem und Frist. Zum Bearbeiten antippen.${view==="board"&&can?" Im Board Karten in eine andere Spalte ziehen, um den Status zu ändern.":""}</p></div>${newBtn("tasks","Neuer Punkt")}</div>`;
+  const head=`<div class="head"><div><h1>Offene Punkte</h1></div>${newBtn("tasks","Neuer Punkt")}</div>`;
   const who=`<select id="tfwho" aria-label="Wer"><option value="">Alle Personen</option>${WHO.map(w=>`<option ${f.who===w?"selected":""}>${w}</option>`).join("")}</select>`;
   const sw=`<span class="vswitch"><button class="btn sm ${view==="tabelle"?"pri":""}" data-tv="tabelle">Tabelle</button><button class="btn sm ${view==="board"?"pri":""}" data-tv="board">Board</button></span>`;
   if(view==="board"){
@@ -874,7 +873,7 @@ VIEWS_after.aufgaben=()=>{
 VIEWS.einstellungen=()=>{
   const can=S.canWrite&&!S.offline;
   const rows=(S.data.optionen||[]).filter(o=>o.feld==="person").sort((a,b)=>String(a.wert).localeCompare(String(b.wert),"de"));
-  return `<div class="head"><div><span class="tag">Einstellungen</span><h1>Optionen</h1><p>Personen und Abteilungen für „Wer führt durch“, „Wen fragen“ und „Entschieden von“. Umbenennen oder Löschen wirkt auf die Auswahl. Bereits eingetragene Einträge behalten ihren alten Text.</p></div></div>`+
+  return `<div class="head"><div><h1>Optionen</h1><p>Umbenennen oder Löschen wirkt nur auf die Auswahl. Eingetragene Einträge behalten ihren Text.</p></div></div>`+
     (can?`<div class="toolbar"><input id="optnew" placeholder="Neue Person oder Abteilung" aria-label="Neue Option" style="min-width:260px"><button class="btn pri" id="optadd">Hinzufügen</button></div>`:"")+
     `<div class="tbl"><table><thead><tr><th>Name</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr><td><input value="${esc(o.wert)}" data-optname="${esc(o.id)}" ${can?"":"disabled"} style="width:100%"></td><td>${can?`<button class="btn sm danger" data-optdel="${esc(o.id)}">Löschen</button>`:""}</td></tr>`).join("")||'<tr><td colspan="2" class="empty">Noch keine Optionen.</td></tr>'}</tbody></table></div>`;
 };
@@ -890,7 +889,7 @@ VIEWS.postfach=()=>{
   const show=lsGet("pfDrop",false);
   const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
   const dropped=S.data.postfach.filter(p=>p.status==="verworfen");
-  const head=`<div class="head"><div><span class="tag">Steuerung</span><h1>Postfach</h1><p>Neue Vorschläge kommen zuerst in den Eingang. Dort entscheidest du, ob ein Vorschlag übernommen wird und in welche Kategorie er gehört. Der Altbestand aus dem bisherigen Cockpit steht auch hier, erkennbar an „Altbestand“.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
+  const head=`<div class="head"><div><h1>Postfach</h1><p>Vorschläge landen zuerst hier. Du übernimmst oder verwirfst sie. Der Altbestand ist mit „Altbestand“ markiert.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
   return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span>${can?'<button class="btn" id="pruefbtn">Dokumente prüfen</button>':""}<label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
     listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Quelle / Vorschlag von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."})+
     (show?`<h3 style="margin-top:18px">Verworfen (${dropped.length})</h3><p class="small muted">Zum Wiederherstellen Eintrag antippen und den Eingang auf „neu“ setzen.</p>`+
@@ -915,7 +914,7 @@ VIEWS.offen=()=>{
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div>${cardMeta(t)}</div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen haben eigene Karten im Bereich Entscheidungen. Hängt eine Aufgabe an einer Entscheidung, wird die Entscheidung mit der Antwort entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board" style="--cols:3">${board}</div>`;
+  return `<div class="head"><div><h1>Aufgaben</h1></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board" style="--cols:3">${board}</div>`;
 };
 VIEWS_after.offen=()=>{
   if(!(S.canWrite&&!S.offline))return;
@@ -1002,7 +1001,7 @@ async function pfAcceptRaw(id,pre){
 VIEWS.aenderungsdoku=()=>{
   const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
-  return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 6</span><h1>Änderungsdoku</h1><p>Wird erst geführt, sobald das Pflichtenheft unterschrieben ist und eine Änderungsdoku nötig wird. Bis dahin bleibt sie leer. Als Tabelle lässt sie sich nach Word kopieren.</p></div>${newBtn("changes","Neue Änderung")}</div>
+  return `<div class="head"><div><h1>Änderungsdoku</h1><p>Bleibt leer, bis das Pflichtenheft unterschrieben ist. Als Tabelle nach Word kopierbar.</p></div>${newBtn("changes","Neue Änderung")}</div>
   <div class="toolbar"><span class="pill p-acc">${ch.length} Einträge</span><span style="flex:1"></span><button class="btn" id="chcopy">Für Word kopieren</button></div>`+
   listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]],{empty:"Noch keine Änderungen. Einträge kommen erst nach der Unterschrift des Pflichtenhefts."})+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`;
@@ -1012,7 +1011,7 @@ VIEWS_after.aenderungsdoku=()=>{const c=$("#chcopy");if(c)c.onclick=()=>copyText
 VIEWS.zeitleiste=()=>{
   const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
   const svg=timelineSvg();
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Terminleiste</h1><p>Schulische und betriebliche Termine.<br><span style="color:var(--ok)">Grün</span> = erledigt · <span style="color:var(--warn)">Gelb</span> = Betrieb · <span style="color:var(--accent)">Blau</span> = Schule</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
+  return `<div class="head"><div><h1>Terminleiste</h1><p>Schulische und betriebliche Termine.<br><span style="color:var(--ok)">Grün</span> = erledigt · <span style="color:var(--warn)">Gelb</span> = Betrieb · <span style="color:var(--accent)">Blau</span> = Schule</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px">${svg}</div>`+
   listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${r.approx?"ca. ":""}${dueCell(r.date,r.status==="erledigt")}</div>`],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]])+frBlock();
 };
@@ -1052,7 +1051,7 @@ VIEWS.anforderungen=()=>{
   const rsort=lsGet("reqSort","nr");const rows=reqSorted(S.data.reqs,rsort);const W=reqWarnings();
   const wfor=r=>W.filter(w=>w[0]===r).map(w=>w[1]);
   const fOpen=rows.filter(r=>r.art==="F"&&r.status!=="bestätigt").length;
-  return `<div class="head"><div><span class="tag">Pflichtenheft · Kap. 3</span><h1>Anforderungsliste</h1><p>F = Festanforderung (muss erfüllt sein, wird nicht gewichtet), M = Mindestanforderung, W = Wunschanforderung. Werte nur mit Quelle und Datum vom Betrieb als „bestätigt“ markieren.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reqcopy">Als Tabelle kopieren</button>${newBtn("reqs","Neue Anforderung")}</div></div>
+  return `<div class="head"><div><h1>Anforderungsliste</h1><p>F = Festanforderung (muss erfüllt sein, wird nicht gewichtet), M = Mindestanforderung, W = Wunschanforderung. Werte nur mit Quelle und Datum vom Betrieb als „bestätigt“ markieren.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reqcopy">Als Tabelle kopieren</button>${newBtn("reqs","Neue Anforderung")}</div></div>
   <div class="toolbar"><select id="reqsort" aria-label="Sortierung">${REQ_SORTS.map(([v,l])=>`<option value="${v}" ${rsort===v?"selected":""}>${l}</option>`).join("")}</select>${pill(rows.length+" Anforderungen","p-acc")} ${pill(rows.filter(r=>r.status==="bestätigt").length+" bestätigt","p-ok")} ${pill(fOpen+" F noch nicht bestätigt",fOpen?"p-warn":"p-ok")}</div>`+
   listTable("reqs",rows,[["nr","Nr.",r=>`<span class="num">${esc(r.nr)}</span>`],["art","Art",r=>r.art&&r.art!=="–"?pill(r.art,r.art==="F"?"p-bad":r.art==="M"?"p-warn":"p-acc"):""],["text","Anforderung",r=>`${r.group?`<div class="small muted">${esc(r.group)}</div>`:""}${nl(r.text)}`],["min","min.",r=>`<span class="num">${esc(r.min)}</span>`],["exact","exakt",r=>`<span class="num">${esc(r.exact)}</span>`],["max","max.",r=>`<span class="num">${esc(r.max)}</span>`],["unit","Einheit"],["status","Status",r=>stPill(r.status)],["source","Quelle",r=>`<span class="small">${esc(r.source)}${r.date?"<br>"+fd(r.date):""}</span>`],["w","Prüfung",r=>{const w=wfor(r);return w.length?w.map(x=>pill(x,"p-warn")).join(" "):pill("ok","p-ok");}]])+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(["Nr.\tArt\tAnforderung\tSymbol\tmin.\texakt\tmax.\tEinheit"].concat(rows.map(r=>[r.nr,r.art,(r.text||"").replace(/\n/g," "),r.sym,r.min,r.exact,r.max,r.unit].map(v=>v==null?"":v).join("\t"))).join("\n"))}</textarea>`;
@@ -1072,7 +1071,7 @@ VIEWS.entscheidungen=()=>{
     const shown=c==="entschieden"?list.slice(0,10):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was noch entschieden werden muss. Eine Entscheidung gilt als getroffen, sobald eine verknüpfte Aufgabe mit Antwort erledigt ist, oder wenn du sie von Hand mit „Entschieden von“ und „Begründung“ abschließt.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
+  return `<div class="head"><div><h1>Entscheidungen</h1><p>Eine Entscheidung gilt als getroffen, sobald die verknüpfte Aufgabe mit Antwort erledigt ist. Von Hand schließt du sie mit „Entschieden von“ und „Begründung“ ab.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board" style="--cols:3">${board}</div>`;
 };
@@ -1104,7 +1103,7 @@ const MAT={nitinol:{n:"Nitinol (austenitisch)",E:75,rho:6.45},nitinolM:{n:"Nitin
 const CASES={ss:{n:"Zwei Stützen, gelenkig (Einfeldträger)",k:5/384},ff:{n:"Beidseitig eingespannt",k:1/384},cont:{n:"Viele Stützen, Innenfeld (Durchlaufträger, Näherung)",k:1/384*1.0},cant:{n:"Kragarm (überstehendes Ende)",k:1/8}};
 VIEWS.rechner=()=>{
   const c=lsGet("calc",{mat:"nitinol",E:"",D:6.5,s:0.3,L:300,cs:"ss",fz:0.01,dmin:1.0,dmax:6.5,tol:10});
-  return `<div class="head"><div><span class="tag">Lösungsphase</span><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte. Jeder Wert braucht eine Quelle.</p></div></div>
+  return `<div class="head"><div><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte. Jeder Wert braucht eine Quelle.</p></div></div>
   <div class="grid g2">
    <div class="panel calc"><h3>Durchbiegung durch Eigengewicht</h3>
     <div class="in"><label for="c_mat">Werkstoff<select id="c_mat">${Object.entries(MAT).map(([k,m])=>`<option value="${k}" ${c.mat===k?"selected":""}>${m.n}</option>`).join("")}</select></label>
@@ -1203,7 +1202,7 @@ VIEWS.sensoren=()=>{
   const ds=r=>{const d=docs(r);const u=String(r.url||"").trim();const ok=/^https?:\/\//i.test(u);
     return (r.docs||[]).length?d:(ok?`<a class="small" href="${esc(u)}" target="_blank" rel="noopener" data-noedit>Hersteller-Link</a>`:`<span class="pill p-warn">fehlt</span>`);};
   const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["rep","Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}">${esc(r.rep||"–")}</span>`],["rate","Rate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],["det","Alle Werte",det],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Sensoren aus Datenblättern und Katalogen, die Ø 1,0 bis 6,5 mm abdecken. Grundmodelle haben ganze Nummern, Varianten x.1, x.2 usw. Der Datei-Chip öffnet direkt die Katalogseite. Zum Bearbeiten die Zeile anklicken.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
+  return `<div class="head"><div><h1>Sensorvergleich</h1><p>Sensoren für Ø 1,0 bis 6,5 mm. Varianten tragen hinter der Grundnummer x.1, x.2 usw.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
@@ -1222,7 +1221,7 @@ VIEWS.morpho=()=>{
   const m=mkNorm(getTool("morph",MORPH_DEF));const ro=!S.canWrite||S.offline;
   const nrOf=id=>m.rows.findIndex(o=>o.id===id)+1;
   const cols=Math.max(3,...m.rows.map(r=>r.ideas.length));
-  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 06</span><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungen. Eine Lösung je Teilfunktion ergibt eine Kombination (Konzept). Nicht umsetzbare Lösungen gleich streichen; Varianten, die Festanforderungen nicht erfüllen, werden nicht weiterverfolgt. Unter „Abhängig von“ die Nummern der Teilfunktionen anklicken, die nur gemeinsam mit dieser Zeile entschieden werden dürfen (UP4) – die Verknüpfung gilt automatisch in beide Richtungen. Die Konzepte (Kombinationen) stellst du in der Variantenauswahl zusammen. Gespeichert wird automatisch.</p></div>
+  let h=`<div class="head"><div><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungen. Eine Lösung je Teilfunktion ergibt eine Kombination (Konzept). Nicht umsetzbare Lösungen gleich streichen; Varianten, die Festanforderungen nicht erfüllen, werden nicht weiterverfolgt. Unter „Abhängig von“ die Nummern der Teilfunktionen anklicken, die nur gemeinsam mit dieser Zeile entschieden werden dürfen (UP4) – die Verknüpfung gilt automatisch in beide Richtungen. Die Konzepte (Kombinationen) stellst du in der Variantenauswahl zusammen. Gespeichert wird automatisch.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="mk_addcol">Ideen-Spalte +</button><button class="btn pri" id="mk_addrow">Teilfunktion +</button></div>`}</div>
   <div class="tbl mk"><table><thead><tr><th>Nr.</th><th>Teilfunktion</th><th>Abhängig von</th>${Array.from({length:cols},(_,i)=>`<th>Lösung ${i+1}</th>`).join("")}<th></th></tr></thead><tbody>`;
   if(!m.rows.length)h+=`<tr><td colspan="${cols+4}" class="empty">Noch keine Teilfunktionen. Leg mit „Teilfunktion +“ die erste an.</td></tr>`;
@@ -1255,7 +1254,7 @@ VIEWS.variantenauswahl=()=>{
   const cell=(v,vi,a)=>`<input data-evd="${esc(a.id)}" data-v="${vi}" value="${esc((v.desc&&v.desc[a.id])||"")}" ${ro?"readonly":""} aria-label="${esc(a.name)} für ${esc(v.name)}" style="width:100%;min-width:90px;${inp}">`;
   const konz=!m.rows.length?'<div class="empty">Noch keine Teilfunktionen im Morph. Kasten.</div>':
     `<div class="tbl mk"><table><thead><tr><th>Teilfunktion</th>${mv.map((k,ki)=>`<th><div class="toolbar" style="margin:0"><input data-mvname="${ki}" value="${esc(k.name)}" ${ro?"readonly":""} aria-label="Konzeptname" style="flex:1;min-width:80px;font-weight:600;${inp}">${ro?"":`<button class="btn sm" data-mvdel="${ki}" aria-label="Konzept löschen">×</button>`}</div></th>`).join("")}</tr></thead><tbody>${m.rows.map((r,ri)=>`<tr><td class="small"><b>TF${ri+1}</b> ${esc(r.fn||"")}</td>${mv.map((k,ki)=>`<td><select data-mvpick="${ri}" data-mv="${ki}" ${ro?"disabled":""} aria-label="Lösung TF${ri+1} für ${esc(k.name)}" style="max-width:220px"><option value="">–</option>${(r.ideas||[]).filter(x=>String(x).trim()).map(x=>`<option value="${esc(x)}" ${(k.pick||{})[r.id]===x?"selected":""}>${esc(x)}</option>`).join("")}</select></td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Variantenauswahl</h1><p>Ablauf: 1. Konzepte zusammenstellen: je Teilfunktion eine Lösung wählen, nur verträgliche Kombinationen. 2. Varianten für die Bewertung übernehmen und Festanforderungen prüfen; Varianten, die eine Festanforderung nicht erfüllen, scheiden aus. 3. Varianten beschreiben, damit die Bewertung darauf angewendet werden kann.</p></div>
+  return `<div class="head"><div><h1>Variantenauswahl</h1><p>Ablauf: 1. Konzepte zusammenstellen: je Teilfunktion eine Lösung wählen, nur verträgliche Kombinationen. 2. Varianten für die Bewertung übernehmen und Festanforderungen prüfen; Varianten, die eine Festanforderung nicht erfüllen, scheiden aus. 3. Varianten beschreiben, damit die Bewertung darauf angewendet werden kann.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="mk_addvar">Konzept +</button><button class="btn" id="ev_impv">Konzepte in Bewertung übernehmen</button></div>`}</div>
   <div class="panel"><h3>1. Konzepte zusammenstellen</h3><p class="note">Pro Konzept je Teilfunktion eine Lösung aus dem Morph. Kasten wählen. Die Konzepte werden über „Konzepte in Bewertung übernehmen“ zu Varianten.</p>
    ${mv.length?"":'<p class="note">Noch keine Konzepte. Mit „Konzept +“ anlegen.</p>'}${konz}</div>
@@ -1315,7 +1314,7 @@ VIEWS.bewertung=()=>{
     sens=flips.length?`<div class="banner">Das Ergebnis kippt, wenn sich diese Gewichte ändern: ${esc(flips.join(", "))}. Gewichtung mit dem Betrieb absichern.</div>`:`<p>${pill("robust","p-ok")} Die beste Variante bleibt vorn, auch wenn jedes Gewicht um ±20 % schwankt.</p>`;}
   const n=e.criteria.length;
   const pv=(i,j)=>{const a=e.criteria[i].id,b=e.criteria[j].id;if(i<j){const v=e.pair[a+"|"+b];return v===undefined||v===""?"":Number(v);}const v=e.pair[b+"|"+a];return v===undefined||v===""?"":2-Number(v);};
-  let h=`<div class="head"><div><span class="tag">Lösungsphase · Chat 07</span><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Bewertungskriterien festlegen (ca. 5, höchstens 10, positiv formuliert: mehr Punkte = besser), 2. paarweiser Vergleich für Gewichte, 3. Punkte je Variante, 4. Nutzwert und prozentuale Erfüllung, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
+  let h=`<div class="head"><div><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Bewertungskriterien festlegen (ca. 5, höchstens 10, positiv formuliert: mehr Punkte = besser), 2. paarweiser Vergleich für Gewichte, 3. Punkte je Variante, 4. Nutzwert und prozentuale Erfüllung, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impc">Kriterien aus Pflichtenheft übernehmen</button></div>`}</div>
   <div>
   <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser. Reihenfolge wie im Pflichtenheft (K1 = erste Anforderung).</p>
@@ -1394,7 +1393,7 @@ VIEWS.meilensteine=()=>{
    ${l.hint?`<p class="note">${esc(l.hint)}</p>`:""}
    ${it.map((x,i)=>`<label class="ck ${x.done?"done":""}"><input type="checkbox" data-ck="${esc(l.id)}" data-i="${i}" ${x.done?"checked":""} ${ro?"disabled":""}><span>${esc(x.t)}</span>${ro?"":`<span style="white-space:nowrap"><button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="-1" ${i===0?"disabled":""} aria-label="Punkt nach oben">↑</button> <button class="btn sm" data-ckmv="${esc(l.id)}" data-i="${i}" data-d="1" ${i===it.length-1?"disabled":""} aria-label="Punkt nach unten">↓</button> <button class="btn sm" data-ckdel="${esc(l.id)}" data-i="${i}" aria-label="Punkt löschen">×</button></span>`}</label>${ro?"":`<div class="small" style="margin:-4px 0 8px 28px"><select data-ckto="${esc(l.id)}" data-i="${i}" aria-label="In Termin verschieben" style="max-width:100%"><option value="">→ zu einem Termin verschieben …</option>${termOpts}</select></div>`}`).join("")}
    ${ro?"":`<div style="margin-top:8px;min-width:0"><select data-ckaddtask="${esc(l.id)}" aria-label="Aufgabe oder Entscheidung hinzufügen" style="width:100%;max-width:100%;box-sizing:border-box"><option value="">+ offene Aufgabe oder Entscheidung hinzufügen …</option>${ckTaskOpts()}</select></div>`}${ro?"":`<div class="toolbar" style="margin-top:8px"><input data-cknew="${esc(l.id)}" placeholder="Punkt hinzufügen" aria-label="Neuer Punkt" style="flex:1;min-width:0"><button class="btn sm" data-ckadd="${esc(l.id)}">+</button></div>`}</div>`;};
-  return `<div class="head"><div><span class="tag">Schule · UP0 / UP5 / UP7</span><h1>Checklisten</h1><p>Pflichtunterlagen und Prüfpunkte für die Meilensteine, die Formalia der Dokumentation, die Abgabe und die Präsentation.</p></div></div>
+  return `<div class="head"><div><h1>Checklisten</h1></div></div>
   <div class="toolbar"><span class="pill p-acc">${openL.length} offen</span><span style="flex:1"></span><label class="small"><input type="checkbox" id="ckdone" ${showDone?"checked":""}> erledigte anzeigen (${doneL.length})</label></div>
   <h3 class="small muted" style="margin:12px 0 6px">Offen</h3>
   <div class="grid g2">${openL.map(card).join("")||'<div class="empty">Keine offenen Checklisten.</div>'}</div>
@@ -1416,18 +1415,18 @@ VIEWS.doku=()=>{
   const rows=S.data.doku.slice().sort(byNr);
   const plan=rows.reduce((a,r)=>a+(num(r.pagesPlan)||0),0),done=rows.reduce((a,r)=>a+(num(r.pagesDone)||0),0);
   const pct=v=>Math.min(100,v/60*100);
-  return `<div class="head"><div><span class="tag">Schule · UP5 · Chat 10</span><h1>Doku-Speicher</h1><p>Die Gliederung folgt der Sache, nicht der Chronologie. Notizen, Abbildungsideen und Quellen festhalten, solange sie frisch sind. Den Text schreibst du selbst.</p></div>${newBtn("doku","Neues Kapitel")}</div>
+  return `<div class="head"><div><h1>Doku-Speicher</h1><p>Den Text schreibst du selbst. Notizen und Quellen früh festhalten.</p></div>${newBtn("doku","Neues Kapitel")}</div>
   <div class="panel" style="margin-bottom:14px"><div class="toolbar" style="justify-content:space-between"><b>Seitenumfang (Ziel 30–60 Seiten ohne Deckblatt, Verzeichnisse, Anhang)</b><span class="num">${f2(done,0)} geschrieben · ${f2(plan,0)} geplant</span></div>
    <svg viewBox="0 0 600 34" width="100%" role="img" aria-label="Seitenbalken"><rect x="0" y="8" width="600" height="14" rx="7" fill="var(--off-soft)"/><rect x="${30/60*600}" y="8" width="${300}" height="14" fill="var(--ok-soft)"/><rect x="0" y="8" width="${pct(plan)*6}" height="14" rx="7" fill="var(--accent-soft)"/><rect x="0" y="8" width="${pct(done)*6}" height="14" rx="7" fill="var(--accent)"/><text x="300" y="33" font-size="10" text-anchor="middle" fill="var(--muted)">30</text><text x="597" y="33" font-size="10" text-anchor="end" fill="var(--muted)">60</text></svg>
    ${plan>60?`<p>${pill("Plan über 60 Seiten","p-bad")}</p>`:plan&&plan<30?`<p>${pill("Plan unter 30 Seiten","p-warn")}</p>`:""}
-   <p class="note">Formalia-Checkliste: unter „Checklisten“.</p></div>`+
+   </div>`+
   listTable("doku",rows,[["nr","Nr.",r=>`<span class="num">${esc(r.nr)}</span>`],["title","Kapitel"],["status","Status",r=>stPill(r.status)],["p","Seiten",r=>`<span class="num">${esc(r.pagesDone||0)}/${esc(r.pagesPlan||"–")}</span>`],["notes","Notizen",r=>`<span class="small">${nl(r.notes)}</span>`],["figures","Abbildungen",r=>`<span class="small">${nl(r.figures)}</span>`],["refs","Quellen",r=>`<span class="small">${esc(r.refs)}</span>`]]);
 };
 
 VIEWS.quellen=()=>{
   const rows=S.data.sources.slice().sort((a,b)=>(num(a.nr)||999)-(num(b.nr)||999));
   const txt=rows.map(r=>`[${r.nr}] ${(r.text||"").replace(/\n/g," ")}${r.kind==="Internet"&&r.accessed?" (Stand: "+fd(r.accessed)+")":""}`).join("\n");
-  return `<div class="head"><div><span class="tag">Schule · UP5</span><h1>Quellenverzeichnis</h1><p>Nummern in der Reihenfolge, in der die Quellen im Text zitiert werden. Schema: Name, Vorname: Titel. Auflage. Ort: Verlag, Jahr. Im Text: [n, S. x].</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="srccopy">Verzeichnis kopieren</button>${newBtn("sources","Neue Quelle",)}</div></div>`+
+  return `<div class="head"><div><h1>Quellenverzeichnis</h1><p>Nummern in der Reihenfolge, in der die Quellen im Text zitiert werden. Schema: Name, Vorname: Titel. Auflage. Ort: Verlag, Jahr. Im Text: [n, S. x].</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="srccopy">Verzeichnis kopieren</button>${newBtn("sources","Neue Quelle",)}</div></div>`+
   listTable("sources",rows,[["nr","Nr.",r=>`<span class="num">[${esc(r.nr)}]</span>`],["kind","Art",r=>pill(r.kind,"p-acc")],["text","Quellenangabe"],["accessed","Stand",r=>r.accessed?`<span class="num">${fd(r.accessed)}</span>`:""],["used","Verwendet in",r=>`<span class="small">${esc(r.used)}</span>`]])+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(txt)}</textarea>`;
 };
@@ -1436,7 +1435,7 @@ VIEWS_after.quellen=()=>{const b=$("#srccopy");if(b)b.onclick=()=>copyText($("#c
 VIEWS["ki-logbuch"]=()=>{
   const rows=S.data.kilog.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   const f=rows.filter(r=>r.fach).length;
-  return `<div class="head"><div><span class="tag">Schule · Selbstständigkeitserklärung</span><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
+  return `<div class="head"><div><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
   <div class="toolbar">${pill(rows.length+" Einträge","p-acc")} ${pill(f+" mit fachlichem Text durch KI",f?"p-bad":"p-ok")}</div>`+
   listTable("kilog",rows,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["help","Art der Hilfe",r=>`<span class="small">${nl(r.help||r.purpose||r.zweck||"")}</span>`],["fach","",r=>r.fach?pill("fachlich","p-bad"):""]]);
 };
@@ -1505,7 +1504,7 @@ VIEWS.dateien=()=>{
   const folders=Object.keys(t).sort((a,b)=>a.localeCompare(b,"de",{numeric:true}));
   let nDoc=0,nFile=0,nMiss=0;folders.forEach(fo=>Object.values(t[fo]).forEach(v=>{nDoc++;v.forEach(x=>x.missing?nMiss++:nFile++);}));
   const openF=lsGet("archOpen",null);S.archVer=S.archVer||{};
-  let h=`<div class="head"><div><span class="tag">Ablage · auch ohne Laptop</span><h1>Archiv</h1><p>Alle Unterlagen der Technikerarbeit in Ordnern. Jedes Dokument zeigt seine neueste Version; über „Verlauf“ kommst du an jede ältere Version. Hochgeladene Dateien liegen im GitHub-Ordner docs/archiv und sind öffentlich sichtbar. Einträge „noch ohne Datei“ kannst du mit „Datei hinzufügen“ nachreichen.</p></div>
+  let h=`<div class="head"><div><h1>Archiv</h1><p>Die neueste Version steht oben, ältere Stände findest du über „Verlauf“. Hochgeladene Dateien liegen öffentlich im Repo unter docs/archiv.</p></div>
    <div class="facts">${can?`<button class="btn pri" id="archup">Datei hochladen</button>`:""}<button class="btn" id="zipall">Alles als ZIP</button><button class="btn" id="zipallv">ZIP mit allen Versionen</button></div></div>
    
    <div class="toolbar">${pill(nDoc+" Dokumente","p-acc")} ${pill(nFile+" Dateien","p-ok")} ${nMiss?pill(nMiss+" Versionen fehlen","p-warn"):""} <input id="archq" type="search" placeholder="Suchen …" aria-label="Archiv durchsuchen" style="flex:1 1 180px;max-width:320px"></div>`;
