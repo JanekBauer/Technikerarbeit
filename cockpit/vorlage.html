@@ -12,7 +12,7 @@
   --accent:#28598a; --accent-ink:#ffffff; --accent-soft:#dde8f3;
   --ok:#2f7d4f; --ok-soft:#dcefe3; --warn:#a86a00; --warn-soft:#f7ead0; --bad:#b33a2e; --bad-soft:#f6dcd8; --off:#8a96a3; --off-soft:#e7ebef;
   --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-body:"Barlow","Segoe UI",Arial,sans-serif; --f-mono:"JetBrains Mono",Consolas,monospace;
-  --r:6px;
+  --r:10px; --shadow:0 1px 2px rgba(23,33,43,.06),0 1px 1px rgba(23,33,43,.03);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#11161c; --panel:#18202a; --panel2:#1d2732; --ink:#e3e8ee; --muted:#9aa7b4; --line:#2c3845;
@@ -29,30 +29,34 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 h1,h2,h3{font-family:var(--f-disp);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0}
 h1{font-size:26px} h2{font-size:22px} h3{font-size:17px}
 .app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
-nav{background:var(--panel);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
-.brand{padding:0 8px 14px;border-bottom:1px solid var(--line);margin-bottom:10px}
-.brand b{font-family:var(--f-disp);font-size:21px;display:block}
+nav{background:var(--panel);border-right:1px solid var(--line);padding:18px 12px 24px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{padding:4px 8px 14px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.brand b{font-family:var(--f-disp);font-size:22px;font-weight:700;display:block;line-height:1.1}
 .brand span{color:var(--muted);font-size:12.5px}
-.navgrp{font-size:12.5px;font-weight:600;color:var(--muted);padding:12px 8px 4px}
-nav a{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:var(--r);color:var(--ink);text-decoration:none;font-size:14.5px}
+.navgrp{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:16px 8px 6px}
+nav a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;margin:1px 0;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14.5px;transition:background .12s}
 nav a:hover{background:var(--panel2)}
-nav a.on{background:var(--accent);color:var(--accent-ink)}
-nav a .cnt{font-family:var(--f-mono);font-size:11.5px;opacity:.8}
-main{padding-block:22px 60px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));min-width:0}
+nav a.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+nav a .cnt{font-family:var(--f-mono);font-size:11.5px;line-height:1;padding:3px 6px;border-radius:999px;background:var(--panel2);color:var(--muted);min-width:22px;text-align:center}
+nav a.on .cnt{background:rgba(255,255,255,.22);color:var(--accent-ink)}
+#srchbtn{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-weight:400}
+#srchbtn::after{content:"/";font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+main{padding-block:56px 60px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));min-width:0}
 .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
 .head p{margin:4px 0 0;color:var(--muted);max-width:70ch}
 .tag{font-family:var(--f-body);font-size:12.5px;color:var(--muted)}
 .banner{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);padding:8px 12px;border-radius:var(--r);margin-bottom:14px;font-size:14px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
 .grid{display:grid;gap:14px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .wide{grid-column:1/-1}
 a.big{display:block;color:inherit;text-decoration:none}
 a.big:hover{border-color:var(--accent)}
-.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:var(--r);cursor:pointer}
-.btn:hover{border-color:var(--accent)}
+.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;border-radius:8px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .12s,background .12s}
+.btn:hover{border-color:var(--accent);background:var(--panel2)}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.pri:hover{filter:brightness(1.06);background:var(--accent)}
 .katrow{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px}
 .kat{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:8px 10px;min-width:200px}
 .fchip{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:2px 4px 2px 0;max-width:230px;vertical-align:middle;background:var(--panel)}
@@ -107,7 +111,7 @@ tbody tr.click{cursor:pointer} tbody tr.click:hover td{background:var(--panel2)}
 .cd .d{font-family:var(--f-mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .cd .d small{font-size:12px;font-weight:400;color:var(--muted)}
 .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px}
-.big{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:12px 16px}
+.big{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow)}
 .big .n{font-family:var(--f-disp);font-size:44px;font-weight:700;line-height:1}
 .big .l{color:var(--muted);font-size:13.5px}
 .amp{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);align-items:start}
@@ -166,8 +170,8 @@ svg text{font-family:var(--f-body)}
   nav{position:sticky;top:env(safe-area-inset-top,0px);height:auto;z-index:20;border-right:none;border-bottom:1px solid var(--line);padding:8px max(12px,env(safe-area-inset-left,0px)) 8px max(12px,env(safe-area-inset-right,0px));display:flex;gap:4px;overflow-x:auto}
   body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
   .brand,.navgrp{display:none}
-  nav a{white-space:nowrap;flex:none}
-  main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  nav a{white-space:nowrap;flex:none;align-self:center}
+  main{padding-top:22px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
   .big .n{font-size:36px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -352,7 +356,7 @@ h3 a.small:hover{text-decoration:underline}
   /* Knopf: Zugriffstoken speichern oder entfernen */
   var b=document.createElement("button");
   b.id="ghbtn";b.className="btn sm";
-  b.style.cssText="position:fixed;right:14px;top:8px;z-index:50;font-size:12px;padding:3px 10px;opacity:.8";b.title="GitHub-Zugriffstoken für Bearbeiten und Löschen";
+  b.style.cssText="position:fixed;right:18px;top:14px;z-index:50;font-size:13px;padding:5px 12px;border-radius:999px;box-shadow:0 4px 14px rgba(23,33,43,.12)";b.title="GitHub-Zugriffstoken für Bearbeiten und Löschen";
   b.textContent=tok()?"Bearbeiten aktiv · Token ändern":"Bearbeiten freischalten";
   b.onclick=function(){
     var t=prompt("GitHub-Zugriffstoken einfügen. Es bleibt nur in diesem Browser gespeichert.\nLeer lassen und OK = Verbindung trennen.");
@@ -511,7 +515,7 @@ function getTool(id,def){return S.tmp["tool_"+id]||(tool(id)?JSON.parse(JSON.str
 
 /* ---------- Rendering ---------- */
 function navHtml(){
-  let h=`<div style="padding:0 0 14px"><button class="btn" id="srchbtn" style="width:100%;text-align:left">Suchen</button><button class="btn pri" id="pendgo" style="width:100%;margin-top:8px">Aktualisieren</button></div>`;
+  let h=`<div style="padding:0 0 10px"><button class="btn" id="srchbtn" style="width:100%">Suchen</button><button class="btn pri" id="pendgo" style="width:100%;margin-top:8px">Aktualisieren</button></div>`;
   NAV.forEach(([g,items])=>{h+=`<div class="navgrp">${g}</div>`;items.forEach(([k,l,c])=>{
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
