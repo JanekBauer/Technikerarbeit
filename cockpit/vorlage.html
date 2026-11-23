@@ -1079,7 +1079,7 @@ VIEWS_after.sensoren=()=>{const sx=$("#sxlsx");if(sx)sx.onclick=async()=>{
 const MAT={nitinol:{n:"Nitinol (austenitisch)",E:75,rho:6.45},nitinolM:{n:"Nitinol (martensitisch)",E:35,rho:6.45},steel:{n:"Edelstahl 1.4404/316L",E:193,rho:8.0},tantal:{n:"Tantal",E:186,rho:16.6}};
 const CASES={ss:{n:"Zwei Stützen, gelenkig (Einfeldträger)",k:5/384},ff:{n:"Beidseitig eingespannt",k:1/384},cont:{n:"Viele Stützen, Innenfeld (Durchlaufträger, Näherung)",k:1/384*1.0},cant:{n:"Kragarm (überstehendes Ende)",k:1/8}};
 VIEWS.rechner=()=>{
-  const c=lsGet("calc",{mat:"nitinol",E:"",D:6.5,s:0.3,L:300,cs:"ss",fz:0.01,len:3000,dx:2,tq:1.5,tv:0.3,th:30,dmin:1.0,dmax:6.5,tol:10});
+  const c=lsGet("calc",{mat:"nitinol",E:"",D:6.5,s:0.3,L:300,cs:"ss",fz:0.01,dmin:1.0,dmax:6.5,tol:10});
   return `<div class="head"><div><span class="tag">Lösungsphase</span><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte und müssen mit einer Quelle belegt werden.</p></div></div>
   <div class="grid g2">
    <div class="panel calc"><h3>Durchbiegung durch Eigengewicht</h3>
@@ -1092,14 +1092,6 @@ VIEWS.rechner=()=>{
     <label for="c_cs" class="calc"><span class="note">Lagerung</span><select id="c_cs">${Object.entries(CASES).map(([k,m])=>`<option value="${k}" ${c.cs===k?"selected":""}>${m.n}</option>`).join("")}</select></label>
     <div class="res" id="r_bend"></div>
     <p class="note">Modell: Kreisring I = π(D⁴−d⁴)/64, Streckenlast q = ρ·A·g, f = k·q·L⁴/(E·I). k: 5/384 gelenkig, 1/384 eingespannt (Innenfeld eines Durchlaufträgers näherungsweise ebenso), 1/8 Kragarm. Nitinol: E stark temperatur- und phasenabhängig.</p></div>
-   <div class="panel calc"><h3>Taktzeit pro Rohr</h3>
-    <div class="in"><label for="c_len">Rohrlänge (mm)<input id="c_len" type="number" step="any" value="${esc(c.len)}"></label>
-    <label for="c_dx">Messpunktabstand (mm)<input id="c_dx" type="number" step="any" value="${esc(c.dx)}"></label>
-    <label for="c_tq">Messzeit je Querschnitt inkl. Drehung (s)<input id="c_tq" type="number" step="any" value="${esc(c.tq)}"></label>
-    <label for="c_tv">Verfahrzeit je Schritt (s)<input id="c_tv" type="number" step="any" value="${esc(c.tv)}"></label>
-    <label for="c_th">Einlegen/Entnehmen (s)<input id="c_th" type="number" step="any" value="${esc(c.th)}"></label></div>
-    <div class="res" id="r_takt"></div>
-    <p class="note">n = L/Δx + 1 Querschnitte; t = n·(t_Messung + t_Verfahren) + t_Handling. Alternative zur schrittweisen Messung: Helix-Abtastung (Rohr dreht, Achse fährt gleichzeitig) – ob zulässig, ist eine offene Frage an den Betrieb.</p></div>
    <div class="panel calc wide"><h3>Messbereich und Genauigkeit der Sensoren</h3>
     <div class="in"><label for="c_dmin">Kleinster Ø (mm)<input id="c_dmin" type="number" step="any" value="${esc(c.dmin)}"></label>
     <label for="c_dmax">Größter Ø (mm)<input id="c_dmax" type="number" step="any" value="${esc(c.dmax)}"></label>
@@ -1109,7 +1101,7 @@ VIEWS.rechner=()=>{
   </div>`;
 };
 VIEWS_after.rechner=()=>{
-  const ids=["mat","E","D","s","L","cs","fz","len","dx","tq","tv","th","dmin","dmax","tol"];
+  const ids=["mat","E","D","s","L","cs","fz","dmin","dmax","tol"];
   const run=()=>{
     const c={};ids.forEach(k=>{const el=$("#c_"+k);if(el)c[k]=el.value;});lsSet("calc",c);
     const m=MAT[c.mat];const E=(isFinite(num(c.E))&&num(c.E)>0?num(c.E):m.E)*1000;// N/mm²
@@ -1120,13 +1112,9 @@ VIEWS_after.rechner=()=>{
       const Lmax=fz>0?Math.pow(fz*E*I/(k*qN),0.25):NaN;
       h=`<div>Durchbiegung f = <span class="v">${f2(f*1000,1)} µm</span> <span class="muted">(${f2(f,4)} mm)</span></div>
       <div class="small">Masse je Meter ${f2(qN/9.81*1000*1000,1)} g/m · I = ${f2(I,4)} mm⁴ · E = ${f2(E/1000,0)} GPa</div>
-      ${fz>0?`<div>Größter Stützabstand für f ≤ ${f2(fz,3)} mm: <span class="v">${f2(Lmax,0)} mm</span> → bei ${f2(num(c.len)||3000,0)} mm Rohrlänge etwa ${f2(Math.ceil((num(c.len)||3000)/Lmax)+1,0)} Stützen</div>`:""}
+      ${fz>0?`<div>Größter Stützabstand für f ≤ ${f2(fz,3)} mm: <span class="v">${f2(Lmax,0)} mm</span> → bei ${f2(3000,0)} mm Rohrlänge etwa ${f2(Math.ceil((num(c.len)||3000)/Lmax)+1,0)} Stützen</div>`:""}
       ${fz>0?(f<=fz?pill("zulässig","p-ok"):pill("zu groß","p-bad")):""}`;}
     $("#r_bend").innerHTML=h;
-    const len=num(c.len),dx=num(c.dx),tq=num(c.tq),tv=num(c.tv),th=num(c.th);
-    if(len>0&&dx>0){const n=Math.floor(len/dx)+1;const t=n*((tq||0)+(tv||0))+(th||0);
-      $("#r_takt").innerHTML=`<div>Querschnitte n = <span class="v">${f2(n,0)}</span></div><div>Taktzeit ≈ <span class="v">${f2(t/60,1)} min</span> <span class="muted">(${f2(t,0)} s)</span></div><div class="small">Rohre pro 8-h-Schicht ≈ ${f2(Math.floor(8*3600/t),0)}</div>`;}
-    else $("#r_takt").innerHTML=`<span class="muted">Rohrlänge und Messpunktabstand eingeben.</span>`;
     const dmin=num(c.dmin),dmax=num(c.dmax),tol=num(c.tol);
     const ss=S.data.sensors;
     $("#r_sens").innerHTML=ss.length?`<div class="tbl"><table><thead><tr><th>Sensor</th><th>Bereich</th><th>Ø-Bereich</th><th>Genauigkeit</th></tr></thead><tbody>${ss.map(x=>{
@@ -1152,15 +1140,8 @@ async function buildXlsx(sheetName,headers,rows){
   return z.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
 function sensorOrder(){const all=S.data.sensors.slice();const hasOrd=r=>r.ord!=null&&r.ord!=="";return all.filter(hasOrd).sort((a,b)=>a.ord-b.ord).concat(all.filter(r=>!hasOrd(r)));}
-const TAKT={"ls-9030": {"m": 15.7, "a": "rot", "t": "1D", "n": 1501}, "ls-9030m": {"m": 15.7, "a": "rot", "t": "1D", "n": 1501}, "ls-9030d": {"m": 15.7, "a": "rot", "t": "1D", "n": 1501}, "ls-9120m": {"m": 15.7, "a": "rot", "t": "1D", "n": 1501}, "odc2700-10": {"m": 14.2, "a": "rot", "t": "1D", "n": 1501}, "odc2700-40": {"m": 14.2, "a": "rot", "t": "1D", "n": 1501}, "odc2520-46": {"m": 13.2, "a": "rot", "t": "1D", "n": 1501}, "odc2520-46-090": {"m": 13.2, "a": "rot", "t": "1D", "n": 1501}, "odc1200-10": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "odc1200-16": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "odc1200-90-10": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "odc1200-90-16": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "odc1201-20": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "odc1201-30": {"m": 12.5, "a": "rot", "t": "1D", "n": 1501}, "rf656-8x10": {"m": 9.7, "a": "rot", "t": "2D 8×10", "n": 300}, "rf656-15x20": {"m": 4.8, "a": "gelb", "t": "2D 15×20", "n": 150}, "rf656-25x35": {"m": 2.8, "a": "gelb", "t": "2D 25×35", "n": 86}, "rf656-40x50": {"m": 1.9, "a": "gelb", "t": "2D 40×50", "n": 60}, "rf657-15x20": {"m": 8.8, "a": "rot", "t": "2D 15×20", "n": 150}, "rf657-25x35": {"m": 5.0, "a": "rot", "t": "2D 25×35", "n": 86}, "rf657-40x50": {"m": 3.5, "a": "gelb", "t": "2D 40×50", "n": 60}, "rf657-60x80": {"m": 2.2, "a": "gelb", "t": "2D 60×80", "n": 38}, "rf657r-25": {"m": 37.0, "a": "rot", "t": "2D rund", "n": 120}, "rf657r-45": {"m": 20.7, "a": "rot", "t": "2D rund", "n": 67}, "rf657r-70": {"m": 13.3, "a": "rot", "t": "2D rund", "n": 43}, "rf657r-100": {"m": 9.2, "a": "rot", "t": "2D rund", "n": 30}, "lsm-501s": {"m": 16.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-503s": {"m": 16.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-506s": {"m": 16.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-512s": {"m": 20.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-516s": {"m": 20.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-6902h": {"m": 20.5, "a": "rot", "t": "1D", "n": 1501}, "lsm-9506": {"m": 20.5, "a": "rot", "t": "1D", "n": 1501}, "xls13xy-480": {"m": 1813.7, "a": "rot", "t": "1D", "n": 1501}, "xls13xy-1500": {"m": 1813.7, "a": "rot", "t": "1D", "n": 1501}, "xls35xy-480": {"m": 1813.7, "a": "rot", "t": "1D", "n": 1501}, "xls35xy-1500": {"m": 1813.7, "a": "rot", "t": "1D", "n": 1501}};
-const TAKT_DUP={};
-const takOf=r=>TAKT[r.id]||r.takt||null;
-const isEntf=r=>!r.offen&&((TAKT[r.id]&&TAKT[r.id].a==="rot")||!!TAKT_DUP[r.id]);
-const ampelCell=r=>{const t=takOf(r);if(TAKT_DUP[r.id])return `<span class="pill p-bad">Dublette</span>`;if(!t)return `<span class="muted small">–</span>`;const c={"grün":"#2e9d5b","gelb":"#e0a800","rot":"#c0392b"}[t.a];return `<span title="${esc(t.t)}: ${t.n} Stationen, Modellrechnung 3 m / 1501 Prüfstellen" style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap"><i style="width:12px;height:12px;border-radius:50%;background:${c};display:inline-block"></i>${t.m.toString().replace(".",",")} min</span>`;};
 VIEWS.sensoren=()=>{
-  const all0=S.data.sensors.slice();
-  const all=all0.filter(r=>!isEntf(r));
-  const entf=all0.filter(isEntf);
+  const all=S.data.sensors.slice();
   const open=all.filter(r=>r.offen);
   const on=all.filter(r=>!r.offen&&r.ord!=null&&r.ord!=="").sort((a,b)=>a.ord-b.ord);
   const rest=all.filter(r=>!r.offen&&!(r.ord!=null&&r.ord!==""));
@@ -1189,7 +1170,7 @@ VIEWS.sensoren=()=>{
     ["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],
     ["docs","Datenblatt",docs],
     ["r","1 Messbereich",r=>`<span class="small clamp w150" title="${esc(r.range||"")}">${esc(r.range||rng(r))}</span>`],
-    ["fit","Ø 1,0–6,5",fitP],["ampel","Taktzeit je Rohr",ampelCell],
+    ["fit","Ø 1,0–6,5",fitP],
     ["rep","2 Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}"><b>${esc(r.rep||"–")}</b>${r.repcond&&r.repcond!=="–"?` <span class="muted">(${esc(r.repcond)})</span>`:""}</span>`],
     ["lin","3 Genauig&shy;keit",r=>`<span class="small clamp w150" title="${esc(r.lin||"")}">${esc(r.lin||"–")}</span>`],
     ["rate","5 Abtastrate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],
@@ -1197,12 +1178,11 @@ VIEWS.sensoren=()=>{
   const restCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle)}</span>`],["r","Messbereich",r=>`<span class="num">${rng(r)}</span>`],["fit","Ø 1,0–6,5",fit],["source","Quelle",r=>`<span class="small">${esc(r.source)}</span>`],["note","Notiz",r=>`<span class="small clamp" title="${esc(r.note||"")}">${esc(r.note||"")}</span>`]];
   const ds=r=>{const d=docs(r);const u=String(r.url||"").trim();const ok=/^https?:\/\//i.test(u);
     return (r.docs||[]).length?d:(ok?`<a class="small" href="${esc(u)}" target="_blank" rel="noopener" data-noedit>Hersteller-Link</a>`:`<span class="pill p-warn">fehlt</span>`);};
-  const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["ampel","Taktzeit je Rohr",ampelCell],["rep","Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}">${esc(r.rep||"–")}</span>`],["rate","Rate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],["det","Alle Werte",det],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
-  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p><b>Ampel (Taktzeit je 3-m-Rohr, 1501 Prüfstellen):</b> grün = unter 1 min, gelb = 1 bis 5 min, rot = über 5 min (entfällt). Modellrechnung: Servo dreht durchgehend, Umdrehung = 72 Bilder ÷ Bildrate, je Station + 0,5 s Verfahrachse; 1D-Sensor = 1501 Stationen, 2D-Sensor = 3000 mm ÷ Feldlänge. Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
+  const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["rep","Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}">${esc(r.rep||"–")}</span>`],["rate","Rate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],["det","Alle Werte",det],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
+  return `<div class="head"><div><span class="tag">Lösungsphase · Chat 05</span><h1>Sensorvergleich</h1><p>Alle Sensoren aus den vorliegenden Datenblättern und Katalogen, die Ø 1,0–6,5 mm abdecken. Grundmodell = ganze Nummer, Varianten = x.1, x.2 … Datei-Chip öffnet direkt auf der Katalogseite. Zeile anklicken zum Bearbeiten.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
-  ${entf.length?`<details class="restbox"><summary>Entfallen – Taktzeit über 5 min je Rohr oder Dublette (${entf.length})</summary><p class="small muted">Nicht gelöscht, nur aus der Hauptliste genommen. Zeile anklicken zum Bearbeiten; „Alle Werte“ zeigt alle 9 Punkte. Grundlage: Modellrechnung in der Kopfzeile, siehe projekt/Analyse_Taktzeit_Ampel_2026-11-22.md.</p>${listTable("sensors",entf,[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["docs","Datenblatt",docs],["ampel","Taktzeit je Rohr",ampelCell],["grund","Grund",r=>`<span class="small">${TAKT_DUP[r.id]?"Dublette: "+esc(TAKT_DUP[r.id]):"Taktzeit über 5 min"}</span>`],["det","Alle Werte",det]])}</details>`:""}
   ${open.length?`<details class="restbox" open><summary>Offen – noch nicht alle Punkte geprüft (${open.length})</summary><p class="small muted">Sensoren ohne geprüftes Datenblatt oder mit offenen Fragen. Zeile anklicken zum Bearbeiten; wenn alle 9 Punkte belegt sind, „Offen“ abwählen und eine Nummer vergeben.</p>${listTable("sensors",open,openCols)}</details>`:""}
   ${rest.length?`<details class="restbox"><summary>Weitere Sensoren ohne Nummer (${rest.length})</summary>${listTable("sensors",rest,restCols)}</details>`:""}
   ${(kat.excluded||[]).length?`<details class="restbox"><summary>Nicht aufgenommen – Messbereich deckt Ø 1,0–6,5 mm nicht ab (${kat.excluded.length})</summary><table class="small"><tbody>${kat.excluded.map(e=>`<tr><td><b>${esc(e[0])}</b></td><td>${esc(e[1])}</td></tr>`).join("")}</tbody></table></details>`:""}`;
@@ -1290,7 +1270,6 @@ const PH_KRIT=[
  {nr:"1.5",name:"1.5 Werkstoff: Tantal (W)"},
  {nr:"2.6",name:"2.6 Rauheit messen (W)"},
  {nr:"2.7",name:"2.7 Beschädigung oder Kontamination feststellen (W)"},
- {nr:"4.1",name:"4.1 Taktzeit pro Rohr, über 5 min entfällt (W)"},
  {nr:"5.1",name:"5.1 Max. Platzbedarf L × B (W)"}];
 const critNr=c=>{const m=/^\s*(\d+(?:\.\d+)*)/.exec((c&&c.name)||"");return m?m[1]:"";};
 const critCmp=(a,b)=>{const x=critNr(a),y=critNr(b);if(!x&&!y)return 0;if(!x)return 1;if(!y)return -1;const p=x.split(".").map(Number),q=y.split(".").map(Number);for(let i=0;i<Math.max(p.length,q.length);i++){const d=(p[i]||0)-(q[i]||0);if(d)return d;}return 0;};
