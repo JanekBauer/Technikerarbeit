@@ -207,7 +207,8 @@ svg text{font-family:var(--f-body)}
 #palette li .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:92px}
 #palette li .t{flex:1;min-width:0}
 #palette .hint{padding:8px 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
-.board{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:12px;overflow-x:auto;align-items:start}
+.board{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:12px;align-items:start;width:100%}
+@media(max-width:820px){.board{grid-template-columns:repeat(var(--cols,3),minmax(210px,1fr));overflow-x:auto}}
 .bcol{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:8px;min-height:120px}
 .bcol.over{outline:2px dashed var(--accent)}
 .bh{display:flex;justify-content:space-between;padding:2px 4px 8px}
@@ -848,7 +849,7 @@ VIEWS.aufgaben=()=>{
       if(c==="erledigt")items=items.sort((x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")));else items=items.sort(sortDue);
       const shown=c==="erledigt"?items.slice(0,6):items;
       return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${items.length}</span></div>${shown.map(t=>`<div class="bcard" ${can?'draggable="true"':""} data-bid="${esc(t.id)}" data-task="${esc(t.id)}"><div>${esc(t.title)}</div><div class="small muted">${esc(t.who||"")}${t.ask?" · fragen: "+esc(t.ask):""}${t.prio?" · P"+esc(t.prio):""} · ${dueCell(t.due,c==="erledigt")}</div></div>`).join("")||'<div class="empty small">–</div>'}${items.length>shown.length?`<div class="small muted" style="padding:4px">… ${items.length-shown.length} weitere (Tabelle, Filter „Erledigt“)</div>`:""}</div>`;}).join("");
-    return head+`<div class="toolbar">${sw}${who}<span class="muted small">${all.length} Punkte</span></div><div class="board">${board}</div>`;
+    return head+`<div class="toolbar">${sw}${who}<span class="muted small">${all.length} Punkte</span></div><div class="board" style="--cols:3">${board}</div>`;
   }
   return head+`<div class="toolbar">${sw}<select id="tfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Offen</option><option value="über" ${f.st==="über"?"selected":""}>Überfällig</option><option value="erledigt" ${f.st==="erledigt"?"selected":""}>Erledigt</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select>${who}<span class="muted small">${rows.length} Einträge</span></div>`+
   listTable("tasks",rows,[["prio","P",r=>`<span class="num">${esc(r.prio||"")}</span>`],["title","Punkt"],["who","Wer"],["due","Bis",r=>dueCell(r.due,r.status==="erledigt")],["status","Status",r=>stPill(r.status)],["chat","Chat",r=>`<span class="small">${esc(r.chat||"")}</span>`]]);
@@ -913,7 +914,7 @@ VIEWS.offen=()=>{
     const shown=c==="erledigt"?list.slice(0,8):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div>${cardMeta(t)}</div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen stehen unter Entscheidungen. Eine Aufgabe ist mit ihrer Entscheidung verknüpft: Mit der Antwort wird die Entscheidung entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
+  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen stehen unter Entscheidungen. Eine Aufgabe ist mit ihrer Entscheidung verknüpft: Mit der Antwort wird die Entscheidung entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board" style="--cols:3">${board}</div>`;
 };
 VIEWS_after.offen=()=>{
   if(!(S.canWrite&&!S.offline))return;
@@ -1072,7 +1073,7 @@ VIEWS.entscheidungen=()=>{
   }).join("");
   return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss. Eine Entscheidung wird entschieden, sobald eine verknüpfte Aufgabe mit Antwort erledigt ist, oder von Hand mit „Entschieden von“ und „Begründung“.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
-  <div class="board">${board}</div>`;
+  <div class="board" style="--cols:3">${board}</div>`;
 };
 VIEWS_after.entscheidungen=()=>{
   if(!(S.canWrite&&!S.offline))return;
