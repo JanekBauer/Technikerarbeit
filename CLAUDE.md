@@ -48,6 +48,17 @@ Bestehende IDs bleiben unverändert. Neue Einträge bekommen den Präfix ihrer S
 
 Archiviert (keine neuen IDs mehr): `decisions.json`, `questions.json`, `conflicts.json` liegen in `cockpit/_Versionen/daten_2026-11-23/`. Entscheidungen leben nur noch in `tasks.json` mit `typ: "entscheidung"`.
 
+## 2a. Aufgaben und Entscheidungen (Speichermodell)
+
+- Aufgabe und Entscheidung bleiben zwei Typen in `tasks.json`: `typ: "aufgabe"` bzw. `typ: "entscheidung"`. Fehlt `typ`, gilt „aufgabe“.
+- **Statuswerte Aufgabe:** `offen`, `in Arbeit`, `erledigt`, `entfallen`.
+- **Statuswerte Entscheidung:** `offen` (Frage, noch nicht entschieden), `entschieden` (gilt), `entfallen` (aufgehoben). `erledigt` gibt es bei Entscheidungen nicht mehr.
+- **Pflichtfelder bei `entschieden`:** `by` (Entschieden von, ein Name) und `reason` (Begründung). Die Seite verlangt sie.
+- **Entscheidungsfelder:** `optionen` (betrachtete Alternativen), `konsequenzen`, `date` (Datum der Entscheidung).
+- **Widerruf als Paar:** Die alte Entscheidung bekommt `status: "entfallen"` und `ersetzt_durch: <neue ID>`. Die neue bekommt `ersetzt: <alte ID>`. Ohne Nachfolger steht der Grund in `grund_entfallen`. Nie löschen.
+- **Verweise:** `entscheidung` (auf der Aufgabe, welche Entscheidung sie auslöst), `bezug` (Liste von IDs wie `r-`, `q-`, `f-`, `dk-`). Das Feld `refs` ist abgeschafft.
+- **Verlauf** ist das Postfach mit dem Feld `alt`. Eine eigene Feld-Historie gibt es nicht.
+
 ## 3. Postfach: Aufbau
 
 Jeder Eintrag im `postfach.json` hat diese Pflichtfelder:

@@ -31,6 +31,12 @@ Oben rechts „Bearbeiten freischalten“ wählen und ein GitHub-Zugriffstoken e
 
 Die Anzeige im Browser ändert sich erst nach der Übernahme. Bis dahin bleibt der alte Stand sichtbar, mit dem offenen Vorschlag im Postfach.
 
+## Aufgaben und Entscheidungen
+- Aufgaben haben die Status offen, in Arbeit, erledigt, entfallen.
+- Entscheidungen haben die Status offen (Frage), entschieden (gilt) und entfallen (aufgehoben). Entschieden verlangt „Entschieden von“ und „Begründung“.
+- Eine aufgehobene Entscheidung wird nie gelöscht. Sie bekommt „Ersetzt durch“, die neue Entscheidung „Ersetzt“. Ohne Nachfolger steht der Grund unter „Grund, wenn ohne Nachfolger entfallen“.
+- Ausführlich begründet in `projekt/` (Bericht „Aufgaben und Entscheidungen in Projektsystemen“) und CLAUDE.md, Abschnitt 2a.
+
 ## Dateien hoch- und herunterladen
 Im Archiv gibt es „Datei hochladen“, „Neue Version“ und „Datei hinzufügen“. Die Datei wird direkt als Commit nach `docs/archiv/<Ordner>/<Dokument>/<Version>_<Name>` gelegt (max. 20 MB). Der Eintrag in `cockpit/daten/files.json` läuft als Vorschlag ins Postfach und wird erst mit der Übernahme sichtbar.
 Herunterladen geht direkt über die Seite.
