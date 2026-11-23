@@ -158,3 +158,35 @@ Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 - Der Ablauf: erst Inhalt und Quellen festlegen, dann die beiden Prüfungen. Keine Zahl, kein Name und kein Datum wird dabei ergänzt, was nicht in der Quelle steht. Fehlende Angaben werden als Lücke gemeldet.
 - Der Schreibstil bleibt Janeks eigener. Bei Texten, die er selbst schreibt, bleiben seine Formulierungen erhalten. Die Prüfung meldet nur, was auffällt.
 - Die Gestaltung der Oberfläche folgt dem Entwurf im Repo (Schrift IBM Plex, Mono für Kennungen, keine Schatten, Ecken mit 4 px). Neue Bereiche halten sich daran.
+
+## 14. Formulierung von Aufgaben und Entscheidungen
+
+Ziel: Die Einträge, die Claude Code anlegt, sind kurz, sachlich und ohne Rechnung lesbar, wie die, die Janek selbst schreibt.
+
+**Titel**
+- Höchstens 60 Zeichen. Beginnt mit dem Gegenstand oder der Handlung: „MS 1 nachfragen“, „Datenblätter Mitutoyo LSM-501S beschaffen“.
+- Kein Präfix wie „KI-Vorschlag:“ oder „Frage an den Betrieb:“. Die Art steht bereits im Feld `kind`, `typ` oder `vorschlag`.
+- Entscheidungen als offene Festlegung: „Bezug der Zylinderform festlegen (je Querschnitt oder über das Rohr)“.
+- Keine Empfehlung im Titel.
+
+**Inhalt (`note` bzw. `detail`)**
+- Höchstens drei Sätze, etwa 50 Wörter. Erster Satz: die Frage oder was festgelegt werden muss. Zweiter Satz: der Grund mit Fundstelle, z. B. „(PH V1.2, Kap. 5.3)“. Dritter Satz, falls nötig: die Optionen als a) und b).
+- Rechenwege, Formeln und Messreihen gehören nicht in den Eintrag. Der Eintrag verweist auf die Datei unter `projekt/`, in der sie stehen.
+- Zahlen mit Einheit und Quelle. Fehlt eine Zahl, steht „offen“. Eine geschätzte Zahl wird nicht eingetragen.
+- Abkürzungen beim ersten Auftreten ausschreiben, z. B. „Gage Repeatability and Reproducibility (GRR)“.
+- Eine Empfehlung steht als eigener Satz, der mit „Vorschlag:“ beginnt.
+
+**Umfang**
+- Ein Eintrag enthält genau eine Frage, eine Entscheidung oder eine Aufgabe.
+- Vor dem Anlegen wird gegen die offenen Einträge geprüft. Ein Duplikat wird nicht angelegt, sondern als Hinweis im bestehenden Eintrag ergänzt.
+
+**Fragen aus einem neuen Dokument (z. B. Pflichtenheft)**
+- Pro Anforderung mit echter Unklarheit eine Frage. Nicht jede Anforderung erzeugt einen Eintrag.
+- Eine Entscheidung nur, wenn die Projektarbeit eine Festlegung braucht. Eine offene Zahl ist eine Frage, keine Entscheidung.
+- Jeder Vorschlag nennt die Anforderungsnummer im Inhalt und setzt `vorschlag` auf „KI (Claude Code)“.
+- Die Zahl der Vorschläge je Dokument wird im Eintrag des Prüfauftrags genannt. Mehr als zehn neue Vorschläge pro Dokument werden vorher mit Janek abgestimmt.
+
+**Test vor dem Anlegen**
+- Der Titel allein muss verständlich sein, ohne den Inhalt zu lesen.
+- Der Inhalt muss in unter einer Minute erfassbar sein.
+- Fachbegriffe bleiben, Floskeln und Füllwörter fallen weg. Die Sätze werden nach den Unslop-Regeln (Abschnitt 13) geprüft.
