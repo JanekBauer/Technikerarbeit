@@ -139,6 +139,7 @@ Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 
 - **Claude-Sitzungen arbeiten direkt auf `main`** (Janek, 23.11.2026). Eigene Branches nur auf ausdrücklichen Wunsch.
 - Nach jeder abgeschlossenen Aufgabe committen und pushen. Nachricht auf Deutsch: was und warum.
+- Die Veröffentlichung läuft automatisch: Nach jedem Push, der die Oberfläche oder die Daten ändert, baut `cockpit-bauen.yml` die Seite neu und `cockpit-seite.yml` stellt sie unter derselben Adresse ins Netz. Kein manueller Schritt nötig.
 - Committet werden `cockpit/daten/`, `cockpit/vorlage.html`, `cockpit/build.py`, `cockpit/README.md`, `projekt/` und `CLAUDE.md`. **Nicht** `docs/index.html`: die Action baut die Seite nach jeder Änderung neu.
 - Lokaler Test der Seite: `python cockpit/build.py` (zum Anschauen, nicht committen).
 

@@ -2,12 +2,17 @@ name: Cockpit veröffentlichen
 
 # Veröffentlicht den Stand von main (Ordner docs) unter der Hauptadresse der Seite.
 # Voraussetzung: Settings > Pages > Build and deployment > Source = „GitHub Actions“.
+# Läuft nach jedem erfolgreichen Neubau („Cockpit neu bauen“). Commits des Bots lösen über
+# das Standard-Token keine anderen Workflows aus, deshalb startet das über workflow_run.
 
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
+  workflow_run:
+    workflows: ["Cockpit neu bauen"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -21,11 +26,14 @@ concurrency:
 
 jobs:
   veroeffentlichen:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs

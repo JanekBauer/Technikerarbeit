@@ -48,4 +48,4 @@ Das Repo ist öffentlich. Janek hat am 20.11.2026 entschieden, dass die vorhande
 `python cockpit/build.py` schreibt `docs/index.html`. Diese Datei committest du nicht von Hand. Das macht die Action nach dem Push.
 
 ## Veröffentlichen (GitHub Pages)
-Repo-Einstellungen → Pages → Quelle „GitHub Actions“. Der Workflow `cockpit-seite.yml` veröffentlicht `docs/` nach jedem Push auf `main`.
+Repo-Einstellungen → Pages → Quelle „GitHub Actions“. Nach jeder Änderung an Oberfläche oder Daten baut `cockpit-bauen.yml` die Seite neu, und `cockpit-seite.yml` veröffentlicht sie danach automatisch unter derselben Adresse.
