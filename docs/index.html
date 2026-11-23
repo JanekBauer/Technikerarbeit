@@ -506,9 +506,11 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(S.dirty&&!S.modalOpe
 
 /* Schreiben: Änderungen an Daten gehen zuerst als Vorschlag in den Postfach-Eingang (kind „daten“).
    Erst die Übernahme im Postfach schreibt sie direkt (saveDirect / delDirect). Ausnahme: der Postfach selbst. */
+/* Ausnahmen: Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung) werden direkt gespeichert, nicht als Vorschlag. */
+const DIRECT_COLLS=["checks","tools"];
 async function save(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
-  if(coll==="postfach")return saveDirect(coll,id,obj);
+  if(coll==="postfach"||DIRECT_COLLS.includes(coll))return saveDirect(coll,id,obj);
   return proposeChange(coll,id||nidFor(coll,obj),obj,false);
 }
 async function saveDirect(coll,id,obj){
@@ -519,7 +521,7 @@ async function saveDirect(coll,id,obj){
 }
 async function del(coll,id){
   if(!S.db||!S.canWrite)return false;
-  if(coll==="postfach")return delDirect(coll,id);
+  if(coll==="postfach"||DIRECT_COLLS.includes(coll))return delDirect(coll,id);
   return proposeChange(coll,id,null,true);
 }
 async function delDirect(coll,id){
