@@ -418,7 +418,7 @@ const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektpl
 
 const LISTS = {
   tasks:{coll:"tasks",title:"Aufgabe",
-    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["entscheidung","Gehört zu Entscheidung","dec"],["antwort","Antwort (Ergebnis der Frage)","area"]],
+    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["nr","Nummer","text"],["entscheidung","Gehört zu Entscheidung","dec"],["antwort","Antwort (Ergebnis der Frage)","area"]],
     def:{status:"offen",prio:"2",who:"Janek"}},
   deadlines:{coll:"deadlines",title:"Termine",
     fields:[["title","Termin","text"],["date","Datum","date"],["approx","Datum ungefähr (ca.)","bool"],["kind","Art","select",["schule","betrieb"]],["status","Status","select",["geplant","erledigt"]],["note","Notiz","area"]],
@@ -430,7 +430,7 @@ const LISTS = {
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
   decisions:{coll:"tasks",title:"Entscheidung",
-    fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","entschieden","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["optionen","Betrachtete Optionen","area"],["konsequenzen","Konsequenzen","area"],["ersetzt","Ersetzt (ID der aufgehobenen Entscheidung)","text"],["ersetzt_durch","Ersetzt durch (ID der neuen Entscheidung)","text"],["grund_entfallen","Grund, wenn ohne Nachfolger entfallen","area"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
+    fields:[["nr","Nummer","text"],["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","entschieden","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"],["optionen","Betrachtete Optionen","area"],["konsequenzen","Konsequenzen","area"],["ersetzt","Ersetzt (ID der aufgehobenen Entscheidung)","text"],["ersetzt_durch","Ersetzt durch (ID der neuen Entscheidung)","text"],["grund_entfallen","Grund, wenn ohne Nachfolger entfallen","area"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
@@ -465,6 +465,10 @@ const isAufg=t=>!!t&&t.typ!=="entscheidung";
 const colOf=t=>t&&t.typ==="entscheidung"&&t.status==="entschieden"?"erledigt":(t&&t.status||"offen");
 const ID_PREF={tasks:"t",postfach:"p",kilog:"k",deadlines:"d",reqs:"r",sensors:"s",sources:"q",files:"f",doku:"dk",checks:"c",tools:"wz",optionen:"o",freitage:"fr",packages:"pk",changes:"ae"};
 function idPrefix(coll,obj){return coll==="tasks"&&obj&&obj.typ==="entscheidung"?"e":(ID_PREF[coll]||"x");}
+/* Lesbare Nummer je Aufgabe (T-001) und Entscheidung (E-001), fortlaufend vergeben */
+function nextNr(ent){const pre=ent?"E":"T";let m=0;(S.data.tasks||[]).forEach(x=>{if((x.typ==="entscheidung")===ent&&x.nr){const r=/-(\d+)$/.exec(String(x.nr));if(r)m=Math.max(m,parseInt(r[1],10));}});return pre+"-"+String(m+1).padStart(3,"0");}
+const prioPill=p=>p?pill("P"+p,p==="1"?"p-bad":p==="2"?"p-warn":""):"";
+const cardMeta=t=>`<div class="small" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px"><span class="num muted">${esc(t.nr||"")}</span>${prioPill(t.prio)}${t.due?dueCell(t.due,t.status==="erledigt"||t.status==="entschieden"):""}</div>`;
 function nidFor(coll,obj){
   const p=idPrefix(coll,obj);const re=new RegExp("^"+p+"-(\\d+)$");let m=0;
   (S.data[coll]||[]).forEach(x=>{const r=re.exec(String(x.id||""));if(r)m=Math.max(m,parseInt(r[1],10));});
@@ -518,6 +522,7 @@ async function save(coll,id,obj){
 async function saveDirect(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
   const body=Object.assign({},obj);delete body.id;body.updated=new Date().toISOString();
+  if(coll==="tasks"&&!body.nr)body.nr=nextNr(body.typ==="entscheidung");
   try{const did=id||nidFor(coll,body);await S.db.collection(coll).doc(did).set(body);if(coll==="tasks"){await syncTaskCheck(did,body);await syncLinks(did,body);}return true;}
   catch(e){if(e&&e.code==="invalid_argument"){S.canWrite=false;}alert2(e&&e.code==="quota_exceeded"?"Speicher voll: bitte alte Einträge löschen.":"Speichern hat nicht geklappt. Bitte erneut versuchen.");render();return false;}
 }
@@ -906,7 +911,7 @@ VIEWS.offen=()=>{
   const board=cols.map(c=>{
     const list=S.data.tasks.filter(t=>isAufg(t)&&colOf(t)===c).sort(c==="erledigt"?(x,y)=>String(y.updated||"").localeCompare(String(x.updated||"")):sortDue);
     const shown=c==="erledigt"?list.slice(0,8):list;
-    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div></div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
+    return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(t=>{const ent=t.typ==="entscheidung";return `<div class="bcard" ${can?'draggable="true"':""} data-tid="${esc(t.id)}" ${ent?`data-edit="decisions" data-id="${esc(t.id)}"`:`data-edit="tasks" data-id="${esc(t.id)}"`}><div>${ent?'<span class="pill p-acc">Entscheidung</span> ':""}${esc(shortT(t.title))}</div>${cardMeta(t)}</div>`;}).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
   return `<div class="head"><div><span class="tag">Steuerung</span><h1>Aufgaben</h1><p>Fragen und Aufgaben. Entscheidungen stehen unter Entscheidungen. Eine Aufgabe ist mit ihrer Entscheidung verknüpft: Mit der Antwort wird die Entscheidung entschieden.</p></div>${newBtn("tasks","Neue Aufgabe")}</div><div class="board">${board}</div>`;
 };
@@ -1059,7 +1064,7 @@ VIEWS.entscheidungen=()=>{
   const openN=all.filter(t=>(t.status||"offen")==="offen"||t.status==="in Arbeit").length;
   const cols=["offen","entschieden","entfallen"];
   const sortIt=(x,y)=>(x.due||"9999").localeCompare(y.due||"9999");
-  const card=d=>{const na=S.data.tasks.filter(t=>isAufg(t)&&t.entscheidung===d.id&&colOf(t)!=="erledigt").length;return `<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(shortT(d.title||"(ohne Titel)"))}</div>${na?`<div class="small muted">${na} ${na===1?"Aufgabe":"Aufgaben"} offen</div>`:""}</div>`;};
+  const card=d=>{const na=S.data.tasks.filter(t=>isAufg(t)&&t.entscheidung===d.id&&colOf(t)!=="erledigt").length;return `<div class="bcard" ${can?'draggable="true"':""} data-dec="${esc(d.id)}" data-edit="decisions" data-id="${esc(d.id)}"><div>${esc(shortT(d.title||"(ohne Titel)"))}</div>${cardMeta(d)}${na?`<div class="small muted">${na} ${na===1?"Aufgabe":"Aufgaben"} offen</div>`:""}</div>`;};
   const board=cols.map(c=>{
     const list=all.filter(d=>(d.status||"offen")===c).sort(c==="entschieden"?(x,y)=>String(y.date||"").localeCompare(String(x.date||"")):sortIt);
     const shown=c==="entschieden"?list.slice(0,10):list;
