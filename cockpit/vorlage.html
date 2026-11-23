@@ -412,7 +412,7 @@ const NAV = [
   ["Schule",[["meilensteine","Checklisten"],["doku","Doku-Speicher","doku"],["quellen","Quellen","sources"],["ki-logbuch","KI-Logbuch","kilog"]]],
   ["Einstellungen",[["einstellungen","Optionen"]]]
 ];
-const COLLS = ["deadlines","packages","tasks","questions","reqs","decisions","changes","conflicts","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen","freitage"];
+const COLLS = ["deadlines","packages","tasks","reqs","changes","kilog","sensors","sources","doku","checks","tools","files","postfach","optionen","freitage"];
 const WHO = ["Janek","Baidinger","Graudejus","FSL"];
 const CHATS = ["","00 Cockpit","01 AS/Klärung","02 Pflichtenheft","03 Projektplan","04 Meilensteine","05 Messtechnik","06 Spann/Handhabung","07 Bewertung","08 CAD","09 Messprozess/Unterlagen","10 Doku","11 Präsentation"];
 
@@ -426,9 +426,6 @@ const LISTS = {
   packages:{coll:"packages",title:"Arbeitspakete",
     fields:[["name","Arbeitspaket","text"],["ampel","Ampel","select",["gruen","gelb","rot","grau"]],["stand","Stand","area"],["chat","Chat","select",CHATS],["order","Reihenfolge","num"]],
     def:{ampel:"grau"}},
-  questions:{coll:"questions",title:"Fragen an den Betrieb",
-    fields:[["q","Frage","area"],["prio","Priorität","select",["1","2"]],["topic","Bezug (z. B. Anf. 2.1)","text"],["due","Fällig bis","date"],["entscheider","Wer entscheidet","select",["","Baidinger","Graudejus","FSL","Janek"]],["refs","Verknüpft mit (IDs, z. B. e13, w02, 2.4)","text"],["status","Status","select",["offen","beantwortet","abgesagt"]],["answer","Antwort","area"],["source","Quelle (wer)","text"],["date","Datum Antwort","date"]],
-    def:{prio:"1",status:"offen"}},
   reqs:{coll:"reqs",title:"Anforderungsliste",
     fields:[["nr","Nr.","text"],["group","Hauptmerkmal","text"],["art","Art","select",["F","M","W","–"]],["text","Anforderung","area"],["sym","Symbol","text"],["min","min.","text"],["exact","exakt","text"],["max","max.","text"],["unit","Einheit","text"],["status","Status","select",["offen","bestätigt"]],["source","Quelle","text"],["date","Datum","date"],["note","Bemerkung","area"]],
     def:{art:"F",status:"offen"}},
@@ -436,8 +433,6 @@ const LISTS = {
     fields:[["title","Titel","text"],["note","Inhalt (Frage bzw. Entscheidung)","area"],["topic","Bezug (z. B. Anf. 2.1)","text"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Fällig bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["status","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["by","Entschieden von","select",["","Janek","Baidinger","Graudejus","FSL"],"r3"],["date","Datum","date",null,"r3"],["reason","Begründung (warum)","area"],["source","Quelle / Vorschlag von","text"]],def:{typ:"entscheidung",status:"offen",prio:"2"}},
   changes:{coll:"changes",title:"Änderungsdoku Pflichtenheft (Kap. 6)",
     fields:[["ver","Version","text"],["date","Datum","date"],["chap","Kapitel","text"],["change","Änderung","area"],["reason","Grund","area"],["by","Entschieden von","text"]],def:{}},
-  conflicts:{coll:"conflicts",title:"Widersprüche",
-    fields:[["text","Widerspruch","area"],["between","Zwischen","text"],["status","Status","select",["offen","geklärt"]],["resolved","Geklärt am","date"],["refs","Verknüpft mit (IDs)","text"],["note","Lösung / Notiz","area"]],def:{status:"offen"}},
   postfach:{coll:"postfach",title:"Postfach-Eintrag",
     fields:[["kind","Zielkategorie","select",["aufgabe","entscheidung","aenderung","abschluss","kilog","daten"]],["title","Titel","text"],["detail","Inhalt (bei KI-Logbuch: Art der Hilfe)","area"],["fach","Fachlicher Text durch KI (nur KI-Logbuch)","bool"],["who","Wer führt durch","select",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["ask","Wen fragen","multi",["","Janek","Baidinger","Graudejus","FSL"],"r1"],["due","Bis","date",null,"r2"],["prio","Priorität","select",["1","2","3"],"r2"],["stand","Status","select",["offen","in Arbeit","erledigt","entfallen"],"r2"],["vorschlag","Quelle / Vorschlag von","text"],["beleg","Beleg (Dokument, nur bei Abschluss)","text"],["ziel","Betrifft Eintrag (ID, nur bei Abschluss)","text"],["coll","Sammlung im Cockpit (nur bei Daten)","text"],["docId","ID des Datensatzes zum Überschreiben (nur bei Daten, leer = neu)","text"],["date","Datum","date"],["status","Eingang","select",["neu","übernommen","verworfen"]]],
     def:{kind:"aufgabe",status:"neu",stand:"offen",prio:"2",who:"Janek"}},
@@ -465,6 +460,15 @@ const pd = s=>{if(!s)return null;const [y,m,d]=s.split("-").map(Number);if(!y)re
 const fd = s=>{const d=pd(s);return d?d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}):"–";};
 const days = s=>{const d=pd(s);return d?Math.round((d-today())/864e5):null;};
 const nid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+/* Präfixe je Sammlung (siehe CLAUDE.md, Abschnitt Präfixe): neue Nummer = höchste vergebene +1, auch über offene Vorschläge */
+const ID_PREF={tasks:"t",postfach:"p",kilog:"k",deadlines:"d",reqs:"r",sensors:"s",sources:"q",files:"f",doku:"dk",checks:"c",tools:"wz",optionen:"o",freitage:"fr",packages:"pk",changes:"ae"};
+function idPrefix(coll,obj){return coll==="tasks"&&obj&&obj.typ==="entscheidung"?"e":(ID_PREF[coll]||"x");}
+function nidFor(coll,obj){
+  const p=idPrefix(coll,obj);const re=new RegExp("^"+p+"-(\\d+)$");let m=0;
+  (S.data[coll]||[]).forEach(x=>{const r=re.exec(String(x.id||""));if(r)m=Math.max(m,parseInt(r[1],10));});
+  (S.data.postfach||[]).forEach(x=>{if(x.coll===coll){const r=re.exec(String(x.docId||""));if(r)m=Math.max(m,parseInt(r[1],10));}});
+  return p+"-"+String(m+1).padStart(3,"0");
+}
 const num = v=>{if(v===""||v==null)return NaN;return Number(String(v).replace(",","."));};
 const f2 = (v,d=2)=>isFinite(v)?v.toLocaleString("de-DE",{maximumFractionDigits:d,minimumFractionDigits:0}):"–";
 function lsGet(k,d){try{const v=localStorage.getItem("tac_"+k);return v?JSON.parse(v):d;}catch(e){return d;}}
@@ -500,13 +504,58 @@ function typing(){const a=document.activeElement;return !!(a&&$("#main").contain
 function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=null;if(S.terminId&&!typing()&&!tTyping()){renderTermin();S.dirty=true;return;}if(S.taskId&&!typing()){renderTask();S.dirty=true;return;}if(S.modalOpen||typing()){S.dirty=true;return;}render();});}
 document.addEventListener("focusout",()=>setTimeout(()=>{if(S.dirty&&!S.modalOpen&&!typing())render();},300));
 
+/* Schreiben: Änderungen an Daten gehen zuerst als Vorschlag in den Postfach-Eingang (kind „daten“).
+   Erst die Übernahme im Postfach schreibt sie direkt (saveDirect / delDirect). Ausnahme: der Postfach selbst. */
 async function save(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
+  if(coll==="postfach")return saveDirect(coll,id,obj);
+  return proposeChange(coll,id||nidFor(coll,obj),obj,false);
+}
+async function saveDirect(coll,id,obj){
+  if(!S.db||!S.canWrite)return false;
   const body=Object.assign({},obj);delete body.id;body.updated=new Date().toISOString();
-  try{const did=id||nid();await S.db.collection(coll).doc(did).set(body);if(coll==="tasks")await syncTaskCheck(did,body);return true;}
+  try{const did=id||nidFor(coll,body);await S.db.collection(coll).doc(did).set(body);if(coll==="tasks")await syncTaskCheck(did,body);return true;}
   catch(e){if(e&&e.code==="invalid_argument"){S.canWrite=false;}alert2(e&&e.code==="quota_exceeded"?"Speicher voll: bitte alte Einträge löschen.":"Speichern hat nicht geklappt. Bitte erneut versuchen.");render();return false;}
 }
-async function del(coll,id){if(!S.db||!S.canWrite)return;try{await S.db.collection(coll).doc(id).delete();if(coll==="tasks")await syncTaskCheck(id,{title:"",due:"",status:"offen"});}catch(e){alert2("Löschen hat nicht geklappt.");}}
+async function del(coll,id){
+  if(!S.db||!S.canWrite)return false;
+  if(coll==="postfach")return delDirect(coll,id);
+  return proposeChange(coll,id,null,true);
+}
+async function delDirect(coll,id){
+  if(!S.db||!S.canWrite)return false;
+  try{await S.db.collection(coll).doc(id).delete();if(coll==="tasks")await syncTaskCheck(id,{title:"",due:"",status:"offen"});return true;}catch(e){alert2("Löschen hat nicht geklappt.");return false;}
+}
+/* Vorschläge: ein offener Vorschlag je Eintrag. Weitere Änderungen aktualisieren ihn, und „Alt“ bleibt der Stand vor dem ersten Vorschlag. */
+const PF_LAB=r=>String(r&&(r.title||r.name||r.q||r.text||r.nr||r.fn||r.family)||"").slice(0,60);
+function pfStrip(o){const c=Object.assign({},o||{});delete c.id;delete c.updated;return c;}
+function pfShort(v){if(v==null||v==="")return "–";const s=typeof v==="object"?JSON.stringify(v):String(v);return s.length>80?s.slice(0,77)+"…":s;}
+function pfDiff(a,b){
+  const A=pfStrip(a),B=pfStrip(b);const keys=[...new Set(Object.keys(A).concat(Object.keys(B)))];
+  const out=keys.filter(k=>JSON.stringify(A[k]===undefined?null:A[k])!==JSON.stringify(B[k]===undefined?null:B[k])).map(k=>k+": "+pfShort(A[k])+" → "+pfShort(B[k]));
+  return out.join("\n")||"Keine Feldänderung.";
+}
+async function proposeChange(coll,id,obj,isDel){
+  try{
+    const cur=(S.data[coll]||[]).find(x=>x.id===id)||null;
+    const pf=S.data.postfach||[];
+    const prev=pf.find(p=>p.status==="neu"&&p.kind==="daten"&&p.coll===coll&&p.docId===id)||null;
+    const base=prev?prev.alt:(cur?pfStrip(cur):null);
+    const neu=isDel?null:pfStrip(obj);
+    if(isDel&&!base)return true;
+    if(!isDel&&base&&pfDiff(base,neu)==="Keine Feldänderung."){if(prev)await S.db.collection("postfach").doc(prev.id).delete();return true;}
+    const day=new Date().toISOString().slice(0,10);
+    const titel=(isDel?"Löschen":base?"Ändern":"Neu")+": "+coll+" – "+(PF_LAB(base||neu)||id);
+    const entry={kind:"daten",coll:coll,docId:id,title:titel,
+      detail:isDel?"Eintrag aus dem Cockpit entfernen.":(base?pfDiff(base,neu):"Neuer Eintrag."),
+      vorschlag:"Janek (Web)",status:"neu",date:day,stand:day,ziel:coll+"/"+id,
+      alt:base?pfStrip(base):null,payload:neu,loeschen:!!isDel};
+    const pid=prev?prev.id:nidFor("postfach");
+    await S.db.collection("postfach").doc(pid).set(entry);
+    if(!prev)alert2("Als Vorschlag ins Postfach gelegt. Mit „Aktualisieren“ speichern; wirksam wird er nach deiner Übernahme.");
+    return true;
+  }catch(e){alert2("Vorschlag konnte nicht angelegt werden.");return false;}
+}
 function alert2(t){S.msg=t;render();setTimeout(()=>{S.msg=null;render();},4000);}
 function tool(id){return S.data.tools.find(t=>t.id===id)||null;}
 const toolTimers={};
@@ -520,9 +569,7 @@ function navHtml(){
     let cnt="";if(c){const arr=S.data[c]||[];let n=arr.length;
       if(c==="tasks")n=arr.filter(x=>x.status!=="erledigt").length;
       if(c==="postfach")n=arr.filter(x=>x.status==="neu").length;
-      if(c==="questions")n=arr.filter(x=>x.status==="offen").length;
       if(k==="entscheidungen")n=S.data.tasks.filter(x=>x.typ==="entscheidung"&&(x.status||"offen")!=="erledigt"&&x.status!=="entfallen").length;
-      if(c==="conflicts")n=arr.filter(x=>x.status!=="geklärt").length;
       if(c==="reqs")n=new Set(reqWarnings().map(w=>w[0])).size;
       cnt=`<span class="cnt">${n}</span>`;}
     h+=`<a href="#${k}" class="${S.view===k?"on":""}">${l}${cnt}</a>`;});});
@@ -611,7 +658,7 @@ function openEditor(key,id,preset){
       if(ex)ex.checked=true;else{const l=document.createElement("label");l.className="chk";const inp=document.createElement("input");inp.type="checkbox";inp.className="mchk";inp.dataset.mk=k;inp.value=v;inp.checked=true;l.appendChild(inp);l.appendChild(document.createTextNode(v));box.appendChild(l);}
       mSync(h);}
     else{const sel=document.getElementById(b.dataset.addopt);if(!sel)return;if(![...sel.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}sel.value=v;}
-    await save("optionen",nid(),{feld:b.dataset.group,wert:v});});
+    await save("optionen",nidFor("optionen"),{feld:b.dataset.group,wert:v});});
   if(key==="postfach"){const ks=$("#f_postfach_kind");if(ks)ks.onchange=()=>{S.pfDraft=collectEdForm();openEditor(key,id,preset);};}
   const sb=$("#savebtn");if(sb)sb.onclick=async()=>{
     const obj=Object.assign({},rec);
@@ -619,14 +666,14 @@ function openEditor(key,id,preset){
       const fd_=L.fields.find(x=>x[0]===k);if(fd_&&fd_[2]==="num")obj[k]=el.value===""?"":Number(el.value);});
     if(key==="postfach"&&obj.status==="übernommen"&&rec.status!=="übernommen"){sb.disabled=true;await pfAccept(id,obj);closeModal();return;}
     if(key==="decisions"&&obj.status==="erledigt"&&(!obj.by||!obj.reason)){alert2("Für „erledigt“ bitte „Entschieden von“ und „Begründung“ eintragen.");return;}
-    sb.disabled=true;const ok=await save(L.coll,id,obj);if(ok&&key==="deadlines"&&!id)await save("checks",nid(),{title:obj.title||"",hint:obj.date?fd(obj.date):"",items:[]});if(ok)closeModal();else sb.disabled=false;};
+    sb.disabled=true;const ok=await save(L.coll,id,obj);if(ok&&key==="deadlines"&&!id)await save("checks",nidFor("checks"),{title:obj.title||"",hint:obj.date?fd(obj.date):"",items:[]});if(ok)closeModal();else sb.disabled=false;};
   const pfb=$("#pfbtn");if(pfb)pfb.onclick=async()=>{if(!pfb.dataset.sure){pfb.dataset.sure=1;pfb.textContent="Wirklich ins Postfach?";return;}await toPostfach(L.coll,id,rec);};
   const db_=$("#delbtn");if(db_)db_.onclick=async()=>{if(db_.dataset.sure){await del(L.coll,id);closeModal();}else{db_.dataset.sure=1;db_.textContent="Wirklich löschen?";}};
 }
 async function toPostfach(coll,id,rec){
   const ent=rec.typ==="entscheidung"||coll==="decisions";
   const entry={kind:ent?"entscheidung":"aufgabe",title:rec.title||rec.text||"",detail:rec.note||"",vorschlag:rec.source||"",who:rec.who||"",ask:rec.ask||"",due:rec.due||"",prio:rec.prio||"2",stand:rec.status||"offen",date:rec.date||"",status:"neu",altColl:"tasks",alt:rec};
-  const ok=await save("postfach",nid(),entry);
+  const ok=await save("postfach",nidFor("postfach"),entry);
   if(ok){await del(coll,id);closeModal();}
 }
 function closeModal(){$("#modal").innerHTML="";S.modalOpen=false;S.terminId=null;S.taskId=null;render();}
@@ -658,17 +705,14 @@ const byNr=(a,b)=>String(a.nr).localeCompare(String(b.nr),"de",{numeric:true});
 const SRC=[
  ["tasks","Punkt","aufgaben",r=>r.title,r=>[r.note,r.who,r.chat]],
  ["deadlines","Termin","zeitleiste",r=>r.title,r=>[r.note,r.date]],
- ["questions","Frage","fragen",r=>r.q,r=>[r.answer,r.topic]],
  ["reqs","Anforderung","anforderungen",r=>(r.nr?r.nr+" ":"")+String(r.text||"").split("\n")[0],r=>[r.group,r.text,r.source]],
- ["decisions","Entscheidung","entscheidungen",r=>r.text,r=>[r.source,r.docs]],
- ["conflicts","Widerspruch","widersprueche",r=>r.text,r=>[r.between,r.note]],
  ["sources","Quelle","quellen",r=>r.text,r=>[r.used,r.kind]],
  ["doku","Kapitel","doku",r=>(r.nr?r.nr+" ":"")+(r.title||""),r=>[r.notes,r.figures]],
  ["sensors","Sensor","sensoren",r=>[r.maker,r.model,r.variant].filter(Boolean).join(" "),r=>[r.principle,r.range]],
  ["files","Datei","dateien",r=>(r.family?r.family+" – ":"")+(r.name||""),r=>[r.ver,r.note,r.folder]],
  ["kilog","KI-Logbuch","ki-logbuch",r=>r.purpose||r.zweck,r=>[r.help,r.ergebnis,r.chat]],
 ];
-const NEWS=[["tasks","Neuer offener Punkt"],["deadlines","Neuer Termin"],["questions","Neue Frage an den Betrieb"],["reqs","Neue Anforderung"],["decisions","Neue Entscheidung"],["conflicts","Neuer Widerspruch"],["sources","Neue Quelle"],["doku","Neues Kapitel"],["sensors","Neuer Sensor"]];
+const NEWS=[["tasks","Neuer offener Punkt"],["deadlines","Neuer Termin"],["reqs","Neue Anforderung"],["decisions","Neue Entscheidung"],["sources","Neue Quelle"],["doku","Neues Kapitel"],["sensors","Neuer Sensor"]];
 /* ---------- Wochenberichte: jeder Bericht läuft Freitag 07:30 bis nächsten Freitag 07:30 ---------- */
 function wpStart(ts){
   const s=new Date(ts);s.setHours(7,30,0,0);
@@ -822,7 +866,7 @@ VIEWS.einstellungen=()=>{
     `<div class="tbl"><table><thead><tr><th>Name</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr><td><input value="${esc(o.wert)}" data-optname="${esc(o.id)}" ${can?"":"disabled"} style="width:100%"></td><td>${can?`<button class="btn sm danger" data-optdel="${esc(o.id)}">Löschen</button>`:""}</td></tr>`).join("")||'<tr><td colspan="2" class="empty">Noch keine Optionen.</td></tr>'}</tbody></table></div>`;
 };
 VIEWS_after.einstellungen=()=>{
-  const add=$("#optadd");if(add)add.onclick=async()=>{const v=($("#optnew").value||"").trim();if(!v)return;await save("optionen",nid(),{feld:"person",wert:v});$("#optnew").value="";};
+  const add=$("#optadd");if(add)add.onclick=async()=>{const v=($("#optnew").value||"").trim();if(!v)return;await save("optionen",nidFor("optionen"),{feld:"person",wert:v});$("#optnew").value="";};
   document.querySelectorAll("[data-optname]").forEach(i=>i.onchange=async()=>{const o=S.data.optionen.find(x=>x.id===i.dataset.optname);const v=i.value.trim();if(!o)return;if(!v){i.value=o.wert;return;}await save("optionen",o.id,Object.assign({},o,{wert:v}));});
   document.querySelectorAll("[data-optdel]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Wirklich?";return;}await del("optionen",b.dataset.optdel);});
 };
@@ -843,7 +887,7 @@ VIEWS_after.postfach=()=>{
   const pb=$("#pruefbtn");if(pb)pb.onclick=async()=>{
     if(S.data.postfach.some(x=>x.status==="neu"&&/^Dokumente prüfen/.test(x.title||""))){alert2("Der Prüfauftrag steht schon im Eingang.");return;}
     const day=new Date().toISOString().slice(0,10);
-    await save("postfach",nid(),{kind:"aufgabe",title:"Dokumente prüfen (Prüfauftrag)",detail:"Neue Dokumente im Archiv gegen offene Punkte abgleichen. Ergebnisse kommen als Einträge in den Eingang. Ausgelöst am "+day+".",vorschlag:"Cockpit (Knopf Dokumente prüfen)",who:"Janek Bauer",ask:"",due:"",prio:"1",stand:"offen",date:day,status:"neu"});};
+    await save("postfach",nidFor("postfach"),{kind:"aufgabe",title:"Dokumente prüfen (Prüfauftrag)",detail:"Neue Dokumente im Archiv gegen offene Punkte abgleichen. Ergebnisse kommen als Einträge in den Eingang. Ausgelöst am "+day+".",vorschlag:"Cockpit (Knopf Dokumente prüfen)",who:"Janek Bauer",ask:"",due:"",prio:"1",stand:"offen",date:day,status:"neu"});};
   const pd=$("#pfdrop");if(pd)pd.onchange=()=>{lsSet("pfDrop",pd.checked);render();};
   document.querySelectorAll("[data-pfaccept]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();pfAccept(b.dataset.pfaccept);});
   document.querySelectorAll("[data-pfreject]").forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const p=S.data.postfach.find(x=>x.id===b.dataset.pfreject);if(p)await save("postfach",p.id,Object.assign({},p,{status:"verworfen"}));});
@@ -894,8 +938,8 @@ async function pfClose(p){
   const obj=Object.assign({},t,{status:"erledigt"});
   if(t.typ==="entscheidung"){obj.by=t.by||p.who||"Janek Bauer";obj.reason=t.reason||p.detail||"";
     if(!obj.by||!obj.reason){alert2("Für eine Entscheidung braucht „erledigt“ „Entschieden von“ und „Begründung“.");return;}}
-  if(!(await save("tasks",t.id,obj)))return;
-  await save("postfach",p.id,Object.assign({},p,{status:"übernommen",ziel:"tasks/"+t.id}));
+  if(!(await saveDirect("tasks",t.id,obj)))return;
+  await saveDirect("postfach",p.id,Object.assign({},p,{status:"übernommen",ziel:"tasks/"+t.id}));
 }
 /* Doppelte Übernahme ausschließen: ein Eintrag wird nur einmal übernommen, auch bei Doppelklick */
 const PF_BUSY={};
@@ -909,11 +953,18 @@ async function pfAcceptRaw(id,pre){
   const p=pre||S.data.postfach.find(x=>x.id===id);if(!p)return;
   if(p.kind==="abschluss"){await pfClose(p);return;}
   /* allgemeiner Vorschlag: Datensatz für eine beliebige Sammlung (z. B. Sensoren, Anforderungen, Morphologischer Kasten) */
-  if(p.kind==="daten"){if(!p.coll||!p.payload||typeof p.payload!=="object"){alert2("Dieser Eintrag ist unvollständig (Sammlung oder Inhalt fehlt).");return;}
-    if(!COLLS.includes(p.coll)){alert2("Die Sammlung „"+p.coll+"“ gibt es im Cockpit nicht. Bitte im Eintrag korrigieren.");return;}
-    const did=p.docId||nid();if(await save(p.coll,did,p.payload))await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:p.coll+"/"+did}));return;}
-  if(p.kind==="kilog"){const kid=nid();const day=p.date||new Date().toISOString().slice(0,10);
-    if(await save("kilog",kid,{date:day,help:p.detail||p.title||"",fach:!!p.fach}))await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:"kilog/"+kid}));
+  if(p.kind==="daten"){
+    if(!p.coll||!COLLS.includes(p.coll)){alert2("Die Sammlung „"+p.coll+"“ gibt es im Cockpit nicht. Bitte im Eintrag korrigieren.");return;}
+    const done={status:"übernommen",ziel:p.coll+"/"+p.docId};
+    if(p.loeschen){if(!p.docId)return;if(await delDirect(p.coll,p.docId))await saveDirect("postfach",id,Object.assign({},p,done));return;}
+    if(!p.payload||typeof p.payload!=="object"){alert2("Dieser Eintrag ist unvollständig (Inhalt fehlt).");return;}
+    const did=p.docId||nidFor(p.coll,p.payload);
+    const now=(S.data[p.coll]||[]).find(x=>x.id===did)||null;
+    if(p.alt&&now&&pfDiff(p.alt,now)!=="Keine Feldänderung."&&!confirm("Der Eintrag wurde seit dem Vorschlag geändert. Trotzdem übernehmen?"))return;
+    if(await saveDirect(p.coll,did,p.payload))await saveDirect("postfach",id,Object.assign({},p,done,{docId:did}));
+    return;}
+  if(p.kind==="kilog"){const kid=nidFor("kilog");const day=p.date||new Date().toISOString().slice(0,10);
+    if(await saveDirect("kilog",kid,{date:day,help:p.detail||p.title||"",fach:!!p.fach}))await saveDirect("postfach",id,Object.assign({},p,{status:"übernommen",ziel:"kilog/"+kid}));
     return;}
   let target=null,obj=null;
   if(p.alt){const r=pfAltRecord(p);if(r&&PF_KIND_COLL[p.kind]===r.coll){target=r.coll;obj=r.obj;}}
@@ -929,9 +980,9 @@ async function pfAcceptRaw(id,pre){
     target=m[0];obj=m[1];
   }
   if(target==="tasks"){if(p.who)obj.who=p.who;if(p.ask)obj.ask=p.ask;if(p.due)obj.due=p.due;if(p.prio)obj.prio=p.prio;}
-  const newId=nid();
-  const ok=await save(target,newId,obj);
-  if(ok)await save("postfach",id,Object.assign({},p,{status:"übernommen",ziel:target+"/"+newId}));
+  const newId=nidFor(target,obj);
+  const ok=await saveDirect(target,newId,obj);
+  if(ok)await saveDirect("postfach",id,Object.assign({},p,{status:"übernommen",ziel:target+"/"+newId}));
 }
 
 /* ---------- Änderungsdoku (Pflichtenheft) ---------- */
@@ -984,40 +1035,6 @@ function buildIcs(){
 }
 VIEWS_after.zeitleiste=()=>{const fq=$("#frshow");if(fq)fq.onchange=()=>{lsSet("frShow",fq.checked);render();};const b=$("#icsbtn");if(b)b.onclick=async()=>{b.disabled=true;try{await saveBlob("Termine_Technikerarbeit.ics",new Blob([buildIcs()],{type:"text/calendar"}));}catch(e){alert2("Kalenderdatei konnte nicht erstellt werden.");}b.disabled=false;};};
 
-/* ---------- Verknüpfungen: Fragen, Entscheidungen, Widersprüche, Anforderungen ---------- */
-function refTokens(s){return String(s||"").split(/[,;]/).map(t=>t.trim().toLowerCase().replace(/^anf\.?\s*/,"")).filter(Boolean);}
-function linkedFor(q){
-  const toks=refTokens(q.refs);const out=[];
-  (S.data.decisions||[]).forEach(d=>{if(toks.includes(String(d.id).toLowerCase()))out.push({c:"decisions",id:d.id,kind:"Entscheidung",label:d.text,status:d.status,opts:[["entfallen","Entfällt"],["bestätigt","Bestätigt"]]});});
-  (S.data.conflicts||[]).forEach(c=>{if(toks.includes(String(c.id).toLowerCase()))out.push({c:"conflicts",id:c.id,kind:"Widerspruch",label:c.text,status:c.status,opts:[["geklärt","Geklärt"]]});});
-  (S.data.reqs||[]).forEach(r=>{if(toks.includes(String(r.nr||"").toLowerCase()))out.push({c:"reqs",id:r.id,kind:"Anforderung",label:(r.nr?r.nr+" ":"")+(r.text||""),status:r.status,opts:[["bestätigt","Bestätigt"]]});});
-  return out;
-}
-function openAbgleich(qid){
-  S.abglQ=qid;const q=S.data.questions.find(x=>x.id===qid);if(!q)return;
-  const items=linkedFor(q);
-  const body=items.length?items.map(it=>`<li style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="small muted">${esc(it.kind)} · ${stPill(it.status)}</div><div style="margin:4px 0">${nl(it.label)}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${it.opts.map(([s,l])=>`<button class="btn sm" data-abset="${esc(it.c)}|${esc(it.id)}|${esc(s)}">${esc(l)}</button>`).join("")}</div></li>`).join(""):'<p class="muted">Keine verknüpften Einträge. Trage unter „Verknüpft mit“ die IDs ein, z. B. e13 (Entscheidung), w02 (Widerspruch) oder 2.4 (Anforderung).</p>';
-  $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="Abgleich">
-    <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Frage ${stPill(q.status)}</span><h2 style="margin:6px 0">${esc(q.q)}</h2><p class="small muted" style="margin:0">${q.answer?"Antwort: "+esc(q.answer):"Keine Antwort eingetragen."}</p></div><button class="btn" data-close="1">Schließen</button></div>
-    <h3 style="margin-top:12px">Was dadurch wegfällt oder geklärt wird</h3><ul class="clean">${body}</ul></div></div>`;
-  S.modalOpen=true;
-}
-async function setLinked(c,id,status){
-  const r=(S.data[c]||[]).find(x=>x.id===id);if(!r)return;
-  const obj=Object.assign({},r,{status});
-  if(c==="conflicts"&&status==="geklärt")obj.resolved=new Date().toISOString().slice(0,10);
-  await save(c,id,obj);
-}
-VIEWS.fragen=()=>{
-  const f=lsGet("qFilter",{st:"offen"});
-  const sorted=S.data.questions.slice().sort((x,y)=>(x.status===y.status?0:x.status==="offen"?-1:1)||(x.prio||"9").localeCompare(y.prio||"9"));
-  const rows=f.st==="alle"?sorted:sorted.filter(q=>q.status===f.st);
-  return `<div class="head"><div><span class="tag">Steuerung</span><h1>Fragen an den Betrieb</h1><p>Antworten mit Quelle und Datum eintragen. Wer entscheidet, steht dabei. Unter „Verknüpft mit“ stehen die Entscheidungen, Widersprüche und Anforderungen, die von der Frage abhängen. Nach der Antwort oder Absage prüfst du sie mit „Prüfen“.</p></div>${newBtn("questions","Neue Frage")}</div>
-  <div class="toolbar"><select id="qfst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="beantwortet" ${f.st==="beantwortet"?"selected":""}>Nur beantwortete</option><option value="abgesagt" ${f.st==="abgesagt"?"selected":""}>Nur abgesagte</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
-  listTable("questions",rows,[["prio","P",r=>`<span class="num">${esc(r.prio)}</span>`],["q","Frage"],["entscheider","Wer entscheidet",r=>`<span class="small">${esc(r.entscheider||"–")}</span>`],["refs","Verknüpft",r=>`<span class="small">${esc(r.refs||"")}</span>`],["status","Status",r=>stPill(r.status)],["ab","Abgleich",r=>{const n=r.status!=="offen"?linkedFor(r).length:0;return n?`<button class="btn sm" data-abgl="${esc(r.id)}">Prüfen (${n})</button>`:"";}],["answer","Antwort",r=>r.answer?`${nl(r.answer)}<div class="small muted">${esc(r.source||"")}${r.date?" · "+fd(r.date):""}</div>`:'<span class="muted">–</span>']]);
-};
-VIEWS_after.fragen=()=>{const s=$("#qfst");if(s)s.onchange=()=>{lsSet("qFilter",{st:s.value});render();};};
-
 VIEWS.anforderungen=()=>{
   const rsort=lsGet("reqSort","nr");const rows=reqSorted(S.data.reqs,rsort);const W=reqWarnings();
   const wfor=r=>W.filter(w=>w[0]===r).map(w=>w[1]);
@@ -1042,7 +1059,7 @@ VIEWS.entscheidungen=()=>{
     const shown=c==="erledigt"?list.slice(0,10):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss, inklusive Fragen an den Betrieb und Widersprüche. Dieselben Karten wie unter Aufgaben. Für „erledigt“ braucht es „Entschieden von“ und „Begründung“ (Karte antippen).</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
+  return `<div class="head"><div><span class="tag">Postfach</span><h1>Entscheidungen</h1><p>Alles, was entschieden werden muss. Dieselben Karten wie unter Aufgaben. Für „erledigt“ braucht es „Entschieden von“ und „Begründung“ (Karte antippen).</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board">${board}</div>`;
 };
@@ -1060,16 +1077,6 @@ VIEWS_after.entscheidungen=()=>{
       if(target==="erledigt"&&(!d.by||!d.reason)){alert2("Vor „erledigt“ den Eintrag antippen und „Entschieden von“ und „Begründung“ eintragen.");return;}
       await save("tasks",id,Object.assign({},d,{status:target}));});});
 };
-VIEWS.widersprueche=()=>{
-  const f=lsGet("cfFilter",{st:"offen"});
-  const sorted=S.data.conflicts.slice().sort((x,y)=>String(x.id).localeCompare(String(y.id)));
-  const rows=f.st==="alle"?sorted:sorted.filter(c=>f.st==="geklärt"?c.status==="geklärt":c.status!=="geklärt");
-  return `<div class="head"><div><span class="tag">Pflichtenheft</span><h1>Widersprüche</h1><p>Abgleich Aufgabenstellung ↔ Pflichtenheft ↔ Ausschreibung. Vor jeder Freigabe muss die Liste leer sein. Zeile antippen zum Bearbeiten, dort auch den Status ändern.</p></div>${newBtn("conflicts","Neuer Widerspruch")}</div>
-  <div class="toolbar"><select id="cffst" aria-label="Status"><option value="offen" ${f.st==="offen"?"selected":""}>Nur offene</option><option value="geklärt" ${f.st==="geklärt"?"selected":""}>Nur geklärte</option><option value="alle" ${f.st==="alle"?"selected":""}>Alle</option></select><span class="muted small">${rows.length} Einträge</span></div>`+
-  listTable("conflicts",rows,[["id","Nr.",r=>`<span class="num">${esc(cfLabel(r))}</span>`],["text","Widerspruch"],["between","Zwischen",r=>`<span class="small">${esc(r.between||"")}</span>`],["status","Status",r=>stPill(r.status)],["resolved","Geklärt am",r=>r.resolved?fd(r.resolved):'<span class="muted">–</span>']]);
-};
-VIEWS_after.widersprueche=()=>{const s=$("#cffst");if(s)s.onchange=()=>{lsSet("cfFilter",{st:s.value});render();};};
-function cfLabel(r){const m=/(\d+)/.exec(String(r.id||""));return m?"W"+m[1]:"–";}
 
 VIEWS_after.sensoren=()=>{const sx=$("#sxlsx");if(sx)sx.onclick=async()=>{
   const F=LISTS.sensors.fields;
@@ -1354,7 +1361,7 @@ async function moveCheckItem(srcId,i,dlId){
   const srcC=JSON.parse(JSON.stringify(src));srcC.items.splice(i,1);
   if(!(await save("checks",srcId,srcC)))return;
   if(tgt){const tc=JSON.parse(JSON.stringify(tgt));tc.items=[Object.assign({},item)].concat(tc.items||[]);await save("checks",tgt.id,tc);}
-  else{await save("checks",nid(),{title:dl.title,hint:dl.date?fd(dl.date):"",items:[Object.assign({},item)]});}
+  else{await save("checks",nidFor("checks"),{title:dl.title,hint:dl.date?fd(dl.date):"",items:[Object.assign({},item)]});}
 alert2("Verschoben nach „"+dl.title+"“.");
 }
 /* Datum einer Checkliste: eigenes Datum, sonst Freitag bzw. verknüpfter Termin */
@@ -1602,10 +1609,10 @@ async function syncTaskCheck(tid,task){
       const cc=JSON.parse(JSON.stringify(c));
       cc.items=(cc.items||[]).filter(x=>x.ref!==ref);
       if(should)cc.items.push({t:task.title||"",done:done,ref:ref});
-      await save("checks",c.id,cc);
+      await saveDirect("checks",c.id,cc);
     }
     if(tgtId&&!(S.data.checks||[]).some(c=>c.id===tgtId)){
-      await save("checks",tgtId,Object.assign({},spec,{items:[{t:task.title||"",done:done,ref:ref}]}));
+      await saveDirect("checks",tgtId,Object.assign({},spec,{items:[{t:task.title||"",done:done,ref:ref}]}));
     }
   }catch(e){console.error("Checkliste konnte nicht aktualisiert werden",e);}
 }
@@ -1657,7 +1664,7 @@ function renderTermin(first){
   const upd=async ch=>{const cur=S.data[coll].find(x=>x.id===d.id)||d;await save(coll,d.id,Object.assign({},cur,ch));};
   document.querySelectorAll("[data-tstat]").forEach(b=>b.onclick=()=>upd({status:b.dataset.tstat}));
   document.querySelectorAll("[data-ckaddtask]").forEach(sel=>sel.onchange=()=>addTaskToCheck(sel.dataset.ckaddtask,sel.value));
-  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{if(String(d.id).startsWith("fr-")){if(!checkFor(d))await save("checks",d.id,{title:fd(d.date),hint:"",items:[],termin:d.id});return;}const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);if(!(S.data.checks||[]).some(c=>c.title===d.title))await save("checks",nid(),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
+  document.querySelectorAll("[data-mkck]").forEach(b=>b.onclick=async()=>{if(String(d.id).startsWith("fr-")){if(!checkFor(d))await save("checks",d.id,{title:fd(d.date),hint:"",items:[],termin:d.id});return;}const fams=String(d.unterlagen||"").split(",").map(x=>x.trim()).filter(Boolean);if(!(S.data.checks||[]).some(c=>c.title===d.title))await save("checks",nidFor("checks"),{title:d.title,hint:d.date?fd(d.date):"",items:[]});});
   document.querySelectorAll("[data-tfadd]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfadd);if(f)await save("files",f.id,Object.assign({},f,{deadline:d.id}));});
   document.querySelectorAll("[data-tfdel]").forEach(b=>b.onclick=async()=>{const f=S.data.files.find(x=>x.id===b.dataset.tfdel);if(f)await save("files",f.id,Object.assign({},f,{deadline:""}));});
   const te=$("#tedit");if(te)te.onclick=()=>{S.terminId=null;openEditor("deadlines",d.id);};
@@ -1695,8 +1702,6 @@ function renderTask(first){
 /* ---------- Events ---------- */
 document.addEventListener("click",ev=>{
   if(ev.target.closest("#srchbtn")){palOpenUi();return;}
-  const ab=ev.target.closest("[data-abgl]");if(ab){ev.preventDefault();openAbgleich(ab.dataset.abgl);return;}
-  const as=ev.target.closest("[data-abset]");if(as){ev.preventDefault();const [c,id,s]=as.dataset.abset.split("|");const qid=S.abglQ;setLinked(c,id,s).then(()=>{if(qid)openAbgleich(qid);});return;}
   const wi=ev.target.closest("[data-wpitem]");if(wi){ev.preventDefault();const [c,id,view]=wi.dataset.wpitem.split("|");closeModal();palOpen(c,view,id);return;}
   const dl=ev.target.closest("[data-dl]");if(dl){ev.preventDefault();ev.stopPropagation();const f=S.data.files.find(x=>x.id===dl.dataset.dl);if(f)dlFile(f,dl);return;}
   if(ev.target.closest("[data-noedit],.fchip a"))return;

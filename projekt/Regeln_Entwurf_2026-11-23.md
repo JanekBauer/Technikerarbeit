@@ -1,6 +1,6 @@
 # Arbeitsregeln Cockpit – Entwurf v2 (23.11.2026)
 
-Entwurf zur Prüfung. Ersetzt noch nicht die `CLAUDE.md`. Nach deiner Freigabe wird die CLAUDE.md umgeschrieben, `cockpit/README.md` angeglichen und die Umbauten am Cockpit gemacht (siehe Abschnitt 9).
+Freigegeben von Janek am 23.11.2026 und umgesetzt (siehe CLAUDE.md, Version 2).
 
 ## 1. Wo was liegt
 
