@@ -23,7 +23,7 @@ Die Präfixe der IDs (`t-`, `e-`, `p-`, `k-`, `d-`, …) stehen in `CLAUDE.md`, 
 ## Bearbeiten im Cockpit
 Oben rechts „Bearbeiten freischalten“ wählen und ein GitHub-Zugriffstoken einfügen (fein abgestuftes Token, nur dieses Repo, Berechtigung „Contents: Read and write“). Das Token bleibt nur im Browser.
 
-**Jede Änderung wird ein Vorschlag im Postfach** (Art `daten`):
+**Jede Änderung an Daten wird ein Vorschlag im Postfach** (Art `daten`). Ausnahmen: Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung) werden direkt gespeichert.
 1. Bearbeiten, Löschen oder Ziehen in der Oberfläche legt einen Vorschlag an. Die Daten bleiben unverändert.
 2. Unten links erscheint „N Änderungen nur im Browser“. „Aktualisieren“ schreibt die Vorschläge in einem Commit nach `cockpit/daten/postfach.json`. „Verwerfen“ nimmt sie zurück.
 3. Im Postfach übernimmst du den Vorschlag oder verwirfst ihn. Erst die Übernahme schreibt den Eintrag in die Sammlung.

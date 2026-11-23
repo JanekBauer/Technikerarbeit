@@ -119,7 +119,8 @@ Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 
 1. **Das Postfach selbst** (neue Einträge anlegen, Status setzen).
 2. **Spiegelung Aufgabe ↔ Checkliste:** Ändert Janek eine Aufgabe und übernimmt sie, wird die zugehörige Checkliste automatisch mitgeführt. Sie ist abgeleitet, kein eigener Vorschlag.
-3. **Archiv-Upload:** Die Datei selbst wird direkt unter `docs/archiv` abgelegt (Binärdateien lassen sich nicht im Postfach vorschlagen). Der Metadaten-Eintrag in `files.json` läuft als Vorschlag. Bis zur Übernahme ist die Datei im Archiv vorhanden, aber in der Liste nicht sichtbar.
+3. **Checklisten und Werkzeuge:** Haken in Checklisten (`checks`) und Eingaben in den Werkzeugen (Morph. Kasten, Bewertung: `tools`) werden direkt gespeichert. Sie sind laufende Arbeitsstände und würden das Postfach überfluten.
+4. **Archiv-Upload:** Die Datei selbst wird direkt unter `docs/archiv` abgelegt (Binärdateien lassen sich nicht im Postfach vorschlagen). Der Metadaten-Eintrag in `files.json` läuft als Vorschlag. Bis zur Übernahme ist die Datei im Archiv vorhanden, aber in der Liste nicht sichtbar.
 
 ## 10. Branch und Commits
 
