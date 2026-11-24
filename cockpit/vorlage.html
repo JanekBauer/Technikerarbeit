@@ -1332,7 +1332,7 @@ VIEWS.bewertung=()=>{
   let h=`<div class="head"><div><h1>Bewertung der Varianten</h1><p>1. Kriterien festlegen (ca. 5, höchstens 10, mehr Punkte = besser). 2. Gewichte vergleichen. 3. Punkte je Variante. Der Betrieb entscheidet.</p></div>
 </div>
   <div>
-  <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser. Reihenfolge wie im Pflichtenheft (K1 = erste Anforderung).</p>
+  <div class="panel"><h3>1. Bewertungskriterien</h3>
    ${(()=>{const nrs=e.criteria.map(c=>critNr(c)||c.name);const dup=nrs.length-new Set(nrs).size;const unsorted=e.criteria.some((c,i,a)=>i>0&&critCmp(a[i-1],c)>0);const too=e.criteria.length>10;if(!dup&&!unsorted&&!too)return "";return `<div class="banner">${dup?dup+" Doppelung(en) mit gleicher Anforderungsnummer. ":""}${too?e.criteria.length+" Kriterien, Obergrenze 10. ":""}${unsorted?"Reihenfolge weicht vom Pflichtenheft ab. ":""}${ro?"":'<button class="btn sm" id="ev_clean">Bereinigen und nach Pflichtenheft sortieren</button>'}</div>`;})()}
    ${e.criteria.map((c,ci)=>`<div class="toolbar"><span class="num" style="width:22px">K${ci+1}</span><input data-ev="cname" data-c="${ci}" value="${esc(c.name)}" ${ro?"readonly":""} aria-label="Kriterium" style="flex:1;min-width:0"><span class="num small">${f2((w[ci]||0)*100,1)} %</span>${ro?"":`<button class="btn sm" data-evdelc="${ci}" aria-label="Kriterium löschen">×</button>`}</div>`).join("")||'<div class="empty">Noch keine Kriterien.</div>'}
    ${ro?"":`<div class="toolbar"><input id="ev_newc" placeholder="Kriterium hinzufügen" aria-label="Neues Kriterium"><button class="btn sm" id="ev_addc">+</button></div>`}</div>
