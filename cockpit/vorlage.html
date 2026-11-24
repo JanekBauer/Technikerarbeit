@@ -1220,6 +1220,11 @@ const MORPH_DEF={rows:[],variants:[]};
 function mkNorm(m){if(m.rows.every(r=>Array.isArray(r.deps)))return m;
   m.rows.forEach(r=>{if(!Array.isArray(r.deps)){const g=String(r.dep||"").trim().toLowerCase();r.deps=g?m.rows.filter(o=>o!==r&&String(o.dep||"").trim().toLowerCase()===g).map(o=>o.id):[];}});
   return m;}
+/* Lösungs-Spalten ohne jede Idee werden entfernt. Spalten mit mindestens einer Idee bleiben in ihrer Reihenfolge erhalten. Gibt true zurück, wenn etwas entfernt wurde. */
+function mkPrune(m){const n=Math.max(0,...m.rows.map(r=>r.ideas.length));const keep=[];
+  for(let i=0;i<n;i++)if(m.rows.some(r=>String(r.ideas[i]||"").trim()))keep.push(i);
+  if(keep.length===n)return false;
+  m.rows.forEach(r=>{r.ideas=keep.map(i=>r.ideas[i]||"");});return true;}
 VIEWS.morpho=()=>{
   const m=mkNorm(getTool("morph",MORPH_DEF));const ro=!S.canWrite||S.offline;
   const nrOf=id=>m.rows.findIndex(o=>o.id===id)+1;
@@ -1238,7 +1243,9 @@ VIEWS_after.morpho=()=>{
   const fit=el=>{el.style.height="auto";el.style.height=el.scrollHeight+2+"px";};
   document.querySelectorAll("textarea[data-mk]").forEach(el=>{fit(el);el.addEventListener("input",()=>fit(el));});
   document.querySelectorAll("[data-mk]").forEach(el=>{el.oninput=()=>{fit(el);const m=get();const r=m.rows[+el.dataset.r];if(el.dataset.mk==="idea"){while(r.ideas.length<=+el.dataset.i)r.ideas.push("");r.ideas[+el.dataset.i]=el.value;}else r[el.dataset.mk]=el.value;put(m);};});
-  document.querySelectorAll("[data-mkdel]").forEach(b=>b.onclick=()=>{const m=get();const [gone]=m.rows.splice(+b.dataset.mkdel,1);m.rows.forEach(r=>{r.deps=r.deps.filter(id=>id!==gone.id);});put(m,1);});
+  /* Beim Verlassen eines Idee-Feldes (change) leere Lösungs-Spalten entfernen */
+  document.querySelectorAll('[data-mk="idea"]').forEach(el=>el.addEventListener("change",()=>{const m=get();if(mkPrune(m))put(m,1);}));
+  document.querySelectorAll("[data-mkdel]").forEach(b=>b.onclick=()=>{const m=get();const [gone]=m.rows.splice(+b.dataset.mkdel,1);m.rows.forEach(r=>{r.deps=r.deps.filter(id=>id!==gone.id);});mkPrune(m);put(m,1);});
   document.querySelectorAll("[data-mkdep]").forEach(b=>b.onclick=()=>{const [i,j]=b.dataset.mkdep.split("|").map(Number);const m=get();const a=m.rows[i],o=m.rows[j];if(!a||!o)return;const on=a.deps.includes(o.id);
     if(on){a.deps=a.deps.filter(x=>x!==o.id);o.deps=o.deps.filter(x=>x!==a.id);}else{a.deps.push(o.id);if(!o.deps.includes(a.id))o.deps.push(a.id);}put(m,1);});
   document.querySelectorAll("[data-mkmv]").forEach(b=>b.onclick=()=>{const [i,dd]=b.dataset.mkmv.split("|").map(Number);const m=get();const j=i+dd;if(j<0||j>=m.rows.length)return;const t=m.rows[i];m.rows[i]=m.rows[j];m.rows[j]=t;put(m,1);});
