@@ -79,7 +79,7 @@ Jeder Eintrag im `postfach.json` hat diese Pflichtfelder:
 |---|---|---|
 | `aufgabe` | Neue Aufgabe in `tasks.json` | optional `who`, `due`, `prio` |
 | `entscheidung` | Neue Entscheidung (`tasks.json`, `typ: entscheidung`) | optional `who`, `due`, `prio` |
-| `daten` | Vorschlag, einen Eintrag in einer Sammlung anzulegen, zu ändern oder zu löschen. Jede Änderung im Web ist ein `daten`-Vorschlag. | `coll` (Sammlung), `docId` (ID des Eintrags), `payload` (neuer Inhalt), `alt` (Stand vor dem ersten Vorschlag), `loeschen` (true bei Löschung) |
+| `daten` | Vorschlag, einen Eintrag in einer Sammlung anzulegen, zu ändern oder zu löschen. Jede Änderung im Web ist ein `daten`-Vorschlag, außer bei Aufgaben und Entscheidungen (Abschnitt 9, Nr. 5). | `coll` (Sammlung), `docId` (ID des Eintrags), `payload` (neuer Inhalt), `alt` (Stand vor dem ersten Vorschlag), `loeschen` (true bei Löschung) |
 | `kilog` | KI-Logbuch-Eintrag (`kilog.json`) | `fach` (true/false) |
 | `abschluss` | Beleg, dass ein offener Punkt erledigt ist | `beleg` (Dateiname), `ziel` |
 | `aenderung` | Eintrag für die Änderungsdoku (`changes.json`). Nur nach Freigabe des Pflichtenhefts. | |
@@ -134,6 +134,7 @@ Nur diese Schreibwege sind direkt, alles andere läuft über das Postfach:
 2. **Spiegelung Aufgabe ↔ Checkliste:** Ändert Janek eine Aufgabe und übernimmt sie, wird die zugehörige Checkliste automatisch mitgeführt. Sie ist abgeleitet, kein eigener Vorschlag.
 3. **Checklisten und Werkzeuge:** Haken in Checklisten (`checks`) und Eingaben in den Werkzeugen (Morph. Kasten, Bewertung: `tools`) werden direkt gespeichert. Sie sind laufende Arbeitsstände und würden das Postfach überfluten.
 4. **Archiv-Upload:** Die Datei selbst wird direkt unter `docs/archiv` abgelegt (Binärdateien lassen sich nicht im Postfach vorschlagen). Der Metadaten-Eintrag in `files.json` läuft als Vorschlag. Bis zur Übernahme ist die Datei im Archiv vorhanden, aber in der Liste nicht sichtbar.
+5. **Aufgaben und Entscheidungen (`tasks`):** Anlegen, Bearbeiten und Status setzen wirken sofort, ohne Postfach-Vorschlag (Janek, 24.11.2026). Die Änderung steht nach dem Speichern im Browser und wird mit „Aktualisieren“ nach `cockpit/daten/` committet. Löschen bleibt ein Vorschlag im Postfach. Ein Verlauf entsteht für diese Änderungen nicht im Postfach.
 
 ## 10. Branch und Commits
 

@@ -23,13 +23,17 @@ Die Präfixe der IDs (`t-`, `e-`, `p-`, `k-`, `d-`, …) stehen in `CLAUDE.md`, 
 ## Bearbeiten im Cockpit
 Oben rechts „Bearbeiten freischalten“ wählen und ein GitHub-Zugriffstoken einfügen (fein abgestuftes Token, nur dieses Repo, Berechtigung „Contents: Read and write“). Das Token bleibt nur im Browser.
 
-**Jede Änderung an Daten wird ein Vorschlag im Postfach** (Art `daten`). Ausnahmen: Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung) werden direkt gespeichert.
+**Jede Änderung an Daten wird ein Vorschlag im Postfach** (Art `daten`). Ausnahmen: Aufgaben und Entscheidungen werden beim Speichern direkt übernommen. Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung) werden ebenfalls direkt gespeichert.
 1. Bearbeiten, Löschen oder Ziehen in der Oberfläche legt einen Vorschlag an. Die Daten bleiben unverändert.
 2. Unten links erscheint „N Änderungen nur im Browser“. „Aktualisieren“ schreibt die Vorschläge in einem Commit nach `cockpit/daten/postfach.json`. „Verwerfen“ nimmt sie zurück.
 3. Im Postfach übernimmst du den Vorschlag oder verwirfst ihn. Erst die Übernahme schreibt den Eintrag in die Sammlung.
 4. Änderst du denselben Eintrag mehrfach, wird der offene Vorschlag aktualisiert. Er wird nicht doppelt angelegt.
 
-Die Anzeige im Browser ändert sich erst nach der Übernahme. Bis dahin bleibt der alte Stand sichtbar, mit dem offenen Vorschlag im Postfach.
+Die Anzeige im Browser ändert sich bei anderen Sammlungen erst nach der Übernahme. Bis dahin bleibt der alte Stand sichtbar, mit dem offenen Vorschlag im Postfach.
+
+**Aufgaben und Entscheidungen** wirken beim Speichern sofort (ohne Übernahme). Die Änderung landet mit „Aktualisieren“ im Commit. Löschen läuft weiter über das Postfach.
+
+**Suche:** Die Suche oben links (oder Taste `/`) findet auch Kennungen wie `T-001`, `E-001`, `R-001` oder `P-085` und öffnet den Eintrag direkt.
 
 ## Aufgaben und Entscheidungen
 - Aufgaben haben die Status offen, in Arbeit, erledigt, entfallen.

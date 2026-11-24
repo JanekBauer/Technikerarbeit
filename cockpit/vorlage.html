@@ -511,10 +511,11 @@ function typing(){const a=document.activeElement;return !!(a&&$("#main").contain
 function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=null;if(S.terminId&&!typing()&&!tTyping()){renderTermin();S.dirty=true;return;}if(S.taskId&&!typing()){renderTask();S.dirty=true;return;}if(S.modalOpen||typing()){S.dirty=true;return;}render();});}
 document.addEventListener("focusout",()=>setTimeout(()=>{if(S.dirty&&!S.modalOpen&&!typing())render();},300));
 
-/* Schreiben: Änderungen an Daten gehen zuerst als Vorschlag in den Postfach-Eingang (kind „daten“).
-   Erst die Übernahme im Postfach schreibt sie direkt (saveDirect / delDirect). Ausnahme: der Postfach selbst. */
-/* Ausnahmen: Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung) werden direkt gespeichert, nicht als Vorschlag. */
-const DIRECT_COLLS=["checks","tools"];
+/* Schreiben: Änderungen an Daten gehen als Vorschlag in den Postfach-Eingang (kind „daten“).
+   Erst die Übernahme im Postfach schreibt sie direkt (saveDirect / delDirect).
+   Ausnahmen, die direkt gespeichert werden: der Postfach selbst, Aufgaben und Entscheidungen (tasks),
+   Checklisten-Haken und Werkzeuge (Morph. Kasten, Bewertung). */
+const DIRECT_COLLS=["tasks","checks","tools"];
 async function save(coll,id,obj){
   if(!S.db||!S.canWrite)return false;
   if(coll==="postfach"||DIRECT_COLLS.includes(coll))return saveDirect(coll,id,obj);
@@ -529,7 +530,8 @@ async function saveDirect(coll,id,obj){
 }
 async function del(coll,id){
   if(!S.db||!S.canWrite)return false;
-  if(coll==="postfach"||DIRECT_COLLS.includes(coll))return delDirect(coll,id);
+  /* Löschen von Aufgaben und Entscheidungen bleibt ein Vorschlag im Postfach (nur Bearbeiten wirkt sofort). */
+  if(coll==="postfach"||(DIRECT_COLLS.includes(coll)&&coll!=="tasks"))return delDirect(coll,id);
   return proposeChange(coll,id,null,true);
 }
 async function delDirect(coll,id){
@@ -715,7 +717,7 @@ const byNr=(a,b)=>String(a.nr).localeCompare(String(b.nr),"de",{numeric:true});
 /* ---------- Ansichten ---------- */
 /* ---------- Suche, Befehle und Wochenübersicht ---------- */
 const SRC=[
- ["tasks","Punkt","aufgaben",r=>r.title,r=>[r.note,r.who,r.chat]],
+ ["tasks","Punkt","aufgaben",r=>(r.nr?r.nr+" ":"")+String(r.title||""),r=>[r.note,r.who,r.chat]],
  ["deadlines","Termin","zeitleiste",r=>r.title,r=>[r.note,r.date]],
  ["reqs","Anforderung","anforderungen",r=>(r.nr?r.nr+" ":"")+String(r.text||"").split("\n")[0],r=>[r.group,r.text,r.source]],
  ["sources","Quelle","quellen",r=>r.text,r=>[r.used,r.kind]],
@@ -723,6 +725,7 @@ const SRC=[
  ["sensors","Sensor","sensoren",r=>[r.maker,r.model,r.variant].filter(Boolean).join(" "),r=>[r.principle,r.range]],
  ["files","Datei","dateien",r=>(r.family?r.family+" – ":"")+(r.name||""),r=>[r.ver,r.note,r.folder]],
  ["kilog","KI-Logbuch","ki-logbuch",r=>r.purpose||r.zweck,r=>[r.help,r.ergebnis,r.chat]],
+ ["postfach","Postfach-Eintrag","postfach",r=>r.title,()=>[]],
 ];
 const NEWS=[["tasks","Neuer offener Punkt"],["deadlines","Neuer Termin"],["reqs","Neue Anforderung"],["decisions","Neue Entscheidung"],["sources","Neue Quelle"],["doku","Neues Kapitel"],["sensors","Neuer Sensor"]];
 /* ---------- Wochenberichte: jeder Bericht läuft Freitag 07:30 bis nächsten Freitag 07:30 ---------- */
@@ -1719,7 +1722,7 @@ function renderTask(first){
   const ro=!S.canWrite||S.offline;
   const dl=t.due?terminFor(t.due):null;
   $("#modal").innerHTML=`<div class="modal-bg" data-close="1"><div class="modal wide" role="dialog" aria-modal="true" aria-label="${esc(t.title)}">
-   <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">Offener Punkt${t.prio?" · Prio "+esc(t.prio):""}</span><h2>${esc(t.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn sm" id="kedit">Bearbeiten</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
+   <div class="toolbar" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${t.nr?esc(t.nr)+" · ":""}Offener Punkt${t.prio?" · Prio "+esc(t.prio):""}</span><h2>${esc(t.title)}</h2></div><div style="display:flex;gap:8px;flex-wrap:wrap">${ro?"":`<button class="btn sm" id="kedit">Bearbeiten</button>`}<button class="btn" data-close="1">Schließen</button></div></div>
    <p class="small muted" style="margin:4px 0">${esc(t.who||"")}${t.chat?" · Chat "+esc(t.chat):""} · ${dueCell(t.due,false)} · ${stPill(t.status)}${dl?` · vor Termin „<a href="#" id="dllink">${esc(dl.title)}</a>“`:""}</p>
    ${t.note?`<p>${nl(t.note)}</p>`:""}
    ${ro?"":`<div class="tsec"><h3>Status</h3><div class="toolbar" style="margin:0">${["offen","in Arbeit","erledigt"].filter(s=>s!==t.status).map(s=>`<button class="btn sm" data-kstat="${s}">auf „${s}“</button>`).join("")}</div></div>`}
@@ -1766,7 +1769,9 @@ function palBuild(q){
   const out=[];
   NAV.forEach(g=>g[1].forEach(([k,l])=>{if(!t.length||hit(l,[])>=0)out.push({k:"Seite",label:l,score:3,go:()=>{location.hash="#"+k;}});}));
   if(S.canWrite&&!S.offline)NEWS.forEach(([c,l])=>{if(!t.length||hit(l,[])>=0)out.push({k:"Neu anlegen",label:l,score:t.length?1.5:0,go:()=>openEditor(c,null)});});
-  if(t.length)SRC.forEach(([c,kind,view,lab,ext])=>{(S.data[c]||[]).forEach(r=>{const s=hit(lab(r),ext(r));if(s>=0)out.push({k:kind,label:String(lab(r)||"(ohne Titel)").slice(0,140),score:s,go:()=>palOpen(c,view,r.id)});});});
+  /* Kennungen wie T-001 (Aufgabe), E-001 (Entscheidung), R-001 usw. finden den Eintrag direkt und stehen oben. */
+  const qCode=nrm(q).trim();
+  if(t.length)SRC.forEach(([c,kind,view,lab,ext])=>{(S.data[c]||[]).forEach(r=>{const code=[r.nr,r.id].map(nrm);const exact=!!qCode&&code.indexOf(qCode)>=0;const s=hit(lab(r),ext(r).concat([r.nr,r.id]));if(exact||s>=0)out.push({k:kind,label:String(lab(r)||"(ohne Titel)").slice(0,140),score:exact?5:s,go:()=>palOpen(c,view,r.id)});});});
   out.sort((a,b)=>b.score-a.score);
   return out.slice(0,40);
 }
