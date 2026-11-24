@@ -398,6 +398,17 @@ h3 a.small:hover{text-decoration:underline}
   }
   refresh();
   Object.keys(PEND).forEach(function(c){if(PEND[c].local)DATA[c]=PEND[c].local;});
+  /* Leere Lösungs-Spalten des Morph. Kasten auch aus einem alten Browser-Entwurf entfernen (Gegenstück zu mkPrune in der Oberfläche) */
+  (function pruneMorphDraft(){
+    var t=PEND.tools&&PEND.tools.local;if(!t)return;
+    var m=t.filter(function(o){return o.id==="morph";})[0];if(!m||!m.rows)return;
+    var n=0;m.rows.forEach(function(r){n=Math.max(n,(r.ideas||[]).length);});
+    var keep=[];for(var i=0;i<n;i++){if(m.rows.some(function(r){return String((r.ideas||[])[i]||"").trim();}))keep.push(i);}
+    if(keep.length===n)return;
+    m.rows.forEach(function(r){r.ideas=keep.map(function(i){return (r.ideas||[])[i]||"";});});
+    PEND.tools.msgs.push("Morph. Kasten: leere Lösungs-Spalten entfernt");
+    DATA.tools=t;savePend();
+  })();
   showBar();
 })();
 </script>
