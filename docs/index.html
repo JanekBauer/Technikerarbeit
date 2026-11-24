@@ -887,7 +887,7 @@ VIEWS_after.aufgaben=()=>{
 VIEWS.einstellungen=()=>{
   const can=S.canWrite&&!S.offline;
   const rows=(S.data.optionen||[]).filter(o=>o.feld==="person").sort((a,b)=>String(a.wert).localeCompare(String(b.wert),"de"));
-  return `<div class="head"><div><h1>Optionen</h1><p>Umbenennen oder Löschen wirkt nur auf die Auswahl. Eingetragene Einträge behalten ihren Text.</p></div></div>`+
+  return `<div class="head"><div><h1>Optionen</h1><p>Umbenennen oder Löschen wirkt nur auf die Auswahl, nicht auf bestehende Einträge.</p></div></div>`+
     (can?`<div class="toolbar"><input id="optnew" placeholder="Neue Person oder Abteilung" aria-label="Neue Option" style="min-width:260px"><button class="btn pri" id="optadd">Hinzufügen</button></div>`:"")+
     `<div class="tbl"><table><thead><tr><th>Name</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr><td><input value="${esc(o.wert)}" data-optname="${esc(o.id)}" ${can?"":"disabled"} style="width:100%"></td><td>${can?`<button class="btn sm danger" data-optdel="${esc(o.id)}">Löschen</button>`:""}</td></tr>`).join("")||'<tr><td colspan="2" class="empty">Noch keine Optionen.</td></tr>'}</tbody></table></div>`;
 };
@@ -903,7 +903,7 @@ VIEWS.postfach=()=>{
   const show=lsGet("pfDrop",false);
   const inbox=S.data.postfach.filter(p=>p.status==="neu").sort((a,b)=>(a.kind||"").localeCompare(b.kind||"")||String(a.title||"").localeCompare(String(b.title||""),"de"));
   const dropped=S.data.postfach.filter(p=>p.status==="verworfen");
-  const head=`<div class="head"><div><h1>Postfach</h1><p>Vorschläge landen zuerst hier. Du übernimmst oder verwirfst sie. Der Altbestand ist mit „Altbestand“ markiert.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
+  const head=`<div class="head"><div><h1>Postfach</h1><p>Vorschläge landen zuerst hier. Übernehmen oder verwerfen.</p></div>${newBtn("postfach","Neuer Eintrag")}</div>`;
   return head+`<div class="toolbar"><span class="pill p-acc">${inbox.length} im Eingang</span><span style="flex:1"></span>${can?'<button class="btn" id="pruefbtn">Dokumente prüfen</button>':""}<label class="small"><input type="checkbox" id="pfdrop" ${show?"checked":""}> ${dropped.length} verworfene anzeigen</label></div>`+
     listTable("postfach",inbox,[["kind","Art",r=>pill(r.kind||"–","p-acc")],["title","Vorschlag"],["vorschlag","Quelle / Vorschlag von",r=>`<span class="small">${esc(r.vorschlag||"")}</span>`],["aktion","",r=>can?`<button class="btn sm pri" data-pfaccept="${esc(r.id)}">Übernehmen</button> <button class="btn sm" data-pfreject="${esc(r.id)}">Verwerfen</button>`:""]],{empty:"Der Eingang ist leer."})+
     (show?`<h3 style="margin-top:18px">Verworfen (${dropped.length})</h3><p class="small muted">Zum Wiederherstellen Eintrag antippen und den Eingang auf „neu“ setzen.</p>`+
@@ -1015,7 +1015,7 @@ async function pfAcceptRaw(id,pre){
 VIEWS.aenderungsdoku=()=>{
   const ch=S.data.changes.slice().sort((a,b)=>String(a.ver).localeCompare(String(b.ver),"de",{numeric:true})||(a.date||"").localeCompare(b.date||""));
   const tsv=["Version\tDatum\tKapitel\tÄnderung\tGrund\tEntschieden von"].concat(ch.map(r=>[r.ver,fd(r.date),r.chap,(r.change||"").replace(/\n/g," "),(r.reason||"").replace(/\n/g," "),r.by].join("\t"))).join("\n");
-  return `<div class="head"><div><h1>Änderungsdoku</h1><p>Bleibt leer, bis das Pflichtenheft unterschrieben ist. Als Tabelle nach Word kopierbar.</p></div>${newBtn("changes","Neue Änderung")}</div>
+  return `<div class="head"><div><h1>Änderungsdoku</h1><p>Bleibt leer, bis das Pflichtenheft unterschrieben ist. Kopierbar nach Word.</p></div>${newBtn("changes","Neue Änderung")}</div>
   <div class="toolbar"><span class="pill p-acc">${ch.length} Einträge</span><span style="flex:1"></span><button class="btn" id="chcopy">Für Word kopieren</button></div>`+
   listTable("changes",ch,[["ver","Version",r=>`<span class="num">${esc(r.ver)}</span>`],["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["chap","Kapitel"],["change","Änderung"],["reason","Grund"],["by","Entschieden von"]],{empty:"Noch keine Änderungen. Einträge kommen erst nach der Unterschrift des Pflichtenhefts."})+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(tsv)}</textarea>`;
@@ -1025,7 +1025,7 @@ VIEWS_after.aenderungsdoku=()=>{const c=$("#chcopy");if(c)c.onclick=()=>copyText
 VIEWS.zeitleiste=()=>{
   const all=S.data.deadlines.filter(d=>d.date).sort((a,b)=>a.date<b.date?-1:1);
   const svg=timelineSvg();
-  return `<div class="head"><div><h1>Terminleiste</h1><p>Schulische und betriebliche Termine.<br><span style="color:var(--ok)">Grün</span> = erledigt · <span style="color:var(--warn)">Gelb</span> = Betrieb · <span style="color:var(--accent)">Blau</span> = Schule</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
+  return `<div class="head"><div><h1>Terminleiste</h1><p>Schule und Betrieb. <span style="color:var(--ok)">Grün</span> = erledigt · <span style="color:var(--warn)">Gelb</span> = Betrieb · <span style="color:var(--accent)">Blau</span> = Schule</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="icsbtn">In Kalender übernehmen (.ics)</button>${newBtn("deadlines","Neuer Termin")}</div></div>
   <div class="panel" style="overflow-x:auto;margin-bottom:14px">${svg}</div>`+
   listTable("deadlines",all.concat(S.data.deadlines.filter(d=>!d.date)),{termin:1},[["nr","#",r=>{const i=all.indexOf(r);return `<span class="num">${i<0?"–":i+1}</span>`;}],["title","Termin"],["date","Datum",r=>`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${r.approx?"ca. ":""}${dueCell(r.date,r.status==="erledigt")}</div>`],["kind","Art",r=>pill(r.kind==="betrieb"?"Betrieb":"Schule",r.kind==="betrieb"?"p-warn":"p-acc")],["status","Status",r=>stPill(r.status)],["note","Notiz",r=>`<span class="small">${nl(r.note)}</span>`]])+frBlock();
 };
@@ -1065,7 +1065,7 @@ VIEWS.anforderungen=()=>{
   const rsort=lsGet("reqSort","nr");const rows=reqSorted(S.data.reqs,rsort);const W=reqWarnings();
   const wfor=r=>W.filter(w=>w[0]===r).map(w=>w[1]);
   const fOpen=rows.filter(r=>r.art==="F"&&r.status!=="bestätigt").length;
-  return `<div class="head"><div><h1>Anforderungsliste</h1><p>F = Festanforderung (muss erfüllt sein, wird nicht gewichtet), M = Mindestanforderung, W = Wunschanforderung. Werte nur mit Quelle und Datum vom Betrieb als „bestätigt“ markieren.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reqcopy">Als Tabelle kopieren</button>${newBtn("reqs","Neue Anforderung")}</div></div>
+  return `<div class="head"><div><h1>Anforderungsliste</h1><p>F = Festanforderung, M = Mindestanforderung, W = Wunschanforderung. Nur mit Quelle und Datum als „bestätigt“ markieren.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reqcopy">Als Tabelle kopieren</button>${newBtn("reqs","Neue Anforderung")}</div></div>
   <div class="toolbar"><select id="reqsort" aria-label="Sortierung">${REQ_SORTS.map(([v,l])=>`<option value="${v}" ${rsort===v?"selected":""}>${l}</option>`).join("")}</select>${pill(rows.length+" Anforderungen","p-acc")} ${pill(rows.filter(r=>r.status==="bestätigt").length+" bestätigt","p-ok")} ${pill(fOpen+" F noch nicht bestätigt",fOpen?"p-warn":"p-ok")}</div>`+
   listTable("reqs",rows,[["nr","Nr.",r=>`<span class="num">${esc(r.nr)}</span>`],["art","Art",r=>r.art&&r.art!=="–"?pill(r.art,r.art==="F"?"p-bad":r.art==="M"?"p-warn":"p-acc"):""],["text","Anforderung",r=>`${r.group?`<div class="small muted">${esc(r.group)}</div>`:""}${nl(r.text)}`],["min","min.",r=>`<span class="num">${esc(r.min)}</span>`],["exact","exakt",r=>`<span class="num">${esc(r.exact)}</span>`],["max","max.",r=>`<span class="num">${esc(r.max)}</span>`],["unit","Einheit"],["status","Status",r=>stPill(r.status)],["source","Quelle",r=>`<span class="small">${esc(r.source)}${r.date?"<br>"+fd(r.date):""}</span>`],["w","Prüfung",r=>{const w=wfor(r);return w.length?w.map(x=>pill(x,"p-warn")).join(" "):pill("ok","p-ok");}]])+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(["Nr.\tArt\tAnforderung\tSymbol\tmin.\texakt\tmax.\tEinheit"].concat(rows.map(r=>[r.nr,r.art,(r.text||"").replace(/\n/g," "),r.sym,r.min,r.exact,r.max,r.unit].map(v=>v==null?"":v).join("\t"))).join("\n"))}</textarea>`;
@@ -1085,7 +1085,7 @@ VIEWS.entscheidungen=()=>{
     const shown=c==="entschieden"?list.slice(0,10):list;
     return `<div class="bcol" data-col="${c}"><div class="bh"><b>${c}</b><span class="muted small">${list.length}</span></div>${shown.map(card).join("")||'<div class="empty small">–</div>'}${list.length>shown.length?`<div class="small muted" style="padding:4px">… ${list.length-shown.length} weitere</div>`:""}</div>`;
   }).join("");
-  return `<div class="head"><div><h1>Entscheidungen</h1><p>Eine Entscheidung gilt als getroffen, sobald die verknüpfte Aufgabe mit Antwort erledigt ist. Von Hand schließt du sie mit „Entschieden von“ und „Begründung“ ab.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
+  return `<div class="head"><div><h1>Entscheidungen</h1><p>Gilt als getroffen, wenn die verknüpfte Aufgabe mit Antwort erledigt ist. Sonst mit „Entschieden von“ und „Begründung“ abschließen.</p></div>${newBtn("decisions","Neue Entscheidung")}</div>
   <div class="toolbar"><span class="pill p-warn">${openN} offen</span></div>
   <div class="board" style="--cols:3">${board}</div>`;
 };
@@ -1117,7 +1117,7 @@ const MAT={nitinol:{n:"Nitinol (austenitisch)",E:75,rho:6.45},nitinolM:{n:"Nitin
 const CASES={ss:{n:"Zwei Stützen, gelenkig (Einfeldträger)",k:5/384},ff:{n:"Beidseitig eingespannt",k:1/384},cont:{n:"Viele Stützen, Innenfeld (Durchlaufträger, Näherung)",k:1/384*1.0},cant:{n:"Kragarm (überstehendes Ende)",k:1/8}};
 VIEWS.rechner=()=>{
   const c=lsGet("calc",{mat:"nitinol",E:"",D:6.5,s:0.3,L:300,cs:"ss",fz:0.01,dmin:1.0,dmax:6.5,tol:10});
-  return `<div class="head"><div><h1>Rechner</h1><p>Zur Kontrolle deiner eigenen Rechnungen. In der Doku stehen dein Rechenweg und deine Quellen, nicht dieses Ergebnis. Werkstoffwerte sind Richtwerte. Jeder Wert braucht eine Quelle.</p></div></div>
+  return `<div class="head"><div><h1>Rechner</h1><p>Zur Kontrolle eigener Rechnungen. In der Doku stehen Rechenweg und Quellen, nicht dieses Ergebnis.</p></div></div>
   <div class="grid g2">
    <div class="panel calc"><h3>Durchbiegung durch Eigengewicht</h3>
     <div class="in"><label for="c_mat">Werkstoff<select id="c_mat">${Object.entries(MAT).map(([k,m])=>`<option value="${k}" ${c.mat===k?"selected":""}>${m.n}</option>`).join("")}</select></label>
@@ -1216,7 +1216,7 @@ VIEWS.sensoren=()=>{
   const ds=r=>{const d=docs(r);const u=String(r.url||"").trim();const ok=/^https?:\/\//i.test(u);
     return (r.docs||[]).length?d:(ok?`<a class="small" href="${esc(u)}" target="_blank" rel="noopener" data-noedit>Hersteller-Link</a>`:`<span class="pill p-warn">fehlt</span>`);};
   const openCols=[["maker","Hersteller"],["model","Modell",r=>`<b>${esc(r.model)}</b>${r.variant?`<div class="small muted">${esc(r.variant)}</div>`:""}`],["principle","Prinzip",r=>`<span class="small">${esc(r.principle||"")}</span>`],["docs","Datenblatt",ds],["rep","Wiederhol&shy;genauigkeit",r=>`<span class="small clamp w150" title="${esc((r.rep||"")+(r.repcond?" – "+r.repcond:""))}">${esc(r.rep||"–")}</span>`],["rate","Rate",r=>`<span class="small clamp w150" title="${esc(r.rate||"")}">${esc(r.rate||"–")}</span>`],["det","Alle Werte",det],["fragen","Offene Punkte",r=>`<span class="small clamp" title="${esc(r.fragen||"")}">${esc(r.fragen||"")}</span>`],["source","Quelle",r=>`<span class="small">${esc(r.source||"")}</span>`]];
-  return `<div class="head"><div><h1>Sensorvergleich</h1><p>Sensoren für Ø 1,0 bis 6,5 mm. Varianten tragen hinter der Grundnummer x.1, x.2 usw.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
+  return `<div class="head"><div><h1>Sensorvergleich</h1><p>Sensoren für Ø 1,0 bis 6,5 mm. Varianten tragen x.1, x.2 usw.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sxlsx">Als Excel-Datei speichern</button>${newBtn("sensors","Neuer Sensor")}</div></div>
   <div class="katrow">${katHtml}</div>
   ${kat.hint?`<details class="hintbox"><summary>Auswahlregel und was aus jedem Datenblatt herausgelesen wird</summary><p class="small">${esc(kat.hint)}</p></details>`:""}
   <div class="sensT">${listTable("sensors",on,cols)}</div>
@@ -1240,7 +1240,7 @@ VIEWS.morpho=()=>{
   const m=mkNorm(getTool("morph",MORPH_DEF));const ro=!S.canWrite||S.offline;
   const nrOf=id=>m.rows.findIndex(o=>o.id===id)+1;
   const cols=Math.max(3,...m.rows.map(r=>r.ideas.length));
-  let h=`<div class="head"><div><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungen. Eine Lösung je Teilfunktion ergibt eine Kombination (Konzept). Nicht umsetzbare Lösungen gleich streichen; Varianten, die Festanforderungen nicht erfüllen, werden nicht weiterverfolgt. Unter „Gemeinsam entscheiden mit“ die Nummern der Teilfunktionen anklicken, die nur gemeinsam mit dieser Zeile entschieden werden dürfen (UP4) – die Verknüpfung gilt automatisch in beide Richtungen. Die Konzepte (Kombinationen) stellst du in der Variantenauswahl zusammen. Gespeichert wird automatisch.</p></div>
+  let h=`<div class="head"><div><h1>Morphologischer Kasten</h1><p>Zeilen = Teilfunktionen, Spalten = Lösungen. Eine Lösung je Teilfunktion ergibt ein Konzept. Mit „Gemeinsam entscheiden mit“ verknüpfst du Teilfunktionen, die nur zusammen entschieden werden. Speichert automatisch.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="mk_addcol">Ideen-Spalte +</button><button class="btn pri" id="mk_addrow">Teilfunktion +</button></div>`}</div>
   <div class="tbl mk"><table><thead><tr><th>Nr.</th><th>Teilfunktion</th><th>Gemeinsam entscheiden mit</th>${Array.from({length:cols},(_,i)=>`<th>Lösung ${i+1}</th>`).join("")}<th></th></tr></thead><tbody>`;
   if(!m.rows.length)h+=`<tr><td colspan="${cols+4}" class="empty">Noch keine Teilfunktionen. Leg mit „Teilfunktion +“ die erste an.</td></tr>`;
@@ -1275,7 +1275,7 @@ VIEWS.variantenauswahl=()=>{
   const cell=(v,vi,a)=>`<input data-evd="${esc(a.id)}" data-v="${vi}" value="${esc((v.desc&&v.desc[a.id])||"")}" ${ro?"readonly":""} aria-label="${esc(a.name)} für ${esc(v.name)}" style="width:100%;min-width:90px;${inp}">`;
   const konz=!m.rows.length?'<div class="empty">Noch keine Teilfunktionen im Morph. Kasten.</div>':
     `<div class="tbl mk"><table><thead><tr><th>Teilfunktion</th>${mv.map((k,ki)=>`<th><div class="toolbar" style="margin:0"><input data-mvname="${ki}" value="${esc(k.name)}" ${ro?"readonly":""} aria-label="Konzeptname" style="flex:1;min-width:80px;font-weight:600;${inp}">${ro?"":`<button class="btn sm" data-mvdel="${ki}" aria-label="Konzept löschen">×</button>`}</div></th>`).join("")}</tr></thead><tbody>${m.rows.map((r,ri)=>`<tr><td class="small"><b>TF${ri+1}</b> ${esc(r.fn||"")}</td>${mv.map((k,ki)=>`<td><select data-mvpick="${ri}" data-mv="${ki}" ${ro?"disabled":""} aria-label="Lösung TF${ri+1} für ${esc(k.name)}" style="max-width:220px"><option value="">–</option>${(r.ideas||[]).filter(x=>String(x).trim()).map(x=>`<option value="${esc(x)}" ${(k.pick||{})[r.id]===x?"selected":""}>${esc(x)}</option>`).join("")}</select></td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
-  return `<div class="head"><div><h1>Variantenauswahl</h1><p>Ablauf: 1. Konzepte zusammenstellen: je Teilfunktion eine Lösung wählen, nur verträgliche Kombinationen. 2. Varianten für die Bewertung übernehmen und Festanforderungen prüfen; Varianten, die eine Festanforderung nicht erfüllen, scheiden aus. 3. Varianten beschreiben, damit die Bewertung darauf angewendet werden kann.</p></div>
+  return `<div class="head"><div><h1>Variantenauswahl</h1><p>1. Konzepte zusammenstellen. 2. Festanforderungen prüfen. 3. Varianten für die Bewertung beschreiben.</p></div>
   ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="mk_addvar">Konzept +</button><button class="btn" id="ev_impv">Konzepte in Bewertung übernehmen</button></div>`}</div>
   <div class="panel"><h3>1. Konzepte zusammenstellen</h3><p class="note">Pro Konzept je Teilfunktion eine Lösung aus dem Morph. Kasten wählen. Die Konzepte werden über „Konzepte in Bewertung übernehmen“ zu Varianten.</p>
    ${mv.length?"":'<p class="note">Noch keine Konzepte. Mit „Konzept +“ anlegen.</p>'}${konz}</div>
@@ -1309,12 +1309,6 @@ VIEWS_after.variantenauswahl=()=>{
 const EVAL_DEF={criteria:[],pair:{},variants:[],hzul:""};
 /* Kriterien: Anforderungsnummer aus dem Namen, Sortierung nach Pflichtenheft, Doppelungen */
 /* Bewertungskriterien aus dem Pflichtenheft V1.2 (gewichtet) */
-const PH_KRIT=[
- {nr:"2.4",name:"2.4 Reproduzierbarkeit %GRR – Reserve zur 10-%-Grenze (M)"},
- {nr:"1.5",name:"1.5 Werkstoff: Tantal (W)"},
- {nr:"2.6",name:"2.6 Rauheit messen (W)"},
- {nr:"2.7",name:"2.7 Beschädigung oder Kontamination feststellen (W)"},
- {nr:"5.1",name:"5.1 Max. Platzbedarf L × B (W)"}];
 const critNr=c=>{const m=/^\s*(\d+(?:\.\d+)*)/.exec((c&&c.name)||"");return m?m[1]:"";};
 const critCmp=(a,b)=>{const x=critNr(a),y=critNr(b);if(!x&&!y)return 0;if(!x)return 1;if(!y)return -1;const p=x.split(".").map(Number),q=y.split(".").map(Number);for(let i=0;i<Math.max(p.length,q.length);i++){const d=(p[i]||0)-(q[i]||0);if(d)return d;}return 0;};
 function critClean(e){const keep={};const drop=new Set();const info=x=>(e.variants||[]).filter(v=>v.scores&&v.scores[x.id]!==undefined&&v.scores[x.id]!=="").length+Object.keys(e.pair||{}).filter(k=>k.split("|").indexOf(x.id)>=0).length;
@@ -1335,8 +1329,8 @@ VIEWS.bewertung=()=>{
     sens=flips.length?`<div class="banner">Das Ergebnis kippt, wenn sich diese Gewichte ändern: ${esc(flips.join(", "))}. Gewichtung mit dem Betrieb absichern.</div>`:`<p>${pill("robust","p-ok")} Die beste Variante bleibt vorn, auch wenn jedes Gewicht um ±20 % schwankt.</p>`;}
   const n=e.criteria.length;
   const pv=(i,j)=>{const a=e.criteria[i].id,b=e.criteria[j].id;if(i<j){const v=e.pair[a+"|"+b];return v===undefined||v===""?"":Number(v);}const v=e.pair[b+"|"+a];return v===undefined||v===""?"":2-Number(v);};
-  let h=`<div class="head"><div><h1>Bewertung der Varianten</h1><p>Ablauf: 1. Bewertungskriterien festlegen (ca. 5, höchstens 10, positiv formuliert: mehr Punkte = besser), 2. paarweiser Vergleich für Gewichte, 3. Punkte je Variante, 4. Nutzwert und prozentuale Erfüllung, 5. Ergebnis und Empfindlichkeit. Die Entscheidung trifft der Betrieb.</p></div>
-  ${ro?"":`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ev_impc">Kriterien aus Pflichtenheft übernehmen</button></div>`}</div>
+  let h=`<div class="head"><div><h1>Bewertung der Varianten</h1><p>1. Kriterien festlegen (ca. 5, höchstens 10, mehr Punkte = besser). 2. Gewichte vergleichen. 3. Punkte je Variante. Der Betrieb entscheidet.</p></div>
+</div>
   <div>
   <div class="panel"><h3>1. Bewertungskriterien</h3><p class="note">Ca. 5, höchstens 10 Kriterien (Aufwand). Positiv formulieren: mehr Punkte = besser. Reihenfolge wie im Pflichtenheft (K1 = erste Anforderung).</p>
    ${(()=>{const nrs=e.criteria.map(c=>critNr(c)||c.name);const dup=nrs.length-new Set(nrs).size;const unsorted=e.criteria.some((c,i,a)=>i>0&&critCmp(a[i-1],c)>0);const too=e.criteria.length>10;if(!dup&&!unsorted&&!too)return "";return `<div class="banner">${dup?dup+" Doppelung(en) mit gleicher Anforderungsnummer. ":""}${too?e.criteria.length+" Kriterien, Obergrenze 10. ":""}${unsorted?"Reihenfolge weicht vom Pflichtenheft ab. ":""}${ro?"":'<button class="btn sm" id="ev_clean">Bereinigen und nach Pflichtenheft sortieren</button>'}</div>`;})()}
@@ -1366,11 +1360,6 @@ VIEWS.bewertung=()=>{
 VIEWS_after.bewertung=()=>{
   const get=()=>getTool("eval",EVAL_DEF);const put=(e,re)=>{saveTool("eval",e);if(re)render();};
       const ac=$("#ev_addc");if(ac)ac.onclick=()=>{const t=$("#ev_newc").value.trim();if(!t)return;const e=get();e.criteria.push({id:nid(),name:t});put(e,1);};
-  const ic=$("#ev_impc");if(ic)ic.onclick=()=>{const e=get();
-    const ph=PH_KRIT.map(c=>{const old=e.criteria.find(o=>critNr(o)===c.nr);return {id:old?old.id:nid(),name:c.name};});
-    const keep=new Set(ph.map(c=>c.id));
-    e.criteria.filter(o=>!keep.has(o.id)).forEach(o=>{Object.keys(e.pair||{}).forEach(k=>{if(k.split("|").indexOf(o.id)>=0)delete e.pair[k];});(e.variants||[]).forEach(v=>{if(v.scores)delete v.scores[o.id];});});
-    e.criteria=ph;e.criteria.sort(critCmp);put(e,1);};
   const cl=$("#ev_clean");if(cl)cl.onclick=()=>{const e=get();critClean(e);put(e,1);};
   document.querySelectorAll("[data-pm]").forEach(el=>el.onchange=()=>{const e=get();const i=+el.dataset.i,j=+el.dataset.j;const a=e.criteria[i].id,b=e.criteria[j].id;const val=el.value===""?"":Number(el.value);if(i<j)e.pair[a+"|"+b]=val;else e.pair[b+"|"+a]=val===""?"":2-val;put(e,1);});
   document.querySelectorAll("[data-evdelc]").forEach(b=>b.onclick=()=>{const e=get();const c=e.criteria.splice(+b.dataset.evdelc,1)[0];Object.keys(e.pair).forEach(k=>{if(k.indexOf(c.id)>=0)delete e.pair[k];});put(e,1);});
@@ -1447,7 +1436,7 @@ VIEWS.doku=()=>{
 VIEWS.quellen=()=>{
   const rows=S.data.sources.slice().sort((a,b)=>(num(a.nr)||999)-(num(b.nr)||999));
   const txt=rows.map(r=>`[${r.nr}] ${(r.text||"").replace(/\n/g," ")}${r.kind==="Internet"&&r.accessed?" (Stand: "+fd(r.accessed)+")":""}`).join("\n");
-  return `<div class="head"><div><h1>Quellenverzeichnis</h1><p>Nummern in der Reihenfolge, in der die Quellen im Text zitiert werden. Schema: Name, Vorname: Titel. Auflage. Ort: Verlag, Jahr. Im Text: [n, S. x].</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="srccopy">Verzeichnis kopieren</button>${newBtn("sources","Neue Quelle",)}</div></div>`+
+  return `<div class="head"><div><h1>Quellenverzeichnis</h1><p>Nummern in der Reihenfolge der Zitate. Schema: Name, Vorname: Titel. Auflage. Ort: Verlag, Jahr. Im Text: [n, S. x].</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="srccopy">Verzeichnis kopieren</button>${newBtn("sources","Neue Quelle",)}</div></div>`+
   listTable("sources",rows,[["nr","Nr.",r=>`<span class="num">[${esc(r.nr)}]</span>`],["kind","Art",r=>pill(r.kind,"p-acc")],["text","Quellenangabe"],["accessed","Stand",r=>r.accessed?`<span class="num">${fd(r.accessed)}</span>`:""],["used","Verwendet in",r=>`<span class="small">${esc(r.used)}</span>`]])+
   `<textarea id="copybox" style="position:absolute;left:-9999px" aria-hidden="true">${esc(txt)}</textarea>`;
 };
@@ -1456,7 +1445,7 @@ VIEWS_after.quellen=()=>{const b=$("#srccopy");if(b)b.onclick=()=>copyText($("#c
 VIEWS["ki-logbuch"]=()=>{
   const rows=S.data.kilog.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   const f=rows.filter(r=>r.fach).length;
-  return `<div class="head"><div><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Chat, Zweck und Art. Die Formatvorlage V10 erlaubt KI nur zur sprachlichen Optimierung. Rot markierte Einträge musst du selbst überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
+  return `<div class="head"><div><h1>KI-Logbuch</h1><p>Jede KI-Hilfe mit Datum, Zweck und Art. Laut Formatvorlage V10 nur zur sprachlichen Optimierung. Rot markierte Einträge überarbeiten oder mit Herrn Graudejus klären.</p></div>${newBtn("kilog","Neuer Eintrag")}</div>
   <div class="toolbar">${pill(rows.length+" Einträge","p-acc")} ${pill(f+" mit fachlichem Text durch KI",f?"p-bad":"p-ok")}</div>`+
   listTable("kilog",rows,[["date","Datum",r=>`<span class="num">${fd(r.date)}</span>`],["help","Art der Hilfe",r=>`<span class="small">${nl(r.help||r.purpose||r.zweck||"")}</span>`],["fach","",r=>r.fach?pill("fachlich","p-bad"):""]]);
 };
@@ -1525,7 +1514,7 @@ VIEWS.dateien=()=>{
   const folders=Object.keys(t).sort((a,b)=>a.localeCompare(b,"de",{numeric:true}));
   let nDoc=0,nFile=0,nMiss=0;folders.forEach(fo=>Object.values(t[fo]).forEach(v=>{nDoc++;v.forEach(x=>x.missing?nMiss++:nFile++);}));
   const openF=lsGet("archOpen",null);S.archVer=S.archVer||{};
-  let h=`<div class="head"><div><h1>Archiv</h1><p>Die neueste Version steht oben, ältere Stände findest du über „Verlauf“. Hochgeladene Dateien liegen öffentlich im Repo unter docs/archiv.</p></div>
+  let h=`<div class="head"><div><h1>Archiv</h1><p>Neueste Version oben, ältere über „Verlauf“. Hochgeladene Dateien liegen öffentlich im Repo unter docs/archiv.</p></div>
    <div class="facts">${can?`<button class="btn pri" id="archup">Datei hochladen</button>`:""}<button class="btn" id="zipall">Alles als ZIP</button><button class="btn" id="zipallv">ZIP mit allen Versionen</button></div></div>
    
    <div class="toolbar">${pill(nDoc+" Dokumente","p-acc")} ${pill(nFile+" Dateien","p-ok")} ${nMiss?pill(nMiss+" Versionen fehlen","p-warn"):""} <input id="archq" type="search" placeholder="Suchen …" aria-label="Archiv durchsuchen" style="flex:1 1 180px;max-width:320px"></div>`;
