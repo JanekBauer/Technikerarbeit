@@ -86,7 +86,7 @@ Ein **2D-Schattenbild** (RIFTEK RF65x.2D) ist eine **Projektion aus einer Blickr
 
 „ThruBeam mit Drehung oder 2D-Bild“ ist deshalb **kein Entweder-oder** für die Zylinderform. Die Achsen der Entscheidung sind:
 
-1. **Wie** werden mehrere Winkellagen erzeugt (Morphologischer Kasten TF3)?
+1. **Wie** werden mehrere Winkellagen erzeugt (Morphologischer Kasten TF9, Querschnitt in mehreren Winkellagen erfassen)?
 2. **Wie viele** Längenpositionen erfasst ein Messvorgang? Ein Linienstrahl erfasst eine, ein 2D-Bild einen Abschnitt.
 
 Der Statusbericht vom 22.11. (Abschnitt 4.2, „Zylinderform lässt sich aus einem Schattenbild direkt bestimmen“) wird hiermit korrigiert.
@@ -113,8 +113,8 @@ Die Bewertung und die Wahl trifft Janek. → Postfach `pv-ent-messprinzip`.
 
 Die folgenden Geräte decken nach Web-Suchergebnissen (22.11.2026) den Bereich Ø 1–6,5 mm ab und werden mit hoher Wiederholgenauigkeit beworben. **Datenblatt nicht eingesehen. Daher keine Zahlen und kein Eintrag in `sensors.json`.**
 
-- **Mitutoyo Laser-Scan-Mikrometer LSM-501S / LSM-503S** (Laser-Scan-Prinzip mit rotierendem Spiegel; in TF5 des Morphologischen Kastens schon als Prinzip genannt). Gesuchte Quelle: Mitutoyo Bulletin „Laser Scan Micrometer“ (mitutoyo.com).
-- **Aeroel (Marposs) XLS13XY**, zweiachsiges Laser-Mikrometer. In TF5 als „Aeroel – ungeprüft“ genannt. Gesuchte Quelle: Datenblatt XLS XY auf marposs.com. Laut Suchergebnis hängt die Wiederholgenauigkeit stark von der Mittelungszeit ab, Einzelmessung und Mittel über 1 s unterscheiden sich. Diese Aussage ist ungeprüft.
+- **Mitutoyo Laser-Scan-Mikrometer LSM-501S / LSM-503S** (Laser-Scan-Prinzip mit rotierendem Spiegel; in TF8 des Morphologischen Kastens schon als Prinzip genannt). Gesuchte Quelle: Mitutoyo Bulletin „Laser Scan Micrometer“ (mitutoyo.com).
+- **Aeroel (Marposs) XLS13XY**, zweiachsiges Laser-Mikrometer. In TF8 als „Aeroel – ungeprüft“ genannt. Gesuchte Quelle: Datenblatt XLS XY auf marposs.com. Laut Suchergebnis hängt die Wiederholgenauigkeit stark von der Mittelungszeit ab, Einzelmessung und Mittel über 1 s unterscheiden sich. Diese Aussage ist ungeprüft.
 
 Gesperrte Hosts in dieser Sitzung: `www.mitutoyo.com`, `www.marposs.com`, `res.cloudinary.com`, `pdf.directindustry.com`. → Postfach `pv-auf-datenblaetter`.
 
